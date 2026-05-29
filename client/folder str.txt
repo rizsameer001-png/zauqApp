@@ -1,0 +1,68 @@
+zauqapp-client/
+├── package.json              # Dependencies (React 18, Vite, Redux, i18next, Framer Motion, etc.)
+├── vite.config.js            # Vite config with code splitting
+├── tailwind.config.js        # Custom colors, fonts (Urdu/Hindi), animations
+├── postcss.config.js
+├── index.html
+│
+├── src/
+│   ├── main.jsx              # Entry point with providers
+│   ├── App.jsx               # Full routing (Public + Auth + User + Creator + Admin)
+│   ├── index.css             # Tailwind + custom Urdu/Hindi styles
+│   │
+│   ├── store/                # Redux Toolkit
+│   │   ├── index.js
+│   │   └── slices/
+│   │       ├── authSlice.js
+│   │       ├── uiSlice.js
+│   │       └── contentSlice.js
+│   │
+│   ├── i18n/                 # Multi-language (EN/HI/UR)
+│   │   ├── index.js
+│   │   └── locales/
+│   │       ├── en.json
+│   │       ├── hi.json
+│   │       └── ur.json
+│   │
+│   ├── services/             # API layer
+│   │   ├── api.js
+│   │   ├── authService.js
+│   │   └── contentService.js
+│   │
+│   ├── hooks/
+│   │   ├── useAuth.js
+│   │   └── useContent.js
+│   │
+│   ├── utils/
+│   │   ├── constants.js      # Genres, categories, plans, roles
+│   │   └── helpers.js
+│   │
+│   ├── layouts/
+│   │   ├── MainLayout.jsx
+│   │   ├── DashboardLayout.jsx
+│   │   └── AdminLayout.jsx
+│   │
+│   ├── components/
+│   │   ├── common/
+│   │   │   ├── Navbar.jsx    # Mega menu, search, language switcher
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Sidebar.jsx   # Dashboard sidebar
+│   │   │   └── TopBar.jsx
+│   │   ├── admin/
+│   │   │   ├── AdminSidebar.jsx
+│   │   │   └── AdminTopBar.jsx
+│   │   └── home/
+│   │       ├── HeroSection.jsx
+│   │       ├── TrendingSection.jsx
+│   │       ├── FeaturedAuthors.jsx
+│   │       ├── PopularBooks.jsx
+│   │       ├── VideoHighlights.jsx
+│   │       ├── DailyQuote.jsx
+│   │       └── PremiumCTA.jsx
+│   │
+│   └── pages/
+│       ├── public/           # 12 pages (Home, Explore, Poetry, Authors, Books, Videos, Search, etc.)
+│       ├── auth/             # Login & Register
+│       ├── user/             # 6 pages (Dashboard, Profile, Favorites, Downloads, History, Notifications, Subscription)
+│       ├── creator/          # 7 pages (Dashboard, Upload Poetry/Ebook/Audio/Video, Content, Revenue)
+│       └── admin/            # 10 pages (Dashboard, Users, Poetry/Author/Ebook/Video CMS, Homepage CMS, SEO, Analytics, Settings)

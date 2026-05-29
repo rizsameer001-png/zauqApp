@@ -1,0 +1,22 @@
+npm install multer-storage-cloudinary
+
+
+# Install dependencies if missing
+cd server && 
+npm install bcryptjs jsonwebtoken express-validator
+
+//admin
+$2a$12$6jl6f0J78sWctNWtRzdWHe7s20YClQJLktlHU/d8vJ8g4rmb94Kfu
+
+
+
+
+
+//moderator
+$2a$12$kmNO3GoG.WGzZFHiZ1AbAOZ0yGoZdavG8MGNiWvzcwZJyunhIQL6C
+
+
+
+
+aman -
+$2a$12$I1e3hrEfp0iyiXVk1kKB4.0CQUwHCf91DqOGEjaRBO.0FYllmxnoW

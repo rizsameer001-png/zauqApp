@@ -1,0 +1,690 @@
+
+
+
+
+
+
+
+API Routes Summary Table
+Method	Endpoint	Description	Auth
+Auth			
+POST	/api/auth/register	User registration	Public
+POST	/api/auth/login	User login	Public
+POST	/api/auth/logout	User logout	Private
+GET	/api/auth/me	Get current user	Private
+POST	/api/auth/forgot-password	Forgot password	Public
+POST	/api/auth/reset-password/:token	Reset password	Public
+Poems			
+GET	/api/poems	Get all poems	Public/Optional
+GET	/api/poems/:slug	Get poem by slug	Public/Optional
+POST	/api/poems	Create poem	Admin
+PUT	/api/poems/:id	Update poem	Admin
+DELETE	/api/poems/:id	Delete poem	Admin
+Authors			
+GET	/api/authors	Get all authors	Public
+GET	/api/authors/:slug	Get author by slug	Public/Optional
+GET	/api/authors/:slug/poems	Get author poems	Public
+POST	/api/authors	Create author	Admin
+PUT	/api/authors/:id	Update author	Admin
+DELETE	/api/authors/:id	Delete author	Admin
+Books			
+GET	/api/books	Get all books	Public
+GET	/api/books/:slug	Get book by slug	Public
+GET	/api/books/:slug/pages	Get book pages	Public/Optional
+POST	/api/books	Create book	Admin
+PUT	/api/books/:id	Update book	Admin
+DELETE	/api/books/:id	Delete book	Admin
+Audio			
+GET	/api/audio	Get all audio	Public
+GET	/api/audio/:slug	Get audio by slug	Public/Optional
+GET	/api/audio/type/:type	Get audio by type	Public
+GET	/api/audio/occasion/:occasion	Get audio by occasion	Public
+POST	/api/audio	Create audio	Admin
+PUT	/api/audio/:id	Update audio	Admin
+DELETE	/api/audio/:id	Delete audio	Admin
+Videos			
+GET	/api/videos	Get all videos	Public
+GET	/api/videos/:slug	Get video by slug	Public/Optional
+GET	/api/videos/type/:type	Get video by type	Public
+POST	/api/videos	Create video	Admin
+PUT	/api/videos/:id	Update video	Admin
+DELETE	/api/videos/:id	Delete video	Admin
+Upload			
+POST	/api/upload/image	Upload single image	Admin
+POST	/api/upload/images	Upload multiple images	Admin
+POST	/api/upload/audio	Upload audio file	Admin
+POST	/api/upload/video	Upload video file	Admin
+POST	/api/upload/pdf	Upload PDF file	Admin
+DELETE	/api/upload/delete	Delete file	Admin
+Frontend Route Structure
+text
+/                           → Home Page
+/explore                    → Explore Page
+/search                     → Search Page
+/about                      → About Page
+
+/poetry                     → Poetry List
+/poem/:slug                 → Poetry Detail
+
+/authors                    → Authors List
+/author/:slug               → Author Detail
+
+/books                      → Books List
+/book/:slug                 → Book Detail
+
+/audio                      → Audio List
+/audio/:slug                → Audio Detail
+/audio/type/:type           → Audio by Type
+/audio/occasion/:occasion   → Audio by Occasion
+
+/videos                     → Videos List
+/video/:slug                → Video Detail
+/video/type/:type           → Video by Type
+
+/login                      → Login Page
+/register                   → Register Page
+
+/dashboard                  → User Dashboard
+/dashboard/profile          → User Profile
+/dashboard/favorites        → User Favorites
+/dashboard/history          → User History
+/dashboard/downloads        → User Downloads
+
+/creator                    → Creator Dashboard
+/creator/upload-poetry      → Upload Poetry
+/creator/upload-audio       → Upload Audio
+/creator/upload-video       → Upload Video
+/creator/upload-book        → Upload Book
+/creator/analytics          → Creator Analytics
+
+/admin                      → Admin Dashboard
+/admin/users                → User Management
+/admin/poetry               → Poetry CMS
+/admin/authors              → Author CMS
+/admin/books                → Books/Ebook CMS
+/admin/audio                → Audio CMS
+/admin/videos               → Video CMS
+/admin/homepage             → Homepage CMS
+/admin/seo                  → SEO Management
+/admin/settings             → Site Settings
+
+/subscription               → Subscription Plans
+/subscription/success       → Subscription Success
+/subscription/cancel        → Subscription Cancel
+This complete routing setup covers all your application needs with proper authentication and role-based access control! 🚀
+
+Add only import notificationRoutes from './routes/notification.routes.js';
+import subscriptionRoutes from './routes/subscription.routes.js';
+Here's the updated server/server.js with the notification and subscription routes added:
+
+javascript
+// server/server.js
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
+import passport from 'passport';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import connectDB from './config/db.js';
+import { errorHandler } from './middleware/errorHandler.js';
+import { notFound } from './middleware/notFound.js';
+
+// Route imports
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import poemRoutes from './routes/poem.routes.js';
+import authorRoutes from './routes/author.routes.js';
+import bookRoutes from './routes/book.routes.js';
+import audioRoutes from './routes/audio.routes.js';
+import videoRoutes from './routes/video.routes.js';
+import categoryRoutes from './routes/category.routes.js';
+import searchRoutes from './routes/search.routes.js';
+import notificationRoutes from './routes/notification.routes.js';      // Added
+import subscriptionRoutes from './routes/subscription.routes.js';      // Added
+import analyticsRoutes from './routes/analytics.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import creatorRoutes from './routes/creator.routes.js';
+import homepageRoutes from './routes/homepage.routes.js';
+import seoRoutes from './routes/seo.routes.js';
+import uploadRoutes from './routes/upload.routes.js';
+
+dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const app = express();
+
+// ============================================
+// CORS Configuration
+// ============================================
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5173',
+  process.env.CLIENT_URL
+].filter(Boolean);
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.warn(`CORS blocked: ${origin}`);
+      callback(null, true);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+}));
+
+app.options('*', cors());
+
+// ============================================
+// Security & Middleware
+// ============================================
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' }
+}));
+app.use(cookieParser());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ extended: true, limit: '100mb' }));
+app.use(compression());
+app.use(morgan('dev'));
+app.use(passport.initialize());
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { success: false, message: 'Too many requests from this IP' }
+});
+app.use('/api/', limiter);
+
+// Static files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// ============================================
+// API Routes
+// ============================================
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/poems', poemRoutes);
+app.use('/api/authors', authorRoutes);
+app.use('/api/books', bookRoutes);
+app.use('/api/audio', audioRoutes);
+app.use('/api/videos', videoRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/notifications', notificationRoutes);      // Added
+app.use('/api/subscriptions', subscriptionRoutes);      // Added
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/creator', creatorRoutes);
+app.use('/api/homepage', homepageRoutes);
+app.use('/api/seo', seoRoutes);
+app.use('/api/upload', uploadRoutes);
+
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV,
+    routes: {
+      auth: '/api/auth',
+      users: '/api/users',
+      poems: '/api/poems',
+      authors: '/api/authors',
+      books: '/api/books',
+      audio: '/api/audio',
+      videos: '/api/videos',
+      notifications: '/api/notifications',
+      subscriptions: '/api/subscriptions'
+    }
+  });
+});
+
+// ============================================
+// Error Handling
+// ============================================
+app.use(notFound);
+app.use(errorHandler);
+
+// ============================================
+// Start Server
+// ============================================
+const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  try {
+    await connectDB();
+    console.log('✅ MongoDB Connected successfully');
+    
+    app.listen(PORT, () => {
+      console.log(`\n🚀 Server running on port ${PORT}`);
+      console.log(`📋 Allowed CORS origins: ${allowedOrigins.join(', ')}`);
+      console.log(`\n📁 API Endpoints:`);
+      console.log(`   POST   /api/auth/login`);
+      console.log(`   POST   /api/auth/register`);
+      console.log(`   GET    /api/poems`);
+      console.log(`   GET    /api/authors`);
+      console.log(`   GET    /api/books`);
+      console.log(`   GET    /api/audio`);
+      console.log(`   GET    /api/videos`);
+      console.log(`   GET    /api/notifications`);
+      console.log(`   GET    /api/subscriptions`);
+      console.log(`   POST   /api/upload/image`);
+      console.log(`\n❤️  Health check: http://localhost:${PORT}/api/health`);
+    });
+  } catch (error) {
+    console.error('❌ Server startup failed:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
+
+export default app;
+Also, ensure your notification and subscription route files exist:
+Notification Routes (server/routes/notification.routes.js)
+javascript
+// server/routes/notification.routes.js
+import express from 'express';
+import { protect } from '../middleware/auth.js';
+import {
+  getNotifications,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  getUnreadCount,
+  updatePreferences
+} from '../controllers/notification.controller.js';
+
+const router = express.Router();
+
+router.get('/', protect, getNotifications);
+router.get('/unread-count', protect, getUnreadCount);
+router.put('/:id/read', protect, markAsRead);
+router.put('/read-all', protect, markAllAsRead);
+router.delete('/:id', protect, deleteNotification);
+router.put('/preferences', protect, updatePreferences);
+
+export default router;
+Subscription Routes (server/routes/subscription.routes.js)
+javascript
+// server/routes/subscription.routes.js
+import express from 'express';
+import { protect, authorize } from '../middleware/auth.js';
+import {
+  getPlans,
+  getCurrentSubscription,
+  subscribe,
+  cancelSubscription,
+  getBillingHistory,
+  verifyPayment,
+  getSubscriptionFeatures
+} from '../controllers/subscription.controller.js';
+
+const router = express.Router();
+
+// Public routes
+router.get('/plans', getPlans);
+router.get('/features', getSubscriptionFeatures);
+
+// Protected routes
+router.get('/current', protect, getCurrentSubscription);
+router.get('/billing-history', protect, getBillingHistory);
+router.post('/subscribe', protect, subscribe);
+router.post('/verify-payment', protect, verifyPayment);
+router.post('/cancel', protect, cancelSubscription);
+
+export default router;
+Notification Controller (server/controllers/notification.controller.js)
+javascript
+// server/controllers/notification.controller.js
+import Notification from '../models/Notification.js';
+import User from '../models/User.js';
+import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+import { getPagination } from '../utils/pagination.js';
+
+export const getNotifications = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = getPagination(req);
+
+    const notifications = await Notification.find({ recipient: req.user.id })
+      .populate('data.sender', 'name avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Notification.countDocuments({ recipient: req.user.id });
+    paginatedResponse(res, notifications, { page, limit, total });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const markAsRead = async (req, res, next) => {
+  try {
+    await Notification.findByIdAndUpdate(req.params.id, {
+      isRead: true,
+      readAt: new Date()
+    });
+    successResponse(res, null, 'Marked as read');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const markAllAsRead = async (req, res, next) => {
+  try {
+    await Notification.updateMany(
+      { recipient: req.user.id, isRead: false },
+      { isRead: true, readAt: new Date() }
+    );
+    successResponse(res, null, 'All marked as read');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteNotification = async (req, res, next) => {
+  try {
+    await Notification.findByIdAndDelete(req.params.id);
+    successResponse(res, null, 'Notification deleted');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUnreadCount = async (req, res, next) => {
+  try {
+    const count = await Notification.countDocuments({
+      recipient: req.user.id,
+      isRead: false
+    });
+    successResponse(res, { count });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updatePreferences = async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { 'preferences.notifications': req.body.enabled },
+      { new: true }
+    );
+    successResponse(res, user.preferences, 'Preferences updated');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const createNotification = async (recipientId, type, title, message, data = {}) => {
+  try {
+    await Notification.create({
+      recipient: recipientId,
+      type,
+      title,
+      message,
+      data
+    });
+    return true;
+  } catch (error) {
+    console.error('Notification creation failed:', error);
+    return false;
+  }
+};
+Subscription Controller (server/controllers/subscription.controller.js)
+javascript
+// server/controllers/subscription.controller.js
+import Subscription from '../models/Subscription.js';
+import User from '../models/User.js';
+import { successResponse, errorResponse } from '../utils/response.js';
+
+const plans = {
+  free: {
+    name: 'Free',
+    price: 0,
+    currency: 'INR',
+    features: ['Browse all content', 'Read public poems', 'Basic search'],
+    limits: { poemsPerDay: 50, booksPerMonth: 2, audioPerMonth: 5 }
+  },
+  basic: {
+    name: 'Basic',
+    price: 99,
+    currency: 'INR',
+    features: ['All free features', 'Unlimited poem reading', 'Download 5 ebooks/month', 'Basic audio streaming'],
+    limits: { ebooksPerMonth: 5, audiobooksPerMonth: 3 }
+  },
+  premium: {
+    name: 'Premium',
+    price: 199,
+    currency: 'INR',
+    features: ['All Basic features', 'Unlimited downloads', 'HD audio streaming', 'Ad-free experience', 'AI explanations'],
+    limits: { unlimited: true }
+  },
+  pro: {
+    name: 'Pro',
+    price: 499,
+    currency: 'INR',
+    features: ['All Premium features', 'Creator tools', 'Priority support', 'Analytics dashboard', 'Early access'],
+    limits: { unlimited: true, creator: true }
+  }
+};
+
+export const getPlans = async (req, res, next) => {
+  try {
+    successResponse(res, plans);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSubscriptionFeatures = async (req, res, next) => {
+  try {
+    successResponse(res, Object.keys(plans).map(key => ({
+      id: key,
+      ...plans[key]
+    })));
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getCurrentSubscription = async (req, res, next) => {
+  try {
+    const subscription = await Subscription.findOne({
+      user: req.user.id,
+      status: 'active'
+    }).sort({ createdAt: -1 });
+
+    const user = await User.findById(req.user.id);
+
+    successResponse(res, {
+      subscription,
+      plan: user.subscription,
+      features: plans[user.subscription.plan] || plans.free
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const subscribe = async (req, res, next) => {
+  try {
+    const { plan, billingCycle, paymentMethod } = req.body;
+
+    if (!plans[plan]) {
+      return errorResponse(res, 'Invalid plan', 400);
+    }
+
+    const planDetails = plans[plan];
+    const months = billingCycle === 'yearly' ? 12 : billingCycle === 'quarterly' ? 3 : 1;
+    const amount = planDetails.price * months;
+
+    const subscription = await Subscription.create({
+      user: req.user.id,
+      plan,
+      status: 'pending',
+      price: { amount, currency: planDetails.currency },
+      billingCycle,
+      paymentMethod,
+      expiresAt: new Date(Date.now() + months * 30 * 24 * 60 * 60 * 1000)
+    });
+
+    await User.findByIdAndUpdate(req.user.id, {
+      'subscription.plan': plan,
+      'subscription.startedAt': new Date(),
+      'subscription.expiresAt': subscription.expiresAt
+    });
+
+    successResponse(res, { subscription, paymentUrl: '/api/subscriptions/verify-payment' }, 'Subscription initiated', 201);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyPayment = async (req, res, next) => {
+  try {
+    const { subscriptionId, paymentId } = req.body;
+
+    const subscription = await Subscription.findByIdAndUpdate(
+      subscriptionId,
+      { status: 'active', paymentId },
+      { new: true }
+    );
+
+    successResponse(res, subscription, 'Payment verified');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const cancelSubscription = async (req, res, next) => {
+  try {
+    const subscription = await Subscription.findOneAndUpdate(
+      { user: req.user.id, status: 'active' },
+      { status: 'cancelled', cancelledAt: new Date() },
+      { new: true, sort: { createdAt: -1 } }
+    );
+
+    if (!subscription) {
+      return errorResponse(res, 'No active subscription found', 404);
+    }
+
+    // Update user subscription plan to free
+    await User.findByIdAndUpdate(req.user.id, {
+      'subscription.plan': 'free',
+      'subscription.expiresAt': null
+    });
+
+    successResponse(res, subscription, 'Subscription cancelled');
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getBillingHistory = async (req, res, next) => {
+  try {
+    const history = await Subscription.find({ user: req.user.id })
+      .sort({ createdAt: -1 });
+
+    successResponse(res, history);
+  } catch (error) {
+    next(error);
+  }
+};
+Now your server has both notification and subscription routes properly configured and ready to use! 🚀
+
+subscriptionAPI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Frontend Route Structure
+/                           → Home Page
+/explore                    → Explore Page
+/search                     → Search Page
+/about                      → About Page
+
+/poetry                     → Poetry List
+/poem/:slug                 → Poetry Detail
+
+/authors                    → Authors List
+/author/:slug               → Author Detail
+
+/books                      → Books List
+/book/:slug                 → Book Detail
+
+/audio                      → Audio List
+/audio/:slug                → Audio Detail
+/audio/type/:type           → Audio by Type
+/audio/occasion/:occasion   → Audio by Occasion
+
+/videos                     → Videos List
+/video/:slug                → Video Detail
+/video/type/:type           → Video by Type
+
+/login                      → Login Page
+/register                   → Register Page
+
+/dashboard                  → User Dashboard
+/dashboard/profile          → User Profile
+/dashboard/favorites        → User Favorites
+/dashboard/history          → User History
+/dashboard/downloads        → User Downloads
+
+/creator                    → Creator Dashboard
+/creator/upload-poetry      → Upload Poetry
+/creator/upload-audio       → Upload Audio
+/creator/upload-video       → Upload Video
+/creator/upload-book        → Upload Book
+/creator/analytics          → Creator Analytics
+
+/admin                      → Admin Dashboard
+/admin/users                → User Management
+/admin/poetry               → Poetry CMS
+/admin/authors              → Author CMS
+/admin/books                → Books/Ebook CMS
+/admin/audio                → Audio CMS
+/admin/videos               → Video CMS
+/admin/homepage             → Homepage CMS
+/admin/seo                  → SEO Management
+/admin/settings             → Site Settings
+
+/subscription               → Subscription Plans
+/subscription/success       → Subscription Success
+/subscription/cancel        → Subscription Cancel

@@ -1,0 +1,8166 @@
+// //client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState } from 'react'
+// import { motion } from 'framer-motion'
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText
+// } from 'lucide-react'
+
+// const authors = [
+//   { id: 1, name: 'Mirza Ghalib', nameUr: 'مرزا غالب', era: 'Classical', poems: 234, status: 'published', createdAt: '2024-01-10' },
+//   { id: 2, name: 'Faiz Ahmed Faiz', nameUr: 'فیض احمد فیض', era: 'Modern', poems: 186, status: 'published', createdAt: '2024-01-15' },
+//   { id: 3, name: 'Allama Iqbal', nameUr: 'علامہ اقبال', era: 'Modern', poems: 312, status: 'published', createdAt: '2024-01-20' },
+//   { id: 4, name: 'Mir Taqi Mir', nameUr: 'میر تقی میر', era: 'Classical', poems: 278, status: 'draft', createdAt: '2024-02-01' },
+// ]
+
+// const AuthorCMSPage = () => {
+//   const [searchQuery, setSearchQuery] = useState('')
+//   const [filterEra, setFilterEra] = useState('all')
+//   const [showAddModal, setShowAddModal] = useState(false)
+
+//   const filteredAuthors = authors.filter(author => {
+//     if (searchQuery && !author.name.toLowerCase().includes(searchQuery.toLowerCase())) return false
+//     if (filterEra !== 'all' && author.era !== filterEra) return false
+//     return true
+//   })
+
+//   return (
+//     <div className="space-y-6">
+//       <div className="flex items-center justify-between">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, and galleries</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="Classical">Classical</option>
+//           <option value="Modern">Modern</option>
+//         </select>
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {filteredAuthors.map((author) => (
+//                 <motion.tr
+//                   key={author.id}
+//                   initial={{ opacity: 0 }}
+//                   animate={{ opacity: 1 }}
+//                   className="hover:bg-gray-50"
+//                 >
+//                   <td className="px-6 py-4">
+//                     <div className="flex items-center space-x-3">
+//                       <div className="h-10 w-10 rounded-full bg-secondary-100 flex items-center justify-center">
+//                         <span className="text-sm font-medium text-secondary-600">{author.name.charAt(0)}</span>
+//                       </div>
+//                       <div>
+//                         <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                         <p className="urdu-text text-xs text-gray-500">{author.nameUr}</p>
+//                       </div>
+//                     </div>
+//                   </td>
+//                   <td className="px-6 py-4">
+//                     <span className="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-blue-50 text-blue-700">
+//                       {author.era}
+//                     </span>
+//                   </td>
+//                   <td className="px-6 py-4 text-sm text-gray-900">{author.poems}</td>
+//                   <td className="px-6 py-4">
+//                     <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
+//                       author.status === 'published' ? 'bg-green-100 text-green-700' :
+//                       'bg-yellow-100 text-yellow-700'
+//                     }`}>
+//                       {author.status}
+//                     </span>
+//                   </td>
+//                   <td className="px-6 py-4 text-sm text-gray-500">{author.createdAt}</td>
+//                   <td className="px-6 py-4 text-right">
+//                     <div className="flex items-center justify-end space-x-2">
+//                       <button className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">
+//                         <Eye className="h-4 w-4" />
+//                       </button>
+//                       <button className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600">
+//                         <Edit className="h-4 w-4" />
+//                       </button>
+//                       <button className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600">
+//                         <Trash2 className="h-4 w-4" />
+//                       </button>
+//                     </div>
+//                   </td>
+//                 </motion.tr>
+//               ))}
+//             </tbody>
+//           </table>
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default AuthorCMSPage
+
+
+
+
+
+
+
+
+
+// // client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+//   AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music
+// } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import authorAPI from '../../api/authorAPI';
+// import toast from 'react-hot-toast';
+
+// const AuthorCMSPage = () => {
+//   const [authors, setAuthors] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [filterEra, setFilterEra] = useState('all');
+//   const [showAddModal, setShowAddModal] = useState(false);
+//   const [editingAuthor, setEditingAuthor] = useState(null);
+//   const [pagination, setPagination] = useState({
+//     page: 1,
+//     limit: 10,
+//     total: 0,
+//     totalPages: 0
+//   });
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     nameUrdu: '',
+//     bio: '',
+//     bioUrdu: '',
+//     birthDate: '',
+//     deathDate: '',
+//     birthPlace: '',
+//     era: 'modern',
+//     category: 'modern',
+//     genres: [],
+//     languages: ['urdu'],
+//     isVerified: false,
+//     isFeatured: false,
+//     avatar: '',
+//     coverImage: ''
+//   });
+
+//   // Fetch authors from API
+//   const fetchAuthors = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const params = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(searchQuery && { search: searchQuery }),
+//         ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+//       };
+
+//       const response = await authorAPI.getAuthors(params);
+      
+//       // Handle different response structures
+//       let authorsData = [];
+//       if (response?.data?.data) {
+//         authorsData = response.data.data;
+//         if (response.data.pagination) setPagination(response.data.pagination);
+//       } else if (response?.data) {
+//         authorsData = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsData = response;
+//       } else if (response?.authors) {
+//         authorsData = response.authors;
+//       } else {
+//         authorsData = [];
+//       }
+      
+//       setAuthors(Array.isArray(authorsData) ? authorsData : []);
+//     } catch (error) {
+//       console.error('Error fetching authors:', error);
+//       toast.error('Failed to load authors');
+//       setAuthors([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+//   useEffect(() => {
+//     fetchAuthors();
+//   }, [fetchAuthors]);
+
+//   // Handle form input changes
+//   const handleInputChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     if (type === 'checkbox') {
+//       setFormData(prev => ({ ...prev, [name]: checked }));
+//     } else if (name === 'genres') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, genres: selectedOptions }));
+//     } else if (name === 'languages') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, languages: selectedOptions }));
+//     } else {
+//       setFormData(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle submit (create or update)
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!formData.name || !formData.name.trim()) {
+//       toast.error('Please enter author name');
+//       return;
+//     }
+
+//     if (!formData.bio || !formData.bio.trim()) {
+//       toast.error('Please enter author biography');
+//       return;
+//     }
+
+//     const authorData = {
+//       name: formData.name.trim(),
+//       nameUrdu: formData.nameUrdu?.trim() || '',
+//       bio: formData.bio.trim(),
+//       bioUrdu: formData.bioUrdu?.trim() || '',
+//       birthDate: formData.birthDate || null,
+//       deathDate: formData.deathDate || null,
+//       birthPlace: formData.birthPlace?.trim() || '',
+//       era: formData.era,
+//       category: formData.category,
+//       genres: formData.genres,
+//       languages: formData.languages,
+//       isVerified: formData.isVerified,
+//       isFeatured: formData.isFeatured,
+//       avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+//       coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+//     };
+
+//     setLoading(true);
+//     try {
+//       if (editingAuthor) {
+//         await authorAPI.updateAuthor(editingAuthor._id, authorData);
+//         toast.success('Author updated successfully');
+//       } else {
+//         await authorAPI.createAuthor(authorData);
+//         toast.success('Author created successfully');
+//       }
+//       resetModal();
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error saving author:', error);
+//       const message = error.response?.data?.message || 'Failed to save author';
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle delete
+//   const handleDelete = async (id, name) => {
+//     if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await authorAPI.deleteAuthor(id);
+//       toast.success('Author deleted successfully');
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error deleting author:', error);
+//       toast.error(error.response?.data?.message || 'Failed to delete author');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle edit
+//   const handleEdit = (author) => {
+//     setEditingAuthor(author);
+//     setFormData({
+//       name: author.name || '',
+//       nameUrdu: author.nameUrdu || '',
+//       bio: author.bio || '',
+//       bioUrdu: author.bioUrdu || '',
+//       birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+//       deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+//       birthPlace: author.birthPlace || '',
+//       era: author.era || 'modern',
+//       category: author.category || 'modern',
+//       genres: author.genres || [],
+//       languages: author.languages || ['urdu'],
+//       isVerified: author.isVerified || false,
+//       isFeatured: author.isFeatured || false,
+//       avatar: author.avatar || '',
+//       coverImage: author.coverImage || ''
+//     });
+//     setShowAddModal(true);
+//   };
+
+//   // Reset modal
+//   const resetModal = () => {
+//     setShowAddModal(false);
+//     setEditingAuthor(null);
+//     setFormData({
+//       name: '',
+//       nameUrdu: '',
+//       bio: '',
+//       bioUrdu: '',
+//       birthDate: '',
+//       deathDate: '',
+//       birthPlace: '',
+//       era: 'modern',
+//       category: 'modern',
+//       genres: [],
+//       languages: ['urdu'],
+//       isVerified: false,
+//       isFeatured: false,
+//       avatar: '',
+//       coverImage: ''
+//     });
+//   };
+
+//   // Clear filters
+//   const clearFilters = () => {
+//     setSearchQuery('');
+//     setFilterEra('all');
+//     setPagination(prev => ({ ...prev, page: 1 }));
+//   };
+
+//   // Format date
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'N/A';
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch {
+//       return 'N/A';
+//     }
+//   };
+
+//   // Get era badge color
+//   const getEraColor = (era) => {
+//     switch (era?.toLowerCase()) {
+//       case 'classical': return 'bg-purple-100 text-purple-700';
+//       case 'modern': return 'bg-blue-100 text-blue-700';
+//       case 'contemporary': return 'bg-green-100 text-green-700';
+//       default: return 'bg-gray-100 text-gray-700';
+//     }
+//   };
+
+//   // Loading state
+//   if (loading && authors.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[60vh]">
+//         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, and galleries</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Stats Summary */}
+//       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+//           <p className="text-sm text-gray-500">Total Authors</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-purple-600">
+//             {authors.filter(a => a.era === 'classical').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Classical Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-blue-600">
+//             {authors.filter(a => a.era === 'modern').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Modern Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-green-600">
+//             {authors.filter(a => a.isFeatured).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Featured</p>
+//         </div>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors by name..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="classical">Classical</option>
+//           <option value="modern">Modern</option>
+//           <option value="contemporary">Contemporary</option>
+//         </select>
+//         {(searchQuery || filterEra !== 'all') && (
+//           <button
+//             onClick={clearFilters}
+//             className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+//           >
+//             Clear Filters
+//           </button>
+//         )}
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {authors.length === 0 ? (
+//                 <tr>
+//                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+//                     No authors found. Click "Add Author" to get started.
+//                   </td>
+//                 </tr>
+//               ) : (
+//                 authors.map((author) => (
+//                   <motion.tr
+//                     key={author._id}
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     className="hover:bg-gray-50"
+//                   >
+//                     <td className="px-6 py-4">
+//                       <div className="flex items-center space-x-3">
+//                         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+//                           {author.avatar ? (
+//                             <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+//                           ) : (
+//                             <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+//                           )}
+//                         </div>
+//                         <div>
+//                           <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                           <p className="text-xs text-gray-500">slug: {author.slug}</p>
+//                           {author.nameUrdu && (
+//                             <p className="urdu-text text-xs text-gray-500" dir="rtl">{author.nameUrdu}</p>
+//                           )}
+//                         </div>
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+//                         {author.era || 'N/A'}
+//                       </span>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex flex-wrap gap-1">
+//                         {author.genres?.slice(0, 2).map((genre, idx) => (
+//                           <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+//                             {genre}
+//                           </span>
+//                         ))}
+//                         {author.genres?.length > 2 && (
+//                           <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-900">
+//                       {author.stats?.poemsCount || 0}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex gap-1">
+//                         {author.isVerified && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+//                             Verified
+//                           </span>
+//                         )}
+//                         {author.isFeatured && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+//                             Featured
+//                           </span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-500">
+//                       {formatDate(author.createdAt)}
+//                     </td>
+//                     <td className="px-6 py-4 text-right">
+//                       <div className="flex items-center justify-end space-x-2">
+//                         <Link
+//                           to={`/author/${author.slug}`}
+//                           target="_blank"
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
+//                           title="View Author"
+//                         >
+//                           <Eye className="h-4 w-4" />
+//                         </Link>
+//                         <button
+//                           onClick={() => handleEdit(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+//                           title="Edit Author"
+//                         >
+//                           <Edit className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDelete(author._id, author.name)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+//                           title="Delete Author"
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </button>
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 ))
+//               )}
+//             </tbody>
+//            </table>
+//         </div>
+
+//         {/* Pagination */}
+//         {pagination.totalPages > 1 && (
+//           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//             <p className="text-sm text-gray-500">
+//               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+//             </p>
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+//                 disabled={pagination.page === 1 || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronLeft className="h-4 w-4" />
+//               </button>
+//               <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+//                 {pagination.page} / {pagination.totalPages}
+//               </span>
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+//                 disabled={pagination.page === pagination.totalPages || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronRight className="h-4 w-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Add/Edit Author Modal */}
+//       <AnimatePresence>
+//         {showAddModal && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <h2 className="text-xl font-bold text-gray-900">
+//                   {editingAuthor ? 'Edit Author' : 'Add New Author'}
+//                 </h2>
+//                 <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+//                 {/* Basic Info */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (English) <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="name"
+//                       value={formData.name}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="Enter author name"
+//                       required
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (Urdu)
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="nameUrdu"
+//                       value={formData.nameUrdu}
+//                       onChange={handleInputChange}
+//                       className="input-field urdu-text"
+//                       dir="rtl"
+//                       placeholder="نام اردو میں"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Bio */}
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (English) <span className="text-red-500">*</span>
+//                   </label>
+//                   <textarea
+//                     name="bio"
+//                     value={formData.bio}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24"
+//                     placeholder="Enter author biography..."
+//                     required
+//                   />
+//                 </div>
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (Urdu)
+//                   </label>
+//                   <textarea
+//                     name="bioUrdu"
+//                     value={formData.bioUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24 urdu-text"
+//                     dir="rtl"
+//                     placeholder="سوانح حیات اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Life Details */}
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+//                     <input
+//                       type="date"
+//                       name="birthDate"
+//                       value={formData.birthDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+//                     <input
+//                       type="date"
+//                       name="deathDate"
+//                       value={formData.deathDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+//                     <input
+//                       type="text"
+//                       name="birthPlace"
+//                       value={formData.birthPlace}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="e.g., Agra, India"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Classification */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+//                     <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="contemporary">Contemporary</option>
+//                     </select>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+//                     <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="female">Female</option>
+//                       <option value="trending">Trending</option>
+//                       <option value="emerging">Emerging</option>
+//                     </select>
+//                   </div>
+//                 </div>
+
+//                 {/* Genres & Languages */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+//                     <select
+//                       multiple
+//                       name="genres"
+//                       value={formData.genres}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="ghazal">Ghazal</option>
+//                       <option value="nazm">Nazm</option>
+//                       <option value="sher">Sher</option>
+//                       <option value="rubai">Rubai</option>
+//                       <option value="rekhti">Rekhti</option>
+//                       <option value="qasida">Qasida</option>
+//                       <option value="marsiya">Marsiya</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+//                     <select
+//                       multiple
+//                       name="languages"
+//                       value={formData.languages}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="urdu">Urdu</option>
+//                       <option value="hindi">Hindi</option>
+//                       <option value="english">English</option>
+//                       <option value="persian">Persian</option>
+//                       <option value="arabic">Arabic</option>
+//                       <option value="punjabi">Punjabi</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Status */}
+//                 <div className="flex flex-wrap gap-4">
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isVerified"
+//                       checked={formData.isVerified}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Verified Author</span>
+//                   </label>
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isFeatured"
+//                       checked={formData.isFeatured}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Featured Author</span>
+//                   </label>
+//                 </div>
+
+//                 {/* Images */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+//                     <input
+//                       type="url"
+//                       name="avatar"
+//                       value={formData.avatar}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                     <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+//                     <input
+//                       type="url"
+//                       name="coverImage"
+//                       value={formData.coverImage}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Form Actions */}
+//                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+//                   <button
+//                     type="submit"
+//                     disabled={loading}
+//                     className="btn-primary flex-1"
+//                   >
+//                     {loading ? (
+//                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+//                     ) : (
+//                       editingAuthor ? 'Update Author' : 'Create Author'
+//                     )}
+//                   </button>
+//                   <button
+//                     type="button"
+//                     onClick={resetModal}
+//                     className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+//                   >
+//                     Cancel
+//                   </button>
+//                 </div>
+//               </form>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default AuthorCMSPage;
+
+
+
+
+
+
+
+
+
+//complete updated AuthorCMSPage.jsx with slug editing functionality:
+// // client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+//   AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music
+// } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import authorAPI from '../../api/authorAPI';
+// import toast from 'react-hot-toast';
+
+// const AuthorCMSPage = () => {
+//   const [authors, setAuthors] = useState([]);
+//   const [loading, setLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [filterEra, setFilterEra] = useState('all');
+//   const [showAddModal, setShowAddModal] = useState(false);
+//   const [editingAuthor, setEditingAuthor] = useState(null);
+//   const [copiedSlug, setCopiedSlug] = useState(null);
+//   const [slugAvailable, setSlugAvailable] = useState(true);
+//   const [checkingSlug, setCheckingSlug] = useState(false);
+//   const [pagination, setPagination] = useState({
+//     page: 1,
+//     limit: 10,
+//     total: 0,
+//     totalPages: 0
+//   });
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     slug: '',
+//     nameUrdu: '',
+//     bio: '',
+//     bioUrdu: '',
+//     birthDate: '',
+//     deathDate: '',
+//     birthPlace: '',
+//     era: 'modern',
+//     category: 'modern',
+//     genres: [],
+//     languages: ['urdu'],
+//     isVerified: false,
+//     isFeatured: false,
+//     avatar: '',
+//     coverImage: ''
+//   });
+
+//   // Generate slug from name
+//   const generateSlugFromName = (name) => {
+//     return name
+//       .toLowerCase()
+//       .replace(/[^a-z0-9]+/g, '-')
+//       .replace(/^-|-$/g, '');
+//   };
+
+//   // Check slug availability
+//   const checkSlugAvailability = async (slug, excludeId = null) => {
+//     if (!slug || slug.length < 2) {
+//       setSlugAvailable(true);
+//       return true;
+//     }
+
+//     setCheckingSlug(true);
+//     try {
+//       // Fetch all authors to check slug uniqueness
+//       const response = await authorAPI.getAuthors({ limit: 1000 });
+//       let authorsList = [];
+//       if (response?.data?.data) {
+//         authorsList = response.data.data;
+//       } else if (response?.data) {
+//         authorsList = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsList = response;
+//       } else {
+//         authorsList = [];
+//       }
+
+//       const exists = authorsList.some(author => 
+//         author.slug === slug && author._id !== excludeId
+//       );
+      
+//       setSlugAvailable(!exists);
+//       return !exists;
+//     } catch (error) {
+//       console.error('Error checking slug:', error);
+//       setSlugAvailable(true);
+//       return true;
+//     } finally {
+//       setCheckingSlug(false);
+//     }
+//   };
+
+//   // Handle name change to auto-generate slug
+//   const handleNameChange = async (e) => {
+//     const name = e.target.value;
+//     const newSlug = generateSlugFromName(name);
+//     setFormData(prev => ({
+//       ...prev,
+//       name: name,
+//       slug: newSlug
+//     }));
+//     if (newSlug) {
+//       await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     }
+//   };
+
+//   // Handle slug manual edit
+//   const handleSlugChange = async (e) => {
+//     const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     setFormData(prev => ({ ...prev, slug }));
+//     await checkSlugAvailability(slug, editingAuthor?._id);
+//   };
+
+//   // Regenerate slug from name
+//   const regenerateSlug = async () => {
+//     const newSlug = generateSlugFromName(formData.name);
+//     setFormData(prev => ({ ...prev, slug: newSlug }));
+//     await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     toast.success('Slug regenerated');
+//   };
+
+//   // Copy slug to clipboard
+//   const copySlugToClipboard = (slug) => {
+//     navigator.clipboard.writeText(`${window.location.origin}/author/${slug}`);
+//     setCopiedSlug(slug);
+//     toast.success('Link copied to clipboard!');
+//     setTimeout(() => setCopiedSlug(null), 2000);
+//   };
+
+//   // Fetch authors from API
+//   const fetchAuthors = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const params = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(searchQuery && { search: searchQuery }),
+//         ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+//       };
+
+//       const response = await authorAPI.getAuthors(params);
+      
+//       let authorsData = [];
+//       if (response?.data?.data) {
+//         authorsData = response.data.data;
+//         if (response.data.pagination) setPagination(response.data.pagination);
+//       } else if (response?.data) {
+//         authorsData = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsData = response;
+//       } else if (response?.authors) {
+//         authorsData = response.authors;
+//       } else {
+//         authorsData = [];
+//       }
+      
+//       setAuthors(Array.isArray(authorsData) ? authorsData : []);
+//     } catch (error) {
+//       console.error('Error fetching authors:', error);
+//       toast.error('Failed to load authors');
+//       setAuthors([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+//   useEffect(() => {
+//     fetchAuthors();
+//   }, [fetchAuthors]);
+
+//   // Handle form input changes
+//   const handleInputChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     if (type === 'checkbox') {
+//       setFormData(prev => ({ ...prev, [name]: checked }));
+//     } else if (name === 'genres') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, genres: selectedOptions }));
+//     } else if (name === 'languages') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, languages: selectedOptions }));
+//     } else {
+//       setFormData(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle submit (create or update)
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!formData.name || !formData.name.trim()) {
+//       toast.error('Please enter author name');
+//       return;
+//     }
+
+//     if (!formData.bio || !formData.bio.trim()) {
+//       toast.error('Please enter author biography');
+//       return;
+//     }
+
+//     if (!formData.slug) {
+//       toast.error('Please enter a slug');
+//       return;
+//     }
+
+//     if (!slugAvailable) {
+//       toast.error('Slug already exists. Please choose a different slug.');
+//       return;
+//     }
+
+//     const authorData = {
+//       name: formData.name.trim(),
+//       slug: formData.slug,
+//       nameUrdu: formData.nameUrdu?.trim() || '',
+//       bio: formData.bio.trim(),
+//       bioUrdu: formData.bioUrdu?.trim() || '',
+//       birthDate: formData.birthDate || null,
+//       deathDate: formData.deathDate || null,
+//       birthPlace: formData.birthPlace?.trim() || '',
+//       era: formData.era,
+//       category: formData.category,
+//       genres: formData.genres,
+//       languages: formData.languages,
+//       isVerified: formData.isVerified,
+//       isFeatured: formData.isFeatured,
+//       avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+//       coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+//     };
+
+//     setLoading(true);
+//     try {
+//       if (editingAuthor) {
+//         await authorAPI.updateAuthor(editingAuthor._id, authorData);
+//         toast.success('Author updated successfully');
+//       } else {
+//         await authorAPI.createAuthor(authorData);
+//         toast.success('Author created successfully');
+//       }
+//       resetModal();
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error saving author:', error);
+//       const message = error.response?.data?.message || 'Failed to save author';
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle delete
+//   const handleDelete = async (id, name) => {
+//     if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await authorAPI.deleteAuthor(id);
+//       toast.success('Author deleted successfully');
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error deleting author:', error);
+//       toast.error(error.response?.data?.message || 'Failed to delete author');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle edit
+//   const handleEdit = (author) => {
+//     setEditingAuthor(author);
+//     setFormData({
+//       name: author.name || '',
+//       slug: author.slug || '',
+//       nameUrdu: author.nameUrdu || '',
+//       bio: author.bio || '',
+//       bioUrdu: author.bioUrdu || '',
+//       birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+//       deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+//       birthPlace: author.birthPlace || '',
+//       era: author.era || 'modern',
+//       category: author.category || 'modern',
+//       genres: author.genres || [],
+//       languages: author.languages || ['urdu'],
+//       isVerified: author.isVerified || false,
+//       isFeatured: author.isFeatured || false,
+//       avatar: author.avatar || '',
+//       coverImage: author.coverImage || ''
+//     });
+//     setSlugAvailable(true);
+//     setShowAddModal(true);
+//   };
+
+//   // Reset modal
+//   const resetModal = () => {
+//     setShowAddModal(false);
+//     setEditingAuthor(null);
+//     setFormData({
+//       name: '',
+//       slug: '',
+//       nameUrdu: '',
+//       bio: '',
+//       bioUrdu: '',
+//       birthDate: '',
+//       deathDate: '',
+//       birthPlace: '',
+//       era: 'modern',
+//       category: 'modern',
+//       genres: [],
+//       languages: ['urdu'],
+//       isVerified: false,
+//       isFeatured: false,
+//       avatar: '',
+//       coverImage: ''
+//     });
+//     setSlugAvailable(true);
+//   };
+
+//   // Clear filters
+//   const clearFilters = () => {
+//     setSearchQuery('');
+//     setFilterEra('all');
+//     setPagination(prev => ({ ...prev, page: 1 }));
+//   };
+
+//   // Format date
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'N/A';
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch {
+//       return 'N/A';
+//     }
+//   };
+
+//   // Get era badge color
+//   const getEraColor = (era) => {
+//     switch (era?.toLowerCase()) {
+//       case 'classical': return 'bg-purple-100 text-purple-700';
+//       case 'modern': return 'bg-blue-100 text-blue-700';
+//       case 'contemporary': return 'bg-green-100 text-green-700';
+//       default: return 'bg-gray-100 text-gray-700';
+//     }
+//   };
+
+//   // Loading state
+//   if (loading && authors.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[60vh]">
+//         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, and galleries</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Stats Summary */}
+//       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+//           <p className="text-sm text-gray-500">Total Authors</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-purple-600">
+//             {authors.filter(a => a.era === 'classical').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Classical Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-blue-600">
+//             {authors.filter(a => a.era === 'modern').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Modern Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-green-600">
+//             {authors.filter(a => a.isFeatured).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Featured</p>
+//         </div>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors by name..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="classical">Classical</option>
+//           <option value="modern">Modern</option>
+//           <option value="contemporary">Contemporary</option>
+//         </select>
+//         {(searchQuery || filterEra !== 'all') && (
+//           <button
+//             onClick={clearFilters}
+//             className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+//           >
+//             Clear Filters
+//           </button>
+//         )}
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {authors.length === 0 ? (
+//                 <tr>
+//                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+//                     No authors found. Click "Add Author" to get started.
+//                   </td>
+//                 </tr>
+//               ) : (
+//                 authors.map((author) => (
+//                   <motion.tr
+//                     key={author._id}
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     className="hover:bg-gray-50"
+//                   >
+//                     <td className="px-6 py-4">
+//                       <div className="flex items-center space-x-3">
+//                         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+//                           {author.avatar ? (
+//                             <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+//                           ) : (
+//                             <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+//                           )}
+//                         </div>
+//                         <div>
+//                           <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                           <div className="flex items-center gap-2 mt-1">
+//                             <code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+//                               slug: {author.slug}
+//                             </code>
+//                             <button
+//                               onClick={() => copySlugToClipboard(author.slug)}
+//                               className="p-1 rounded hover:bg-gray-200 transition-colors"
+//                               title="Copy link to clipboard"
+//                             >
+//                               {copiedSlug === author.slug ? (
+//                                 <Check className="h-3 w-3 text-green-600" />
+//                               ) : (
+//                                 <Copy className="h-3 w-3 text-gray-400" />
+//                               )}
+//                             </button>
+//                           </div>
+//                           {author.nameUrdu && (
+//                             <p className="urdu-text text-xs text-gray-500 mt-1" dir="rtl">{author.nameUrdu}</p>
+//                           )}
+//                         </div>
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+//                         {author.era || 'N/A'}
+//                       </span>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex flex-wrap gap-1">
+//                         {author.genres?.slice(0, 2).map((genre, idx) => (
+//                           <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+//                             {genre}
+//                           </span>
+//                         ))}
+//                         {author.genres?.length > 2 && (
+//                           <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-900">
+//                       {author.stats?.poemsCount || 0}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex gap-1">
+//                         {author.isVerified && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+//                             Verified
+//                           </span>
+//                         )}
+//                         {author.isFeatured && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+//                             Featured
+//                           </span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-500">
+//                       {formatDate(author.createdAt)}
+//                     </td>
+//                     <td className="px-6 py-4 text-right">
+//                       <div className="flex items-center justify-end space-x-2">
+//                         <Link
+//                           to={`/author/${author.slug}`}
+//                           target="_blank"
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600"
+//                           title="View Author"
+//                         >
+//                           <Eye className="h-4 w-4" />
+//                         </Link>
+//                         <button
+//                           onClick={() => handleEdit(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+//                           title="Edit Author"
+//                         >
+//                           <Edit className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDelete(author._id, author.name)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+//                           title="Delete Author"
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </button>
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 ))
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {/* Pagination */}
+//         {pagination.totalPages > 1 && (
+//           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//             <p className="text-sm text-gray-500">
+//               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+//             </p>
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+//                 disabled={pagination.page === 1 || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronLeft className="h-4 w-4" />
+//               </button>
+//               <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+//                 {pagination.page} / {pagination.totalPages}
+//               </span>
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+//                 disabled={pagination.page === pagination.totalPages || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronRight className="h-4 w-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Add/Edit Author Modal with Slug Field */}
+//       <AnimatePresence>
+//         {showAddModal && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <h2 className="text-xl font-bold text-gray-900">
+//                   {editingAuthor ? 'Edit Author' : 'Add New Author'}
+//                 </h2>
+//                 <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+//                 {/* Name and Slug */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (English) <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="name"
+//                       value={formData.name}
+//                       onChange={handleNameChange}
+//                       className="input-field"
+//                       placeholder="Enter author name"
+//                       required
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Slug (URL)
+//                     </label>
+//                     <div className="flex items-center gap-2">
+//                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-2 rounded-l">/author/</span>
+//                       <input
+//                         type="text"
+//                         name="slug"
+//                         value={formData.slug}
+//                         onChange={handleSlugChange}
+//                         className={`input-field flex-1 rounded-l-none ${!slugAvailable ? 'border-red-500 focus:ring-red-500' : ''}`}
+//                         placeholder="author-slug"
+//                       />
+//                       <button
+//                         type="button"
+//                         onClick={regenerateSlug}
+//                         className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+//                         title="Regenerate slug from name"
+//                       >
+//                         <RefreshCw className="h-4 w-4" />
+//                       </button>
+//                     </div>
+//                     {!slugAvailable && (
+//                       <p className="text-xs text-red-500 mt-1">
+//                         This slug is already taken. Please choose a different one.
+//                       </p>
+//                     )}
+//                     {checkingSlug && (
+//                       <p className="text-xs text-gray-500 mt-1">
+//                         Checking availability...
+//                       </p>
+//                     )}
+//                     {slugAvailable && formData.slug && !checkingSlug && (
+//                       <p className="text-xs text-green-500 mt-1">
+//                         ✓ Slug is available
+//                       </p>
+//                     )}
+//                     <p className="text-xs text-gray-500 mt-1">
+//                       URL-friendly version (e.g., allama-iqbal). Only lowercase letters, numbers, and hyphens.
+//                     </p>
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Name (Urdu)
+//                   </label>
+//                   <input
+//                     type="text"
+//                     name="nameUrdu"
+//                     value={formData.nameUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field urdu-text"
+//                     dir="rtl"
+//                     placeholder="نام اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Bio */}
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (English) <span className="text-red-500">*</span>
+//                   </label>
+//                   <textarea
+//                     name="bio"
+//                     value={formData.bio}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24"
+//                     placeholder="Enter author biography..."
+//                     required
+//                   />
+//                 </div>
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (Urdu)
+//                   </label>
+//                   <textarea
+//                     name="bioUrdu"
+//                     value={formData.bioUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24 urdu-text"
+//                     dir="rtl"
+//                     placeholder="سوانح حیات اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Life Details */}
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+//                     <input
+//                       type="date"
+//                       name="birthDate"
+//                       value={formData.birthDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+//                     <input
+//                       type="date"
+//                       name="deathDate"
+//                       value={formData.deathDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+//                     <input
+//                       type="text"
+//                       name="birthPlace"
+//                       value={formData.birthPlace}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="e.g., Agra, India"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Classification */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+//                     <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="contemporary">Contemporary</option>
+//                     </select>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+//                     <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="female">Female</option>
+//                       <option value="trending">Trending</option>
+//                       <option value="emerging">Emerging</option>
+//                     </select>
+//                   </div>
+//                 </div>
+
+//                 {/* Genres & Languages */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+//                     <select
+//                       multiple
+//                       name="genres"
+//                       value={formData.genres}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="ghazal">Ghazal</option>
+//                       <option value="nazm">Nazm</option>
+//                       <option value="sher">Sher</option>
+//                       <option value="rubai">Rubai</option>
+//                       <option value="rekhti">Rekhti</option>
+//                       <option value="qasida">Qasida</option>
+//                       <option value="marsiya">Marsiya</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+//                     <select
+//                       multiple
+//                       name="languages"
+//                       value={formData.languages}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="urdu">Urdu</option>
+//                       <option value="hindi">Hindi</option>
+//                       <option value="english">English</option>
+//                       <option value="persian">Persian</option>
+//                       <option value="arabic">Arabic</option>
+//                       <option value="punjabi">Punjabi</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Status */}
+//                 <div className="flex flex-wrap gap-4">
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isVerified"
+//                       checked={formData.isVerified}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Verified Author</span>
+//                   </label>
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isFeatured"
+//                       checked={formData.isFeatured}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Featured Author</span>
+//                   </label>
+//                 </div>
+
+//                 {/* Images */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+//                     <input
+//                       type="url"
+//                       name="avatar"
+//                       value={formData.avatar}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                     <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+//                     <input
+//                       type="url"
+//                       name="coverImage"
+//                       value={formData.coverImage}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Form Actions */}
+//                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+//                   <button
+//                     type="submit"
+//                     disabled={loading || !slugAvailable || checkingSlug}
+//                     className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+//                   >
+//                     {loading ? (
+//                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+//                     ) : (
+//                       editingAuthor ? 'Update Author' : 'Create Author'
+//                     )}
+//                   </button>
+//                   <button
+//                     type="button"
+//                     onClick={resetModal}
+//                     className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+//                   >
+//                     Cancel
+//                   </button>
+//                 </div>
+//               </form>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default AuthorCMSPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+//   AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music,
+//   Grid, List, Play, Download, Heart, Clock, MapPin, Users
+// } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import authorAPI from '../../api/authorAPI';
+// import poemAPI from '../../api/poemAPI';
+// import bookAPI from '../../api/bookAPI';
+// import audioAPI from '../../api/audioAPI';
+// import videoAPI from '../../api/videoAPI';
+// import toast from 'react-hot-toast';
+
+// const AuthorCMSPage = () => {
+//   const [authors, setAuthors] = useState([]);
+//   const [selectedAuthor, setSelectedAuthor] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [filterEra, setFilterEra] = useState('all');
+//   const [showAddModal, setShowAddModal] = useState(false);
+//   const [showDetailModal, setShowDetailModal] = useState(false);
+//   const [editingAuthor, setEditingAuthor] = useState(null);
+//   const [activeDetailTab, setActiveDetailTab] = useState('works');
+//   const [copiedSlug, setCopiedSlug] = useState(null);
+//   const [slugAvailable, setSlugAvailable] = useState(true);
+//   const [checkingSlug, setCheckingSlug] = useState(false);
+//   const [pagination, setPagination] = useState({
+//     page: 1,
+//     limit: 10,
+//     total: 0,
+//     totalPages: 0
+//   });
+
+//   // Detail view data states
+//   const [authorPoems, setAuthorPoems] = useState([]);
+//   const [authorBooks, setAuthorBooks] = useState([]);
+//   const [authorAudio, setAuthorAudio] = useState([]);
+//   const [authorVideos, setAuthorVideos] = useState([]);
+//   const [authorTimeline, setAuthorTimeline] = useState([]);
+//   const [authorGallery, setAuthorGallery] = useState([]);
+//   const [detailLoading, setDetailLoading] = useState(false);
+//   const [poemsPage, setPoemsPage] = useState(1);
+//   const [booksPage, setBooksPage] = useState(1);
+//   const [viewMode, setViewMode] = useState('grid');
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     slug: '',
+//     nameUrdu: '',
+//     bio: '',
+//     bioUrdu: '',
+//     birthDate: '',
+//     deathDate: '',
+//     birthPlace: '',
+//     era: 'modern',
+//     category: 'modern',
+//     genres: [],
+//     languages: ['urdu'],
+//     isVerified: false,
+//     isFeatured: false,
+//     avatar: '',
+//     coverImage: ''
+//   });
+
+//   // Timeline form state
+//   const [timelineForm, setTimelineForm] = useState({ year: '', event: '', description: '' });
+//   const [showTimelineForm, setShowTimelineForm] = useState(false);
+//   const [editingTimelineIndex, setEditingTimelineIndex] = useState(null);
+
+//   // Gallery form state
+//   const [galleryForm, setGalleryForm] = useState({ url: '', caption: '' });
+//   const [showGalleryForm, setShowGalleryForm] = useState(false);
+//   const [editingGalleryIndex, setEditingGalleryIndex] = useState(null);
+
+//   // Generate slug from name
+//   const generateSlugFromName = (name) => {
+//     return name
+//       .toLowerCase()
+//       .replace(/[^a-z0-9]+/g, '-')
+//       .replace(/^-|-$/g, '');
+//   };
+
+//   // Check slug availability
+//   const checkSlugAvailability = async (slug, excludeId = null) => {
+//     if (!slug || slug.length < 2) {
+//       setSlugAvailable(true);
+//       return true;
+//     }
+
+//     setCheckingSlug(true);
+//     try {
+//       const response = await authorAPI.getAuthors({ limit: 1000 });
+//       let authorsList = [];
+//       if (response?.data?.data) {
+//         authorsList = response.data.data;
+//       } else if (response?.data) {
+//         authorsList = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsList = response;
+//       } else {
+//         authorsList = [];
+//       }
+
+//       const exists = authorsList.some(author => 
+//         author.slug === slug && author._id !== excludeId
+//       );
+      
+//       setSlugAvailable(!exists);
+//       return !exists;
+//     } catch (error) {
+//       console.error('Error checking slug:', error);
+//       setSlugAvailable(true);
+//       return true;
+//     } finally {
+//       setCheckingSlug(false);
+//     }
+//   };
+
+//   // Handle name change to auto-generate slug
+//   const handleNameChange = async (e) => {
+//     const name = e.target.value;
+//     const newSlug = generateSlugFromName(name);
+//     setFormData(prev => ({
+//       ...prev,
+//       name: name,
+//       slug: newSlug
+//     }));
+//     if (newSlug) {
+//       await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     }
+//   };
+
+//   // Handle slug manual edit
+//   const handleSlugChange = async (e) => {
+//     const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     setFormData(prev => ({ ...prev, slug }));
+//     await checkSlugAvailability(slug, editingAuthor?._id);
+//   };
+
+//   // Regenerate slug from name
+//   const regenerateSlug = async () => {
+//     const newSlug = generateSlugFromName(formData.name);
+//     setFormData(prev => ({ ...prev, slug: newSlug }));
+//     await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     toast.success('Slug regenerated');
+//   };
+
+//   // Copy slug to clipboard
+//   const copySlugToClipboard = (slug) => {
+//     navigator.clipboard.writeText(`${window.location.origin}/author/${slug}`);
+//     setCopiedSlug(slug);
+//     toast.success('Link copied to clipboard!');
+//     setTimeout(() => setCopiedSlug(null), 2000);
+//   };
+
+//   // Fetch author details for modal
+//   const fetchAuthorDetails = async (authorId) => {
+//     setDetailLoading(true);
+//     try {
+//       const [poemsRes, booksRes, audioRes, videosRes, timelineRes, galleryRes] = await Promise.all([
+//         authorAPI.getAuthorPoems(authorId, { limit: 100 }),
+//         authorAPI.getAuthorBooks(authorId, { limit: 100 }),
+//         authorAPI.getAuthorAudio(authorId, { limit: 100 }),
+//         authorAPI.getAuthorVideos(authorId, { limit: 100 }),
+//         authorAPI.getAuthorTimeline(authorId),
+//         authorAPI.getAuthorGallery(authorId)
+//       ]);
+
+//       setAuthorPoems(poemsRes?.data || poemsRes || []);
+//       setAuthorBooks(booksRes?.data || booksRes || []);
+//       setAuthorAudio(audioRes?.data || audioRes || []);
+//       setAuthorVideos(videosRes?.data || videosRes || []);
+//       setAuthorTimeline(timelineRes?.data || timelineRes || []);
+//       setAuthorGallery(galleryRes?.data || galleryRes || []);
+//     } catch (error) {
+//       console.error('Error fetching author details:', error);
+//       toast.error('Failed to load author details');
+//     } finally {
+//       setDetailLoading(false);
+//     }
+//   };
+
+//   // Handle view details
+//   const handleViewDetails = async (author) => {
+//     setSelectedAuthor(author);
+//     setShowDetailModal(true);
+//     await fetchAuthorDetails(author._id);
+//   };
+
+//   // Handle add timeline event
+//   const handleAddTimeline = async () => {
+//     if (!timelineForm.year || !timelineForm.event) {
+//       toast.error('Please enter year and event');
+//       return;
+//     }
+
+//     const updatedTimeline = [...authorTimeline];
+//     if (editingTimelineIndex !== null) {
+//       updatedTimeline[editingTimelineIndex] = timelineForm;
+//     } else {
+//       updatedTimeline.push(timelineForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success(editingTimelineIndex !== null ? 'Timeline updated' : 'Timeline event added');
+//       resetTimelineForm();
+//     } catch (error) {
+//       toast.error('Failed to save timeline');
+//     }
+//   };
+
+//   // Handle delete timeline
+//   const handleDeleteTimeline = async (index) => {
+//     const updatedTimeline = authorTimeline.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success('Timeline event deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete timeline');
+//     }
+//   };
+
+//   // Handle add gallery image
+//   const handleAddGallery = async () => {
+//     if (!galleryForm.url) {
+//       toast.error('Please enter image URL');
+//       return;
+//     }
+
+//     const updatedGallery = [...authorGallery];
+//     if (editingGalleryIndex !== null) {
+//       updatedGallery[editingGalleryIndex] = galleryForm;
+//     } else {
+//       updatedGallery.push(galleryForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success(editingGalleryIndex !== null ? 'Gallery image updated' : 'Gallery image added');
+//       resetGalleryForm();
+//     } catch (error) {
+//       toast.error('Failed to save gallery');
+//     }
+//   };
+
+//   // Handle delete gallery
+//   const handleDeleteGallery = async (index) => {
+//     const updatedGallery = authorGallery.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success('Gallery image deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete gallery image');
+//     }
+//   };
+
+//   // Reset timeline form
+//   const resetTimelineForm = () => {
+//     setTimelineForm({ year: '', event: '', description: '' });
+//     setShowTimelineForm(false);
+//     setEditingTimelineIndex(null);
+//   };
+
+//   // Reset gallery form
+//   const resetGalleryForm = () => {
+//     setGalleryForm({ url: '', caption: '' });
+//     setShowGalleryForm(false);
+//     setEditingGalleryIndex(null);
+//   };
+
+//   // Fetch authors from API
+//   const fetchAuthors = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const params = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(searchQuery && { search: searchQuery }),
+//         ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+//       };
+
+//       const response = await authorAPI.getAuthors(params);
+      
+//       let authorsData = [];
+//       if (response?.data?.data) {
+//         authorsData = response.data.data;
+//         if (response.data.pagination) setPagination(response.data.pagination);
+//       } else if (response?.data) {
+//         authorsData = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsData = response;
+//       } else if (response?.authors) {
+//         authorsData = response.authors;
+//       } else {
+//         authorsData = [];
+//       }
+      
+//       setAuthors(Array.isArray(authorsData) ? authorsData : []);
+//     } catch (error) {
+//       console.error('Error fetching authors:', error);
+//       toast.error('Failed to load authors');
+//       setAuthors([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+//   useEffect(() => {
+//     fetchAuthors();
+//   }, [fetchAuthors]);
+
+//   // Handle form input changes
+//   const handleInputChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     if (type === 'checkbox') {
+//       setFormData(prev => ({ ...prev, [name]: checked }));
+//     } else if (name === 'genres') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, genres: selectedOptions }));
+//     } else if (name === 'languages') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, languages: selectedOptions }));
+//     } else {
+//       setFormData(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle submit (create or update)
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!formData.name || !formData.name.trim()) {
+//       toast.error('Please enter author name');
+//       return;
+//     }
+
+//     if (!formData.bio || !formData.bio.trim()) {
+//       toast.error('Please enter author biography');
+//       return;
+//     }
+
+//     if (!formData.slug) {
+//       toast.error('Please enter a slug');
+//       return;
+//     }
+
+//     if (!slugAvailable) {
+//       toast.error('Slug already exists. Please choose a different slug.');
+//       return;
+//     }
+
+//     const authorData = {
+//       name: formData.name.trim(),
+//       slug: formData.slug,
+//       nameUrdu: formData.nameUrdu?.trim() || '',
+//       bio: formData.bio.trim(),
+//       bioUrdu: formData.bioUrdu?.trim() || '',
+//       birthDate: formData.birthDate || null,
+//       deathDate: formData.deathDate || null,
+//       birthPlace: formData.birthPlace?.trim() || '',
+//       era: formData.era,
+//       category: formData.category,
+//       genres: formData.genres,
+//       languages: formData.languages,
+//       isVerified: formData.isVerified,
+//       isFeatured: formData.isFeatured,
+//       avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+//       coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+//     };
+
+//     setLoading(true);
+//     try {
+//       if (editingAuthor) {
+//         await authorAPI.updateAuthor(editingAuthor._id, authorData);
+//         toast.success('Author updated successfully');
+//       } else {
+//         await authorAPI.createAuthor(authorData);
+//         toast.success('Author created successfully');
+//       }
+//       resetModal();
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error saving author:', error);
+//       const message = error.response?.data?.message || 'Failed to save author';
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle delete
+//   const handleDelete = async (id, name) => {
+//     if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await authorAPI.deleteAuthor(id);
+//       toast.success('Author deleted successfully');
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error deleting author:', error);
+//       toast.error(error.response?.data?.message || 'Failed to delete author');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle edit
+//   const handleEdit = (author) => {
+//     setEditingAuthor(author);
+//     setFormData({
+//       name: author.name || '',
+//       slug: author.slug || '',
+//       nameUrdu: author.nameUrdu || '',
+//       bio: author.bio || '',
+//       bioUrdu: author.bioUrdu || '',
+//       birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+//       deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+//       birthPlace: author.birthPlace || '',
+//       era: author.era || 'modern',
+//       category: author.category || 'modern',
+//       genres: author.genres || [],
+//       languages: author.languages || ['urdu'],
+//       isVerified: author.isVerified || false,
+//       isFeatured: author.isFeatured || false,
+//       avatar: author.avatar || '',
+//       coverImage: author.coverImage || ''
+//     });
+//     setSlugAvailable(true);
+//     setShowAddModal(true);
+//   };
+
+//   const resetModal = () => {
+//     setShowAddModal(false);
+//     setEditingAuthor(null);
+//     setFormData({
+//       name: '',
+//       slug: '',
+//       nameUrdu: '',
+//       bio: '',
+//       bioUrdu: '',
+//       birthDate: '',
+//       deathDate: '',
+//       birthPlace: '',
+//       era: 'modern',
+//       category: 'modern',
+//       genres: [],
+//       languages: ['urdu'],
+//       isVerified: false,
+//       isFeatured: false,
+//       avatar: '',
+//       coverImage: ''
+//     });
+//     setSlugAvailable(true);
+//   };
+
+//   const clearFilters = () => {
+//     setSearchQuery('');
+//     setFilterEra('all');
+//     setPagination(prev => ({ ...prev, page: 1 }));
+//   };
+
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'N/A';
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch {
+//       return 'N/A';
+//     }
+//   };
+
+//   const getEraColor = (era) => {
+//     switch (era?.toLowerCase()) {
+//       case 'classical': return 'bg-purple-100 text-purple-700';
+//       case 'modern': return 'bg-blue-100 text-blue-700';
+//       case 'contemporary': return 'bg-green-100 text-green-700';
+//       default: return 'bg-gray-100 text-gray-700';
+//     }
+//   };
+
+//   // Detail view tabs
+//   const detailTabs = [
+//     { id: 'works', label: 'Popular Works', icon: BookOpen },
+//     { id: 'books', label: 'Books', icon: BookOpen },
+//     { id: 'audio', label: 'Audio', icon: Music },
+//     { id: 'videos', label: 'Videos', icon: Video },
+//     { id: 'timeline', label: 'Timeline', icon: Calendar },
+//     { id: 'gallery', label: 'Gallery', icon: Image }
+//   ];
+
+//   // Render works (poems)
+//   const renderWorks = () => {
+//     if (authorPoems.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No poems available for this author.</div>;
+//     }
+
+//     return (
+//       <>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Poems ({authorPoems.length})</h3>
+//           <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => setViewMode('grid')}
+//               className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <Grid className="h-4 w-4" />
+//             </button>
+//             <button
+//               onClick={() => setViewMode('list')}
+//               className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <List className="h-4 w-4" />
+//             </button>
+//           </div>
+//         </div>
+//         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+//           {authorPoems.map((poem) => (
+//             <div key={poem._id} className="card p-4 hover:shadow-md transition-all">
+//               <Link to={`/poem/${poem.slug}`} target="_blank">
+//                 <h4 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">{poem.title}</h4>
+//                 <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//                   <span className="capitalize">{poem.genre}</span>
+//                   <span className="flex items-center gap-1">
+//                     <Eye className="h-3 w-3" />
+//                     {poem.stats?.views?.toLocaleString() || 0}
+//                   </span>
+//                   <span className="flex items-center gap-1">
+//                     <Heart className="h-3 w-3" />
+//                     {poem.stats?.likes?.toLocaleString() || 0}
+//                   </span>
+//                 </div>
+//               </Link>
+//             </div>
+//           ))}
+//         </div>
+//       </>
+//     );
+//   };
+
+//   // Render books
+//   const renderBooks = () => {
+//     if (authorBooks.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No books available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorBooks.map((book) => (
+//           <Link key={book._id} to={`/book/${book.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all">
+//             <h4 className="font-medium text-gray-900">{book.title}</h4>
+//             <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+//             <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//               <span className="capitalize">{book.type}</span>
+//               <span className="flex items-center gap-1">
+//                 <Eye className="h-3 w-3" />
+//                 {book.stats?.views?.toLocaleString() || 0}
+//               </span>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render audio
+//   const renderAudio = () => {
+//     if (authorAudio.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No audio available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="space-y-3">
+//         {authorAudio.map((audio) => (
+//           <Link key={audio._id} to={`/audio/${audio.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all flex items-center gap-4">
+//             <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+//               <Play className="h-5 w-5 text-primary-600" />
+//             </div>
+//             <div className="flex-1">
+//               <h4 className="font-medium text-gray-900">{audio.title}</h4>
+//               <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+//             </div>
+//             <div className="text-sm text-gray-400">
+//               {audio.duration ? `${Math.floor(audio.duration / 60)}:${(audio.duration % 60).toString().padStart(2, '0')}` : '--:--'}
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render videos
+//   const renderVideos = () => {
+//     if (authorVideos.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No videos available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorVideos.map((video) => (
+//           <Link key={video._id} to={`/video/${video.slug}`} target="_blank" className="card overflow-hidden hover:shadow-md transition-all">
+//             <div className="relative h-40 bg-gray-900">
+//               {video.thumbnail ? (
+//                 <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+//               ) : (
+//                 <div className="absolute inset-0 flex items-center justify-center">
+//                   <Play className="h-10 w-10 text-white/50" />
+//                 </div>
+//               )}
+//             </div>
+//             <div className="p-3">
+//               <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+//               <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+//                 <span className="capitalize">{video.type}</span>
+//                 <span className="flex items-center gap-1">
+//                   <Eye className="h-3 w-3" />
+//                   {video.stats?.views?.toLocaleString() || 0}
+//                 </span>
+//               </div>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render timeline management
+//   const renderTimeline = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Timeline Events</h3>
+//           <button
+//             onClick={() => setShowTimelineForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Event
+//           </button>
+//         </div>
+
+//         {authorTimeline.length === 0 && !showTimelineForm && (
+//           <div className="text-center py-8 text-gray-500">No timeline events added yet.</div>
+//         )}
+
+//         {/* Timeline Form */}
+//         {showTimelineForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingTimelineIndex !== null ? 'Edit Event' : 'Add New Event'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+//               <input
+//                 type="text"
+//                 placeholder="Year (e.g., 1797)"
+//                 value={timelineForm.year}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, year: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Event title"
+//                 value={timelineForm.event}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, event: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <textarea
+//                 placeholder="Description (optional)"
+//                 value={timelineForm.description}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, description: e.target.value }))}
+//                 className="input-field h-10"
+//               />
+//             </div>
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddTimeline} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetTimelineForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Timeline List */}
+//         {authorTimeline.length > 0 && (
+//           <div className="space-y-3">
+//             {authorTimeline.map((event, index) => (
+//               <div key={index} className="card p-4 flex items-start justify-between">
+//                 <div className="flex-1">
+//                   <div className="flex items-center gap-3">
+//                     <span className="font-bold text-primary-600 text-lg">{event.year}</span>
+//                     <h4 className="font-medium text-gray-900">{event.event}</h4>
+//                   </div>
+//                   {event.description && <p className="text-sm text-gray-500 mt-1">{event.description}</p>}
+//                 </div>
+//                 <div className="flex gap-2">
+//                   <button
+//                     onClick={() => {
+//                       setTimelineForm(event);
+//                       setEditingTimelineIndex(index);
+//                       setShowTimelineForm(true);
+//                     }}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+//                   >
+//                     <Edit className="h-4 w-4" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteTimeline(index)}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+//                   >
+//                     <Trash2 className="h-4 w-4" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Render gallery management
+//   const renderGallery = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Gallery Images</h3>
+//           <button
+//             onClick={() => setShowGalleryForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Image
+//           </button>
+//         </div>
+
+//         {authorGallery.length === 0 && !showGalleryForm && (
+//           <div className="text-center py-8 text-gray-500">No gallery images added yet.</div>
+//         )}
+
+//         {/* Gallery Form */}
+//         {showGalleryForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingGalleryIndex !== null ? 'Edit Image' : 'Add New Image'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//               <input
+//                 type="url"
+//                 placeholder="Image URL"
+//                 value={galleryForm.url}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, url: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Caption (optional)"
+//                 value={galleryForm.caption}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, caption: e.target.value }))}
+//                 className="input-field"
+//               />
+//             </div>
+//             {galleryForm.url && (
+//               <div className="mt-2">
+//                 <img src={galleryForm.url} alt="Preview" className="h-24 w-auto rounded object-cover" />
+//               </div>
+//             )}
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddGallery} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetGalleryForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Gallery Grid */}
+//         {authorGallery.length > 0 && (
+//           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+//             {authorGallery.map((item, index) => (
+//               <div key={index} className="card overflow-hidden group relative">
+//                 <img src={item.url} alt={item.caption || `Image ${index + 1}`} className="w-full h-40 object-cover" />
+//                 {item.caption && (
+//                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">
+//                     {item.caption}
+//                   </div>
+//                 )}
+//                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                   <button
+//                     onClick={() => {
+//                       setGalleryForm(item);
+//                       setEditingGalleryIndex(index);
+//                       setShowGalleryForm(true);
+//                     }}
+//                     className="p-1 rounded bg-white text-blue-600 hover:bg-gray-100"
+//                   >
+//                     <Edit className="h-3 w-3" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteGallery(index)}
+//                     className="p-1 rounded bg-white text-red-600 hover:bg-gray-100"
+//                   >
+//                     <Trash2 className="h-3 w-3" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Loading state
+//   if (loading && authors.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[60vh]">
+//         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, and galleries</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Stats Summary */}
+//       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+//           <p className="text-sm text-gray-500">Total Authors</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-purple-600">
+//             {authors.filter(a => a.era === 'classical').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Classical Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-blue-600">
+//             {authors.filter(a => a.era === 'modern').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Modern Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-green-600">
+//             {authors.filter(a => a.isFeatured).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Featured</p>
+//         </div>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors by name..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="classical">Classical</option>
+//           <option value="modern">Modern</option>
+//           <option value="contemporary">Contemporary</option>
+//         </select>
+//         {(searchQuery || filterEra !== 'all') && (
+//           <button
+//             onClick={clearFilters}
+//             className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+//           >
+//             Clear Filters
+//           </button>
+//         )}
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {authors.length === 0 ? (
+//                 <tr>
+//                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+//                     No authors found. Click "Add Author" to get started.
+//                   </td>
+//                 </tr>
+//               ) : (
+//                 authors.map((author) => (
+//                   <motion.tr
+//                     key={author._id}
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     className="hover:bg-gray-50"
+//                   >
+//                     <td className="px-6 py-4">
+//                       <div className="flex items-center space-x-3">
+//                         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+//                           {author.avatar ? (
+//                             <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+//                           ) : (
+//                             <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+//                           )}
+//                         </div>
+//                         <div>
+//                           <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                           <div className="flex items-center gap-2 mt-1">
+//                             <code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+//                               slug: {author.slug}
+//                             </code>
+//                             <button
+//                               onClick={() => copySlugToClipboard(author.slug)}
+//                               className="p-1 rounded hover:bg-gray-200 transition-colors"
+//                               title="Copy link to clipboard"
+//                             >
+//                               {copiedSlug === author.slug ? (
+//                                 <Check className="h-3 w-3 text-green-600" />
+//                               ) : (
+//                                 <Copy className="h-3 w-3 text-gray-400" />
+//                               )}
+//                             </button>
+//                           </div>
+//                           {author.nameUrdu && (
+//                             <p className="urdu-text text-xs text-gray-500 mt-1" dir="rtl">{author.nameUrdu}</p>
+//                           )}
+//                         </div>
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+//                         {author.era || 'N/A'}
+//                       </span>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex flex-wrap gap-1">
+//                         {author.genres?.slice(0, 2).map((genre, idx) => (
+//                           <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+//                             {genre}
+//                           </span>
+//                         ))}
+//                         {author.genres?.length > 2 && (
+//                           <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-900">
+//                       {author.stats?.poemsCount || 0}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex gap-1">
+//                         {author.isVerified && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+//                             Verified
+//                           </span>
+//                         )}
+//                         {author.isFeatured && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+//                             Featured
+//                           </span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-500">
+//                       {formatDate(author.createdAt)}
+//                     </td>
+//                     <td className="px-6 py-4 text-right">
+//                       <div className="flex items-center justify-end space-x-2">
+//                         <button
+//                           onClick={() => handleViewDetails(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-primary-600"
+//                           title="Manage Content"
+//                         >
+//                           <Eye className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleEdit(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+//                           title="Edit Author"
+//                         >
+//                           <Edit className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDelete(author._id, author.name)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+//                           title="Delete Author"
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </button>
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 ))
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {/* Pagination */}
+//         {pagination.totalPages > 1 && (
+//           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//             <p className="text-sm text-gray-500">
+//               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+//             </p>
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+//                 disabled={pagination.page === 1 || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronLeft className="h-4 w-4" />
+//               </button>
+//               <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+//                 {pagination.page} / {pagination.totalPages}
+//               </span>
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+//                 disabled={pagination.page === pagination.totalPages || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronRight className="h-4 w-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Author Detail Modal with Tabs */}
+//       <AnimatePresence>
+//         {showDetailModal && selectedAuthor && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <div>
+//                   <h2 className="text-xl font-bold text-gray-900">{selectedAuthor.name}</h2>
+//                   <p className="text-sm text-gray-500">Manage content for this author</p>
+//                 </div>
+//                 <button onClick={() => setShowDetailModal(false)} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               {/* Tabs */}
+//               <div className="flex overflow-x-auto scrollbar-hide gap-1 px-6 pt-4 border-b border-gray-200">
+//                 {detailTabs.map((tab) => {
+//                   const Icon = tab.icon;
+//                   return (
+//                     <button
+//                       key={tab.id}
+//                       onClick={() => setActiveDetailTab(tab.id)}
+//                       className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+//                         activeDetailTab === tab.id
+//                           ? 'border-primary-600 text-primary-600'
+//                           : 'border-transparent text-gray-500 hover:text-gray-700'
+//                       }`}
+//                     >
+//                       <Icon className="h-4 w-4" />
+//                       <span>{tab.label}</span>
+//                     </button>
+//                   );
+//                 })}
+//               </div>
+
+//               {/* Tab Content */}
+//               <div className="p-6">
+//                 {detailLoading ? (
+//                   <div className="flex justify-center py-12">
+//                     <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//                   </div>
+//                 ) : (
+//                   <>
+//                     {activeDetailTab === 'works' && renderWorks()}
+//                     {activeDetailTab === 'books' && renderBooks()}
+//                     {activeDetailTab === 'audio' && renderAudio()}
+//                     {activeDetailTab === 'videos' && renderVideos()}
+//                     {activeDetailTab === 'timeline' && renderTimeline()}
+//                     {activeDetailTab === 'gallery' && renderGallery()}
+//                   </>
+//                 )}
+//               </div>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+
+//       {/* Add/Edit Author Modal */}
+//       <AnimatePresence>
+//         {showAddModal && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <h2 className="text-xl font-bold text-gray-900">
+//                   {editingAuthor ? 'Edit Author' : 'Add New Author'}
+//                 </h2>
+//                 <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+//                 {/* Name and Slug */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (English) <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="name"
+//                       value={formData.name}
+//                       onChange={handleNameChange}
+//                       className="input-field"
+//                       placeholder="Enter author name"
+//                       required
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Slug (URL)
+//                     </label>
+//                     <div className="flex items-center gap-2">
+//                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-2 rounded-l">/author/</span>
+//                       <input
+//                         type="text"
+//                         name="slug"
+//                         value={formData.slug}
+//                         onChange={handleSlugChange}
+//                         className={`input-field flex-1 rounded-l-none ${!slugAvailable ? 'border-red-500 focus:ring-red-500' : ''}`}
+//                         placeholder="author-slug"
+//                       />
+//                       <button
+//                         type="button"
+//                         onClick={regenerateSlug}
+//                         className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+//                         title="Regenerate slug from name"
+//                       >
+//                         <RefreshCw className="h-4 w-4" />
+//                       </button>
+//                     </div>
+//                     {!slugAvailable && (
+//                       <p className="text-xs text-red-500 mt-1">Slug already taken. Please choose a different one.</p>
+//                     )}
+//                     {slugAvailable && formData.slug && !checkingSlug && (
+//                       <p className="text-xs text-green-500 mt-1">✓ Slug is available</p>
+//                     )}
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Name (Urdu)</label>
+//                   <input
+//                     type="text"
+//                     name="nameUrdu"
+//                     value={formData.nameUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field urdu-text"
+//                     dir="rtl"
+//                     placeholder="نام اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Bio */}
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (English) <span className="text-red-500">*</span>
+//                   </label>
+//                   <textarea
+//                     name="bio"
+//                     value={formData.bio}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24"
+//                     placeholder="Enter author biography..."
+//                     required
+//                   />
+//                 </div>
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Biography (Urdu)</label>
+//                   <textarea
+//                     name="bioUrdu"
+//                     value={formData.bioUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24 urdu-text"
+//                     dir="rtl"
+//                     placeholder="سوانح حیات اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Life Details */}
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+//                     <input
+//                       type="date"
+//                       name="birthDate"
+//                       value={formData.birthDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+//                     <input
+//                       type="date"
+//                       name="deathDate"
+//                       value={formData.deathDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+//                     <input
+//                       type="text"
+//                       name="birthPlace"
+//                       value={formData.birthPlace}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="e.g., Agra, India"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Classification */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+//                     <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="contemporary">Contemporary</option>
+//                     </select>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+//                     <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="female">Female</option>
+//                       <option value="trending">Trending</option>
+//                       <option value="emerging">Emerging</option>
+//                     </select>
+//                   </div>
+//                 </div>
+
+//                 {/* Genres & Languages */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+//                     <select
+//                       multiple
+//                       name="genres"
+//                       value={formData.genres}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="ghazal">Ghazal</option>
+//                       <option value="nazm">Nazm</option>
+//                       <option value="sher">Sher</option>
+//                       <option value="rubai">Rubai</option>
+//                       <option value="rekhti">Rekhti</option>
+//                       <option value="qasida">Qasida</option>
+//                       <option value="marsiya">Marsiya</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+//                     <select
+//                       multiple
+//                       name="languages"
+//                       value={formData.languages}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="urdu">Urdu</option>
+//                       <option value="hindi">Hindi</option>
+//                       <option value="english">English</option>
+//                       <option value="persian">Persian</option>
+//                       <option value="arabic">Arabic</option>
+//                       <option value="punjabi">Punjabi</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Status */}
+//                 <div className="flex flex-wrap gap-4">
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isVerified"
+//                       checked={formData.isVerified}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Verified Author</span>
+//                   </label>
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isFeatured"
+//                       checked={formData.isFeatured}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Featured Author</span>
+//                   </label>
+//                 </div>
+
+//                 {/* Images */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+//                     <input
+//                       type="url"
+//                       name="avatar"
+//                       value={formData.avatar}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                     <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+//                     <input
+//                       type="url"
+//                       name="coverImage"
+//                       value={formData.coverImage}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Form Actions */}
+//                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+//                   <button
+//                     type="submit"
+//                     disabled={loading || !slugAvailable || checkingSlug}
+//                     className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+//                   >
+//                     {loading ? (
+//                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+//                     ) : (
+//                       editingAuthor ? 'Update Author' : 'Create Author'
+//                     )}
+//                   </button>
+//                   <button
+//                     type="button"
+//                     onClick={resetModal}
+//                     className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+//                   >
+//                     Cancel
+//                   </button>
+//                 </div>
+//               </form>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default AuthorCMSPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+//   AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music,
+//   Grid, List, Play, Download, Heart, Clock, MapPin, Users, FolderTree
+// } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import authorAPI from '../../api/authorAPI';
+// import poemAPI from '../../api/poemAPI';
+// import bookAPI from '../../api/bookAPI';
+// import audioAPI from '../../api/audioAPI';
+// import videoAPI from '../../api/videoAPI';
+// import toast from 'react-hot-toast';
+
+// const AuthorCMSPage = () => {
+//   const [authors, setAuthors] = useState([]);
+//   const [selectedAuthor, setSelectedAuthor] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [filterEra, setFilterEra] = useState('all');
+//   const [showAddModal, setShowAddModal] = useState(false);
+//   const [showDetailModal, setShowDetailModal] = useState(false);
+//   const [editingAuthor, setEditingAuthor] = useState(null);
+//   const [activeDetailTab, setActiveDetailTab] = useState('works');
+//   const [copiedSlug, setCopiedSlug] = useState(null);
+//   const [slugAvailable, setSlugAvailable] = useState(true);
+//   const [checkingSlug, setCheckingSlug] = useState(false);
+//   const [pagination, setPagination] = useState({
+//     page: 1,
+//     limit: 10,
+//     total: 0,
+//     totalPages: 0
+//   });
+
+//   // Detail view data states
+//   const [authorPoems, setAuthorPoems] = useState([]);
+//   const [authorBooks, setAuthorBooks] = useState([]);
+//   const [authorAudio, setAuthorAudio] = useState([]);
+//   const [authorVideos, setAuthorVideos] = useState([]);
+//   const [authorTimeline, setAuthorTimeline] = useState([]);
+//   const [authorGallery, setAuthorGallery] = useState([]);
+//   const [detailLoading, setDetailLoading] = useState(false);
+//   const [poemsPage, setPoemsPage] = useState(1);
+//   const [booksPage, setBooksPage] = useState(1);
+//   const [viewMode, setViewMode] = useState('grid');
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     slug: '',
+//     nameUrdu: '',
+//     bio: '',
+//     bioUrdu: '',
+//     birthDate: '',
+//     deathDate: '',
+//     birthPlace: '',
+//     era: 'modern',
+//     category: 'modern',
+//     genres: [],
+//     languages: ['urdu'],
+//     isVerified: false,
+//     isFeatured: false,
+//     avatar: '',
+//     coverImage: ''
+//   });
+
+//   // Timeline form state
+//   const [timelineForm, setTimelineForm] = useState({ year: '', event: '', description: '' });
+//   const [showTimelineForm, setShowTimelineForm] = useState(false);
+//   const [editingTimelineIndex, setEditingTimelineIndex] = useState(null);
+
+//   // Gallery form state
+//   const [galleryForm, setGalleryForm] = useState({ url: '', caption: '' });
+//   const [showGalleryForm, setShowGalleryForm] = useState(false);
+//   const [editingGalleryIndex, setEditingGalleryIndex] = useState(null);
+
+//   // Generate slug from name
+//   const generateSlugFromName = (name) => {
+//     return name
+//       .toLowerCase()
+//       .replace(/[^a-z0-9]+/g, '-')
+//       .replace(/^-|-$/g, '');
+//   };
+
+//   // Check slug availability
+//   const checkSlugAvailability = async (slug, excludeId = null) => {
+//     if (!slug || slug.length < 2) {
+//       setSlugAvailable(true);
+//       return true;
+//     }
+
+//     setCheckingSlug(true);
+//     try {
+//       const response = await authorAPI.getAuthors({ limit: 1000 });
+//       let authorsList = [];
+//       if (response?.data?.data) {
+//         authorsList = response.data.data;
+//       } else if (response?.data) {
+//         authorsList = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsList = response;
+//       } else {
+//         authorsList = [];
+//       }
+
+//       const exists = authorsList.some(author => 
+//         author.slug === slug && author._id !== excludeId
+//       );
+      
+//       setSlugAvailable(!exists);
+//       return !exists;
+//     } catch (error) {
+//       console.error('Error checking slug:', error);
+//       setSlugAvailable(true);
+//       return true;
+//     } finally {
+//       setCheckingSlug(false);
+//     }
+//   };
+
+//   // Handle name change to auto-generate slug
+//   const handleNameChange = async (e) => {
+//     const name = e.target.value;
+//     const newSlug = generateSlugFromName(name);
+//     setFormData(prev => ({
+//       ...prev,
+//       name: name,
+//       slug: newSlug
+//     }));
+//     if (newSlug) {
+//       await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     }
+//   };
+
+//   // Handle slug manual edit
+//   const handleSlugChange = async (e) => {
+//     const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     setFormData(prev => ({ ...prev, slug }));
+//     await checkSlugAvailability(slug, editingAuthor?._id);
+//   };
+
+//   // Regenerate slug from name
+//   const regenerateSlug = async () => {
+//     const newSlug = generateSlugFromName(formData.name);
+//     setFormData(prev => ({ ...prev, slug: newSlug }));
+//     await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     toast.success('Slug regenerated');
+//   };
+
+//   // Copy slug to clipboard
+//   const copySlugToClipboard = (slug) => {
+//     navigator.clipboard.writeText(`${window.location.origin}/author/${slug}`);
+//     setCopiedSlug(slug);
+//     toast.success('Link copied to clipboard!');
+//     setTimeout(() => setCopiedSlug(null), 2000);
+//   };
+
+//   // Fetch author details for modal
+//   const fetchAuthorDetails = async (authorId) => {
+//     setDetailLoading(true);
+//     try {
+//       const [poemsRes, booksRes, audioRes, videosRes, timelineRes, galleryRes] = await Promise.all([
+//         authorAPI.getAuthorPoems(authorId, { limit: 100 }),
+//         authorAPI.getAuthorBooks(authorId, { limit: 100 }),
+//         authorAPI.getAuthorAudio(authorId, { limit: 100 }),
+//         authorAPI.getAuthorVideos(authorId, { limit: 100 }),
+//         authorAPI.getAuthorTimeline(authorId),
+//         authorAPI.getAuthorGallery(authorId)
+//       ]);
+
+//       setAuthorPoems(poemsRes?.data || poemsRes || []);
+//       setAuthorBooks(booksRes?.data || booksRes || []);
+//       setAuthorAudio(audioRes?.data || audioRes || []);
+//       setAuthorVideos(videosRes?.data || videosRes || []);
+//       setAuthorTimeline(timelineRes?.data || timelineRes || []);
+//       setAuthorGallery(galleryRes?.data || galleryRes || []);
+//     } catch (error) {
+//       console.error('Error fetching author details:', error);
+//       toast.error('Failed to load author details');
+//     } finally {
+//       setDetailLoading(false);
+//     }
+//   };
+
+//   // Handle view details (opens modal with all content tabs)
+//   const handleManageContent = async (author) => {
+//     setSelectedAuthor(author);
+//     setShowDetailModal(true);
+//     setActiveDetailTab('works');
+//     await fetchAuthorDetails(author._id);
+//   };
+
+//   // Handle add timeline event
+//   const handleAddTimeline = async () => {
+//     if (!timelineForm.year || !timelineForm.event) {
+//       toast.error('Please enter year and event');
+//       return;
+//     }
+
+//     const updatedTimeline = [...authorTimeline];
+//     if (editingTimelineIndex !== null) {
+//       updatedTimeline[editingTimelineIndex] = timelineForm;
+//     } else {
+//       updatedTimeline.push(timelineForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success(editingTimelineIndex !== null ? 'Timeline updated' : 'Timeline event added');
+//       resetTimelineForm();
+//     } catch (error) {
+//       toast.error('Failed to save timeline');
+//     }
+//   };
+
+//   // Handle delete timeline
+//   const handleDeleteTimeline = async (index) => {
+//     const updatedTimeline = authorTimeline.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success('Timeline event deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete timeline');
+//     }
+//   };
+
+//   // Handle add gallery image
+//   const handleAddGallery = async () => {
+//     if (!galleryForm.url) {
+//       toast.error('Please enter image URL');
+//       return;
+//     }
+
+//     const updatedGallery = [...authorGallery];
+//     if (editingGalleryIndex !== null) {
+//       updatedGallery[editingGalleryIndex] = galleryForm;
+//     } else {
+//       updatedGallery.push(galleryForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success(editingGalleryIndex !== null ? 'Gallery image updated' : 'Gallery image added');
+//       resetGalleryForm();
+//     } catch (error) {
+//       toast.error('Failed to save gallery');
+//     }
+//   };
+
+//   // Handle delete gallery
+//   const handleDeleteGallery = async (index) => {
+//     const updatedGallery = authorGallery.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success('Gallery image deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete gallery image');
+//     }
+//   };
+
+//   // Reset timeline form
+//   const resetTimelineForm = () => {
+//     setTimelineForm({ year: '', event: '', description: '' });
+//     setShowTimelineForm(false);
+//     setEditingTimelineIndex(null);
+//   };
+
+//   // Reset gallery form
+//   const resetGalleryForm = () => {
+//     setGalleryForm({ url: '', caption: '' });
+//     setShowGalleryForm(false);
+//     setEditingGalleryIndex(null);
+//   };
+
+//   // Fetch authors from API
+//   const fetchAuthors = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const params = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(searchQuery && { search: searchQuery }),
+//         ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+//       };
+
+//       const response = await authorAPI.getAuthors(params);
+      
+//       let authorsData = [];
+//       if (response?.data?.data) {
+//         authorsData = response.data.data;
+//         if (response.data.pagination) setPagination(response.data.pagination);
+//       } else if (response?.data) {
+//         authorsData = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsData = response;
+//       } else if (response?.authors) {
+//         authorsData = response.authors;
+//       } else {
+//         authorsData = [];
+//       }
+      
+//       setAuthors(Array.isArray(authorsData) ? authorsData : []);
+//     } catch (error) {
+//       console.error('Error fetching authors:', error);
+//       toast.error('Failed to load authors');
+//       setAuthors([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+//   useEffect(() => {
+//     fetchAuthors();
+//   }, [fetchAuthors]);
+
+//   // Handle form input changes
+//   const handleInputChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     if (type === 'checkbox') {
+//       setFormData(prev => ({ ...prev, [name]: checked }));
+//     } else if (name === 'genres') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, genres: selectedOptions }));
+//     } else if (name === 'languages') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, languages: selectedOptions }));
+//     } else {
+//       setFormData(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle submit (create or update)
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!formData.name || !formData.name.trim()) {
+//       toast.error('Please enter author name');
+//       return;
+//     }
+
+//     if (!formData.bio || !formData.bio.trim()) {
+//       toast.error('Please enter author biography');
+//       return;
+//     }
+
+//     if (!formData.slug) {
+//       toast.error('Please enter a slug');
+//       return;
+//     }
+
+//     if (!slugAvailable) {
+//       toast.error('Slug already exists. Please choose a different slug.');
+//       return;
+//     }
+
+//     const authorData = {
+//       name: formData.name.trim(),
+//       slug: formData.slug,
+//       nameUrdu: formData.nameUrdu?.trim() || '',
+//       bio: formData.bio.trim(),
+//       bioUrdu: formData.bioUrdu?.trim() || '',
+//       birthDate: formData.birthDate || null,
+//       deathDate: formData.deathDate || null,
+//       birthPlace: formData.birthPlace?.trim() || '',
+//       era: formData.era,
+//       category: formData.category,
+//       genres: formData.genres,
+//       languages: formData.languages,
+//       isVerified: formData.isVerified,
+//       isFeatured: formData.isFeatured,
+//       avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+//       coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+//     };
+
+//     setLoading(true);
+//     try {
+//       if (editingAuthor) {
+//         await authorAPI.updateAuthor(editingAuthor._id, authorData);
+//         toast.success('Author updated successfully');
+//       } else {
+//         await authorAPI.createAuthor(authorData);
+//         toast.success('Author created successfully');
+//       }
+//       resetModal();
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error saving author:', error);
+//       const message = error.response?.data?.message || 'Failed to save author';
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle delete
+//   const handleDelete = async (id, name) => {
+//     if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await authorAPI.deleteAuthor(id);
+//       toast.success('Author deleted successfully');
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error deleting author:', error);
+//       toast.error(error.response?.data?.message || 'Failed to delete author');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle edit
+//   const handleEdit = (author) => {
+//     setEditingAuthor(author);
+//     setFormData({
+//       name: author.name || '',
+//       slug: author.slug || '',
+//       nameUrdu: author.nameUrdu || '',
+//       bio: author.bio || '',
+//       bioUrdu: author.bioUrdu || '',
+//       birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+//       deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+//       birthPlace: author.birthPlace || '',
+//       era: author.era || 'modern',
+//       category: author.category || 'modern',
+//       genres: author.genres || [],
+//       languages: author.languages || ['urdu'],
+//       isVerified: author.isVerified || false,
+//       isFeatured: author.isFeatured || false,
+//       avatar: author.avatar || '',
+//       coverImage: author.coverImage || ''
+//     });
+//     setSlugAvailable(true);
+//     setShowAddModal(true);
+//   };
+
+//   const resetModal = () => {
+//     setShowAddModal(false);
+//     setEditingAuthor(null);
+//     setFormData({
+//       name: '',
+//       slug: '',
+//       nameUrdu: '',
+//       bio: '',
+//       bioUrdu: '',
+//       birthDate: '',
+//       deathDate: '',
+//       birthPlace: '',
+//       era: 'modern',
+//       category: 'modern',
+//       genres: [],
+//       languages: ['urdu'],
+//       isVerified: false,
+//       isFeatured: false,
+//       avatar: '',
+//       coverImage: ''
+//     });
+//     setSlugAvailable(true);
+//   };
+
+//   const clearFilters = () => {
+//     setSearchQuery('');
+//     setFilterEra('all');
+//     setPagination(prev => ({ ...prev, page: 1 }));
+//   };
+
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'N/A';
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch {
+//       return 'N/A';
+//     }
+//   };
+
+//   const getEraColor = (era) => {
+//     switch (era?.toLowerCase()) {
+//       case 'classical': return 'bg-purple-100 text-purple-700';
+//       case 'modern': return 'bg-blue-100 text-blue-700';
+//       case 'contemporary': return 'bg-green-100 text-green-700';
+//       default: return 'bg-gray-100 text-gray-700';
+//     }
+//   };
+
+//   // Detail view tabs
+//   const detailTabs = [
+//     { id: 'works', label: 'Popular Works', icon: BookOpen },
+//     { id: 'books', label: 'Books', icon: BookOpen },
+//     { id: 'audio', label: 'Audio', icon: Music },
+//     { id: 'videos', label: 'Videos', icon: Video },
+//     { id: 'timeline', label: 'Timeline', icon: Calendar },
+//     { id: 'gallery', label: 'Gallery', icon: Image }
+//   ];
+
+//   // Render works (poems)
+//   const renderWorks = () => {
+//     if (authorPoems.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No poems available for this author.</div>;
+//     }
+
+//     return (
+//       <>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Poems ({authorPoems.length})</h3>
+//           <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => setViewMode('grid')}
+//               className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <Grid className="h-4 w-4" />
+//             </button>
+//             <button
+//               onClick={() => setViewMode('list')}
+//               className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <List className="h-4 w-4" />
+//             </button>
+//           </div>
+//         </div>
+//         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+//           {authorPoems.map((poem) => (
+//             <div key={poem._id} className="card p-4 hover:shadow-md transition-all">
+//               <Link to={`/poem/${poem.slug}`} target="_blank">
+//                 <h4 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">{poem.title}</h4>
+//                 <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//                   <span className="capitalize">{poem.genre}</span>
+//                   <span className="flex items-center gap-1">
+//                     <Eye className="h-3 w-3" />
+//                     {poem.stats?.views?.toLocaleString() || 0}
+//                   </span>
+//                   <span className="flex items-center gap-1">
+//                     <Heart className="h-3 w-3" />
+//                     {poem.stats?.likes?.toLocaleString() || 0}
+//                   </span>
+//                 </div>
+//               </Link>
+//             </div>
+//           ))}
+//         </div>
+//       </>
+//     );
+//   };
+
+//   // Render books
+//   const renderBooks = () => {
+//     if (authorBooks.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No books available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorBooks.map((book) => (
+//           <Link key={book._id} to={`/book/${book.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all">
+//             <h4 className="font-medium text-gray-900">{book.title}</h4>
+//             <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+//             <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//               <span className="capitalize">{book.type}</span>
+//               <span className="flex items-center gap-1">
+//                 <Eye className="h-3 w-3" />
+//                 {book.stats?.views?.toLocaleString() || 0}
+//               </span>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render audio
+//   const renderAudio = () => {
+//     if (authorAudio.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No audio available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="space-y-3">
+//         {authorAudio.map((audio) => (
+//           <Link key={audio._id} to={`/audio/${audio.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all flex items-center gap-4">
+//             <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+//               <Play className="h-5 w-5 text-primary-600" />
+//             </div>
+//             <div className="flex-1">
+//               <h4 className="font-medium text-gray-900">{audio.title}</h4>
+//               <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+//             </div>
+//             <div className="text-sm text-gray-400">
+//               {audio.duration ? `${Math.floor(audio.duration / 60)}:${(audio.duration % 60).toString().padStart(2, '0')}` : '--:--'}
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render videos
+//   const renderVideos = () => {
+//     if (authorVideos.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No videos available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorVideos.map((video) => (
+//           <Link key={video._id} to={`/video/${video.slug}`} target="_blank" className="card overflow-hidden hover:shadow-md transition-all">
+//             <div className="relative h-40 bg-gray-900">
+//               {video.thumbnail ? (
+//                 <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+//               ) : (
+//                 <div className="absolute inset-0 flex items-center justify-center">
+//                   <Play className="h-10 w-10 text-white/50" />
+//                 </div>
+//               )}
+//             </div>
+//             <div className="p-3">
+//               <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+//               <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+//                 <span className="capitalize">{video.type}</span>
+//                 <span className="flex items-center gap-1">
+//                   <Eye className="h-3 w-3" />
+//                   {video.stats?.views?.toLocaleString() || 0}
+//                 </span>
+//               </div>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   // Render timeline management
+//   const renderTimeline = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Timeline Events</h3>
+//           <button
+//             onClick={() => setShowTimelineForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Event
+//           </button>
+//         </div>
+
+//         {authorTimeline.length === 0 && !showTimelineForm && (
+//           <div className="text-center py-8 text-gray-500">No timeline events added yet.</div>
+//         )}
+
+//         {/* Timeline Form */}
+//         {showTimelineForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingTimelineIndex !== null ? 'Edit Event' : 'Add New Event'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+//               <input
+//                 type="text"
+//                 placeholder="Year (e.g., 1797)"
+//                 value={timelineForm.year}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, year: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Event title"
+//                 value={timelineForm.event}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, event: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <textarea
+//                 placeholder="Description (optional)"
+//                 value={timelineForm.description}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, description: e.target.value }))}
+//                 className="input-field h-10"
+//               />
+//             </div>
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddTimeline} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetTimelineForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Timeline List */}
+//         {authorTimeline.length > 0 && (
+//           <div className="space-y-3">
+//             {authorTimeline.map((event, index) => (
+//               <div key={index} className="card p-4 flex items-start justify-between">
+//                 <div className="flex-1">
+//                   <div className="flex items-center gap-3">
+//                     <span className="font-bold text-primary-600 text-lg">{event.year}</span>
+//                     <h4 className="font-medium text-gray-900">{event.event}</h4>
+//                   </div>
+//                   {event.description && <p className="text-sm text-gray-500 mt-1">{event.description}</p>}
+//                 </div>
+//                 <div className="flex gap-2">
+//                   <button
+//                     onClick={() => {
+//                       setTimelineForm(event);
+//                       setEditingTimelineIndex(index);
+//                       setShowTimelineForm(true);
+//                     }}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+//                   >
+//                     <Edit className="h-4 w-4" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteTimeline(index)}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+//                   >
+//                     <Trash2 className="h-4 w-4" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Render gallery management
+//   const renderGallery = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Gallery Images</h3>
+//           <button
+//             onClick={() => setShowGalleryForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Image
+//           </button>
+//         </div>
+
+//         {authorGallery.length === 0 && !showGalleryForm && (
+//           <div className="text-center py-8 text-gray-500">No gallery images added yet.</div>
+//         )}
+
+//         {/* Gallery Form */}
+//         {showGalleryForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingGalleryIndex !== null ? 'Edit Image' : 'Add New Image'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//               <input
+//                 type="url"
+//                 placeholder="Image URL"
+//                 value={galleryForm.url}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, url: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Caption (optional)"
+//                 value={galleryForm.caption}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, caption: e.target.value }))}
+//                 className="input-field"
+//               />
+//             </div>
+//             {galleryForm.url && (
+//               <div className="mt-2">
+//                 <img src={galleryForm.url} alt="Preview" className="h-24 w-auto rounded object-cover" />
+//               </div>
+//             )}
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddGallery} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetGalleryForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* Gallery Grid */}
+//         {authorGallery.length > 0 && (
+//           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+//             {authorGallery.map((item, index) => (
+//               <div key={index} className="card overflow-hidden group relative">
+//                 <img src={item.url} alt={item.caption || `Image ${index + 1}`} className="w-full h-40 object-cover" />
+//                 {item.caption && (
+//                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2">
+//                     {item.caption}
+//                   </div>
+//                 )}
+//                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                   <button
+//                     onClick={() => {
+//                       setGalleryForm(item);
+//                       setEditingGalleryIndex(index);
+//                       setShowGalleryForm(true);
+//                     }}
+//                     className="p-1 rounded bg-white text-blue-600 hover:bg-gray-100"
+//                   >
+//                     <Edit className="h-3 w-3" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteGallery(index)}
+//                     className="p-1 rounded bg-white text-red-600 hover:bg-gray-100"
+//                   >
+//                     <Trash2 className="h-3 w-3" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Loading state
+//   if (loading && authors.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[60vh]">
+//         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, and content</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Stats Summary */}
+//       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+//           <p className="text-sm text-gray-500">Total Authors</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-purple-600">
+//             {authors.filter(a => a.era === 'classical').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Classical Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-blue-600">
+//             {authors.filter(a => a.era === 'modern').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Modern Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-green-600">
+//             {authors.filter(a => a.isFeatured).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Featured</p>
+//         </div>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors by name..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="classical">Classical</option>
+//           <option value="modern">Modern</option>
+//           <option value="contemporary">Contemporary</option>
+//         </select>
+//         {(searchQuery || filterEra !== 'all') && (
+//           <button
+//             onClick={clearFilters}
+//             className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+//           >
+//             Clear Filters
+//           </button>
+//         )}
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {authors.length === 0 ? (
+//                 <tr>
+//                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+//                     No authors found. Click "Add Author" to get started.
+//                   </td>
+//                 </tr>
+//               ) : (
+//                 authors.map((author) => (
+//                   <motion.tr
+//                     key={author._id}
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     className="hover:bg-gray-50"
+//                   >
+//                     <td className="px-6 py-4">
+//                       <div className="flex items-center space-x-3">
+//                         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+//                           {author.avatar ? (
+//                             <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+//                           ) : (
+//                             <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+//                           )}
+//                         </div>
+//                         <div>
+//                           <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                           <div className="flex items-center gap-2 mt-1">
+//                             <code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+//                               slug: {author.slug}
+//                             </code>
+//                             <button
+//                               onClick={() => copySlugToClipboard(author.slug)}
+//                               className="p-1 rounded hover:bg-gray-200 transition-colors"
+//                               title="Copy link to clipboard"
+//                             >
+//                               {copiedSlug === author.slug ? (
+//                                 <Check className="h-3 w-3 text-green-600" />
+//                               ) : (
+//                                 <Copy className="h-3 w-3 text-gray-400" />
+//                               )}
+//                             </button>
+//                           </div>
+//                           {author.nameUrdu && (
+//                             <p className="urdu-text text-xs text-gray-500 mt-1" dir="rtl">{author.nameUrdu}</p>
+//                           )}
+//                         </div>
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+//                         {author.era || 'N/A'}
+//                       </span>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex flex-wrap gap-1">
+//                         {author.genres?.slice(0, 2).map((genre, idx) => (
+//                           <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+//                             {genre}
+//                           </span>
+//                         ))}
+//                         {author.genres?.length > 2 && (
+//                           <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-900">
+//                       {author.stats?.poemsCount || 0}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex gap-1">
+//                         {author.isVerified && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+//                             Verified
+//                           </span>
+//                         )}
+//                         {author.isFeatured && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+//                             Featured
+//                           </span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-500">
+//                       {formatDate(author.createdAt)}
+//                     </td>
+//                     <td className="px-6 py-4 text-right">
+//                       <div className="flex items-center justify-end space-x-2">
+//                         <button
+//                           onClick={() => handleManageContent(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-primary-600"
+//                           title="Manage Content (Poems, Books, Audio, Videos, Timeline, Gallery)"
+//                         >
+//                           <FolderTree className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleEdit(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+//                           title="Edit Author"
+//                         >
+//                           <Edit className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDelete(author._id, author.name)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+//                           title="Delete Author"
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </button>
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 ))
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {/* Pagination */}
+//         {pagination.totalPages > 1 && (
+//           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//             <p className="text-sm text-gray-500">
+//               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+//             </p>
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+//                 disabled={pagination.page === 1 || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronLeft className="h-4 w-4" />
+//               </button>
+//               <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+//                 {pagination.page} / {pagination.totalPages}
+//               </span>
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+//                 disabled={pagination.page === pagination.totalPages || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronRight className="h-4 w-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Author Detail Modal with All Content Tabs */}
+//       <AnimatePresence>
+//         {showDetailModal && selectedAuthor && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <div>
+//                   <h2 className="text-xl font-bold text-gray-900">{selectedAuthor.name}</h2>
+//                   <p className="text-sm text-gray-500">Manage poems, books, audio, videos, timeline & gallery</p>
+//                 </div>
+//                 <button onClick={() => setShowDetailModal(false)} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               {/* Tabs */}
+//               <div className="flex overflow-x-auto scrollbar-hide gap-1 px-6 pt-4 border-b border-gray-200">
+//                 {detailTabs.map((tab) => {
+//                   const Icon = tab.icon;
+//                   return (
+//                     <button
+//                       key={tab.id}
+//                       onClick={() => setActiveDetailTab(tab.id)}
+//                       className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+//                         activeDetailTab === tab.id
+//                           ? 'border-primary-600 text-primary-600'
+//                           : 'border-transparent text-gray-500 hover:text-gray-700'
+//                       }`}
+//                     >
+//                       <Icon className="h-4 w-4" />
+//                       <span>{tab.label}</span>
+//                     </button>
+//                   );
+//                 })}
+//               </div>
+
+//               {/* Tab Content */}
+//               <div className="p-6">
+//                 {detailLoading ? (
+//                   <div className="flex justify-center py-12">
+//                     <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//                   </div>
+//                 ) : (
+//                   <>
+//                     {activeDetailTab === 'works' && renderWorks()}
+//                     {activeDetailTab === 'books' && renderBooks()}
+//                     {activeDetailTab === 'audio' && renderAudio()}
+//                     {activeDetailTab === 'videos' && renderVideos()}
+//                     {activeDetailTab === 'timeline' && renderTimeline()}
+//                     {activeDetailTab === 'gallery' && renderGallery()}
+//                   </>
+//                 )}
+//               </div>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+
+//       {/* Add/Edit Author Modal - Basic Info Only */}
+//       <AnimatePresence>
+//         {showAddModal && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <h2 className="text-xl font-bold text-gray-900">
+//                   {editingAuthor ? 'Edit Author' : 'Add New Author'}
+//                 </h2>
+//                 <p className="text-sm text-gray-500">Basic information only. Add poems, books, audio, videos after creation.</p>
+//                 <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+//                 {/* Name and Slug */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (English) <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="name"
+//                       value={formData.name}
+//                       onChange={handleNameChange}
+//                       className="input-field"
+//                       placeholder="Enter author name"
+//                       required
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Slug (URL)
+//                     </label>
+//                     <div className="flex items-center gap-2">
+//                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-2 rounded-l">/author/</span>
+//                       <input
+//                         type="text"
+//                         name="slug"
+//                         value={formData.slug}
+//                         onChange={handleSlugChange}
+//                         className={`input-field flex-1 rounded-l-none ${!slugAvailable ? 'border-red-500 focus:ring-red-500' : ''}`}
+//                         placeholder="author-slug"
+//                       />
+//                       <button
+//                         type="button"
+//                         onClick={regenerateSlug}
+//                         className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+//                         title="Regenerate slug from name"
+//                       >
+//                         <RefreshCw className="h-4 w-4" />
+//                       </button>
+//                     </div>
+//                     {!slugAvailable && (
+//                       <p className="text-xs text-red-500 mt-1">Slug already taken. Please choose a different one.</p>
+//                     )}
+//                     {slugAvailable && formData.slug && !checkingSlug && (
+//                       <p className="text-xs text-green-500 mt-1">✓ Slug is available</p>
+//                     )}
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Name (Urdu)</label>
+//                   <input
+//                     type="text"
+//                     name="nameUrdu"
+//                     value={formData.nameUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field urdu-text"
+//                     dir="rtl"
+//                     placeholder="نام اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Bio */}
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (English) <span className="text-red-500">*</span>
+//                   </label>
+//                   <textarea
+//                     name="bio"
+//                     value={formData.bio}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24"
+//                     placeholder="Enter author biography..."
+//                     required
+//                   />
+//                 </div>
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Biography (Urdu)</label>
+//                   <textarea
+//                     name="bioUrdu"
+//                     value={formData.bioUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24 urdu-text"
+//                     dir="rtl"
+//                     placeholder="سوانح حیات اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Life Details */}
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+//                     <input
+//                       type="date"
+//                       name="birthDate"
+//                       value={formData.birthDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+//                     <input
+//                       type="date"
+//                       name="deathDate"
+//                       value={formData.deathDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+//                     <input
+//                       type="text"
+//                       name="birthPlace"
+//                       value={formData.birthPlace}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="e.g., Agra, India"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Classification */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+//                     <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="contemporary">Contemporary</option>
+//                     </select>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+//                     <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="female">Female</option>
+//                       <option value="trending">Trending</option>
+//                       <option value="emerging">Emerging</option>
+//                     </select>
+//                   </div>
+//                 </div>
+
+//                 {/* Genres & Languages */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+//                     <select
+//                       multiple
+//                       name="genres"
+//                       value={formData.genres}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="ghazal">Ghazal</option>
+//                       <option value="nazm">Nazm</option>
+//                       <option value="sher">Sher</option>
+//                       <option value="rubai">Rubai</option>
+//                       <option value="rekhti">Rekhti</option>
+//                       <option value="qasida">Qasida</option>
+//                       <option value="marsiya">Marsiya</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+//                     <select
+//                       multiple
+//                       name="languages"
+//                       value={formData.languages}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="urdu">Urdu</option>
+//                       <option value="hindi">Hindi</option>
+//                       <option value="english">English</option>
+//                       <option value="persian">Persian</option>
+//                       <option value="arabic">Arabic</option>
+//                       <option value="punjabi">Punjabi</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Status */}
+//                 <div className="flex flex-wrap gap-4">
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isVerified"
+//                       checked={formData.isVerified}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Verified Author</span>
+//                   </label>
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isFeatured"
+//                       checked={formData.isFeatured}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Featured Author</span>
+//                   </label>
+//                 </div>
+
+//                 {/* Images */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+//                     <input
+//                       type="url"
+//                       name="avatar"
+//                       value={formData.avatar}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                     <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+//                     <input
+//                       type="url"
+//                       name="coverImage"
+//                       value={formData.coverImage}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Info Note */}
+//                 <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-700">
+//                   <p>📌 After creating the author, you can manage their:</p>
+//                   <ul className="list-disc list-inside mt-1 text-xs">
+//                     <li>Poems, Books, Audio, and Videos</li>
+//                     <li>Timeline events</li>
+//                     <li>Gallery images</li>
+//                   </ul>
+//                   <p className="mt-1">Use the "Manage Content" button (📁) in the table to access these features.</p>
+//                 </div>
+
+//                 {/* Form Actions */}
+//                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+//                   <button
+//                     type="submit"
+//                     disabled={loading || !slugAvailable || checkingSlug}
+//                     className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+//                   >
+//                     {loading ? (
+//                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+//                     ) : (
+//                       editingAuthor ? 'Update Author' : 'Create Author'
+//                     )}
+//                   </button>
+//                   <button
+//                     type="button"
+//                     onClick={resetModal}
+//                     className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+//                   >
+//                     Cancel
+//                   </button>
+//                 </div>
+//               </form>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default AuthorCMSPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // client/src/pages/admin/AuthorCMSPage.jsx
+// import React, { useState, useEffect, useCallback } from 'react';
+// import { motion, AnimatePresence } from 'framer-motion';
+// import {
+//   Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+//   ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+//   AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music,
+//   Grid, List, Play, Download, Heart, Clock, MapPin, Users, FolderTree,
+//   ExternalLink, Quote, MessageCircle
+// } from 'lucide-react';
+// import { Link } from 'react-router-dom';
+// import authorAPI from '../../api/authorAPI';
+// import poemAPI from '../../api/poemAPI';
+// import bookAPI from '../../api/bookAPI';
+// import audioAPI from '../../api/audioAPI';
+// import videoAPI from '../../api/videoAPI';
+// import toast from 'react-hot-toast';
+
+// const AuthorCMSPage = () => {
+//   const [authors, setAuthors] = useState([]);
+//   const [selectedAuthor, setSelectedAuthor] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [filterEra, setFilterEra] = useState('all');
+//   const [showAddModal, setShowAddModal] = useState(false);
+//   const [showDetailModal, setShowDetailModal] = useState(false);
+//   const [editingAuthor, setEditingAuthor] = useState(null);
+//   const [activeDetailTab, setActiveDetailTab] = useState('works');
+//   const [copiedSlug, setCopiedSlug] = useState(null);
+//   const [slugAvailable, setSlugAvailable] = useState(true);
+//   const [checkingSlug, setCheckingSlug] = useState(false);
+//   const [pagination, setPagination] = useState({
+//     page: 1,
+//     limit: 10,
+//     total: 0,
+//     totalPages: 0
+//   });
+
+//   // Detail view data states
+//   const [authorPoems, setAuthorPoems] = useState([]);
+//   const [authorBooks, setAuthorBooks] = useState([]);
+//   const [authorAudio, setAuthorAudio] = useState([]);
+//   const [authorVideos, setAuthorVideos] = useState([]);
+//   const [authorTimeline, setAuthorTimeline] = useState([]);
+//   const [authorGallery, setAuthorGallery] = useState([]);
+//   const [authorQuotes, setAuthorQuotes] = useState([]);
+//   const [authorSocialLinks, setAuthorSocialLinks] = useState({});
+//   const [detailLoading, setDetailLoading] = useState(false);
+//   const [poemsPage, setPoemsPage] = useState(1);
+//   const [booksPage, setBooksPage] = useState(1);
+//   const [viewMode, setViewMode] = useState('grid');
+
+//   const [formData, setFormData] = useState({
+//     name: '',
+//     slug: '',
+//     nameUrdu: '',
+//     bio: '',
+//     bioUrdu: '',
+//     birthDate: '',
+//     deathDate: '',
+//     birthPlace: '',
+//     era: 'modern',
+//     category: 'modern',
+//     genres: [],
+//     languages: ['urdu'],
+//     isVerified: false,
+//     isFeatured: false,
+//     avatar: '',
+//     coverImage: ''
+//   });
+
+//   // Timeline form state
+//   const [timelineForm, setTimelineForm] = useState({ year: '', event: '', description: '' });
+//   const [showTimelineForm, setShowTimelineForm] = useState(false);
+//   const [editingTimelineIndex, setEditingTimelineIndex] = useState(null);
+
+//   // Gallery form state
+//   const [galleryForm, setGalleryForm] = useState({ url: '', caption: '' });
+//   const [showGalleryForm, setShowGalleryForm] = useState(false);
+//   const [editingGalleryIndex, setEditingGalleryIndex] = useState(null);
+
+//   // Quotes form state
+//   const [quoteForm, setQuoteForm] = useState({ text: '', source: '' });
+//   const [showQuoteForm, setShowQuoteForm] = useState(false);
+//   const [editingQuoteIndex, setEditingQuoteIndex] = useState(null);
+
+//   // Social links form state
+//   const [socialForm, setSocialForm] = useState({
+//     website: '',
+//     twitter: '',
+//     facebook: '',
+//     instagram: '',
+//     youtube: '',
+//     wikipedia: ''
+//   });
+//   const [showSocialForm, setShowSocialForm] = useState(false);
+
+//   // Generate slug from name
+//   const generateSlugFromName = (name) => {
+//     return name
+//       .toLowerCase()
+//       .replace(/[^a-z0-9]+/g, '-')
+//       .replace(/^-|-$/g, '');
+//   };
+
+//   // Check slug availability
+//   const checkSlugAvailability = async (slug, excludeId = null) => {
+//     if (!slug || slug.length < 2) {
+//       setSlugAvailable(true);
+//       return true;
+//     }
+
+//     setCheckingSlug(true);
+//     try {
+//       const response = await authorAPI.getAuthors({ limit: 1000 });
+//       let authorsList = [];
+//       if (response?.data?.data) {
+//         authorsList = response.data.data;
+//       } else if (response?.data) {
+//         authorsList = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsList = response;
+//       } else {
+//         authorsList = [];
+//       }
+
+//       const exists = authorsList.some(author => 
+//         author.slug === slug && author._id !== excludeId
+//       );
+      
+//       setSlugAvailable(!exists);
+//       return !exists;
+//     } catch (error) {
+//       console.error('Error checking slug:', error);
+//       setSlugAvailable(true);
+//       return true;
+//     } finally {
+//       setCheckingSlug(false);
+//     }
+//   };
+
+//   // Handle name change to auto-generate slug
+//   const handleNameChange = async (e) => {
+//     const name = e.target.value;
+//     const newSlug = generateSlugFromName(name);
+//     setFormData(prev => ({
+//       ...prev,
+//       name: name,
+//       slug: newSlug
+//     }));
+//     if (newSlug) {
+//       await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     }
+//   };
+
+//   // Handle slug manual edit
+//   const handleSlugChange = async (e) => {
+//     const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     setFormData(prev => ({ ...prev, slug }));
+//     await checkSlugAvailability(slug, editingAuthor?._id);
+//   };
+
+//   // Regenerate slug from name
+//   const regenerateSlug = async () => {
+//     const newSlug = generateSlugFromName(formData.name);
+//     setFormData(prev => ({ ...prev, slug: newSlug }));
+//     await checkSlugAvailability(newSlug, editingAuthor?._id);
+//     toast.success('Slug regenerated');
+//   };
+
+//   // Copy slug to clipboard
+//   const copySlugToClipboard = (slug) => {
+//     navigator.clipboard.writeText(`${window.location.origin}/author/${slug}`);
+//     setCopiedSlug(slug);
+//     toast.success('Link copied to clipboard!');
+//     setTimeout(() => setCopiedSlug(null), 2000);
+//   };
+
+//   // Fetch author details for modal
+//   const fetchAuthorDetails = async (authorId) => {
+//     setDetailLoading(true);
+//     try {
+//       const [poemsRes, booksRes, audioRes, videosRes, timelineRes, galleryRes, quotesRes, authorRes] = await Promise.all([
+//         authorAPI.getAuthorPoems(authorId, { limit: 100 }),
+//         authorAPI.getAuthorBooks(authorId, { limit: 100 }),
+//         authorAPI.getAuthorAudio(authorId, { limit: 100 }),
+//         authorAPI.getAuthorVideos(authorId, { limit: 100 }),
+//         authorAPI.getAuthorTimeline(authorId),
+//         authorAPI.getAuthorGallery(authorId),
+//         authorAPI.getAuthorQuotes(authorId),
+//         authorAPI.getAuthor(authorId)
+//       ]);
+
+//       setAuthorPoems(poemsRes?.data || poemsRes || []);
+//       setAuthorBooks(booksRes?.data || booksRes || []);
+//       setAuthorAudio(audioRes?.data || audioRes || []);
+//       setAuthorVideos(videosRes?.data || videosRes || []);
+//       setAuthorTimeline(timelineRes?.data || timelineRes || []);
+//       setAuthorGallery(galleryRes?.data || galleryRes || []);
+//       setAuthorQuotes(quotesRes?.data || quotesRes || []);
+      
+//       const authorData = authorRes?.data || authorRes;
+//       if (authorData?.socialLinks) {
+//         setAuthorSocialLinks(authorData.socialLinks);
+//         setSocialForm(authorData.socialLinks);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching author details:', error);
+//       toast.error('Failed to load author details');
+//     } finally {
+//       setDetailLoading(false);
+//     }
+//   };
+
+//   // Handle view details
+//   const handleManageContent = async (author) => {
+//     setSelectedAuthor(author);
+//     setShowDetailModal(true);
+//     setActiveDetailTab('works');
+//     await fetchAuthorDetails(author._id);
+//   };
+
+//   // ============================================
+//   // TIMELINE MANAGEMENT
+//   // ============================================
+//   const handleAddTimeline = async () => {
+//     if (!timelineForm.year || !timelineForm.event) {
+//       toast.error('Please enter year and event');
+//       return;
+//     }
+
+//     const updatedTimeline = [...authorTimeline];
+//     if (editingTimelineIndex !== null) {
+//       updatedTimeline[editingTimelineIndex] = timelineForm;
+//     } else {
+//       updatedTimeline.push(timelineForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success(editingTimelineIndex !== null ? 'Timeline updated' : 'Timeline event added');
+//       resetTimelineForm();
+//     } catch (error) {
+//       toast.error('Failed to save timeline');
+//     }
+//   };
+
+//   const handleDeleteTimeline = async (index) => {
+//     const updatedTimeline = authorTimeline.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+//       setAuthorTimeline(updatedTimeline);
+//       toast.success('Timeline event deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete timeline');
+//     }
+//   };
+
+//   const resetTimelineForm = () => {
+//     setTimelineForm({ year: '', event: '', description: '' });
+//     setShowTimelineForm(false);
+//     setEditingTimelineIndex(null);
+//   };
+
+//   // ============================================
+//   // GALLERY MANAGEMENT
+//   // ============================================
+//   const handleAddGallery = async () => {
+//     if (!galleryForm.url) {
+//       toast.error('Please enter image URL');
+//       return;
+//     }
+
+//     const updatedGallery = [...authorGallery];
+//     if (editingGalleryIndex !== null) {
+//       updatedGallery[editingGalleryIndex] = galleryForm;
+//     } else {
+//       updatedGallery.push(galleryForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success(editingGalleryIndex !== null ? 'Gallery image updated' : 'Gallery image added');
+//       resetGalleryForm();
+//     } catch (error) {
+//       toast.error('Failed to save gallery');
+//     }
+//   };
+
+//   const handleDeleteGallery = async (index) => {
+//     const updatedGallery = authorGallery.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+//       setAuthorGallery(updatedGallery);
+//       toast.success('Gallery image deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete gallery image');
+//     }
+//   };
+
+//   const resetGalleryForm = () => {
+//     setGalleryForm({ url: '', caption: '' });
+//     setShowGalleryForm(false);
+//     setEditingGalleryIndex(null);
+//   };
+
+//   // ============================================
+//   // QUOTES MANAGEMENT
+//   // ============================================
+//   const handleAddQuote = async () => {
+//     if (!quoteForm.text) {
+//       toast.error('Please enter quote text');
+//       return;
+//     }
+
+//     const updatedQuotes = [...authorQuotes];
+//     if (editingQuoteIndex !== null) {
+//       updatedQuotes[editingQuoteIndex] = quoteForm;
+//     } else {
+//       updatedQuotes.push(quoteForm);
+//     }
+
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { quotes: updatedQuotes });
+//       setAuthorQuotes(updatedQuotes);
+//       toast.success(editingQuoteIndex !== null ? 'Quote updated' : 'Quote added');
+//       resetQuoteForm();
+//     } catch (error) {
+//       toast.error('Failed to save quote');
+//     }
+//   };
+
+//   const handleDeleteQuote = async (index) => {
+//     const updatedQuotes = authorQuotes.filter((_, i) => i !== index);
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { quotes: updatedQuotes });
+//       setAuthorQuotes(updatedQuotes);
+//       toast.success('Quote deleted');
+//     } catch (error) {
+//       toast.error('Failed to delete quote');
+//     }
+//   };
+
+//   const resetQuoteForm = () => {
+//     setQuoteForm({ text: '', source: '' });
+//     setShowQuoteForm(false);
+//     setEditingQuoteIndex(null);
+//   };
+
+//   // ============================================
+//   // SOCIAL LINKS MANAGEMENT
+//   // ============================================
+//   const handleUpdateSocialLinks = async () => {
+//     try {
+//       await authorAPI.updateAuthor(selectedAuthor._id, { socialLinks: socialForm });
+//       setAuthorSocialLinks(socialForm);
+//       setShowSocialForm(false);
+//       toast.success('Social links updated successfully');
+//     } catch (error) {
+//       toast.error('Failed to update social links');
+//     }
+//   };
+
+//   // ============================================
+//   // FETCH AUTHORS
+//   // ============================================
+//   const fetchAuthors = useCallback(async () => {
+//     setLoading(true);
+//     try {
+//       const params = {
+//         page: pagination.page,
+//         limit: pagination.limit,
+//         ...(searchQuery && { search: searchQuery }),
+//         ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+//       };
+
+//       const response = await authorAPI.getAuthors(params);
+      
+//       let authorsData = [];
+//       if (response?.data?.data) {
+//         authorsData = response.data.data;
+//         if (response.data.pagination) setPagination(response.data.pagination);
+//       } else if (response?.data) {
+//         authorsData = response.data;
+//       } else if (Array.isArray(response)) {
+//         authorsData = response;
+//       } else if (response?.authors) {
+//         authorsData = response.authors;
+//       } else {
+//         authorsData = [];
+//       }
+      
+//       setAuthors(Array.isArray(authorsData) ? authorsData : []);
+//     } catch (error) {
+//       console.error('Error fetching authors:', error);
+//       toast.error('Failed to load authors');
+//       setAuthors([]);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+//   useEffect(() => {
+//     fetchAuthors();
+//   }, [fetchAuthors]);
+
+//   // Handle form input changes
+//   const handleInputChange = (e) => {
+//     const { name, value, type, checked } = e.target;
+//     if (type === 'checkbox') {
+//       setFormData(prev => ({ ...prev, [name]: checked }));
+//     } else if (name === 'genres') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, genres: selectedOptions }));
+//     } else if (name === 'languages') {
+//       const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+//       setFormData(prev => ({ ...prev, languages: selectedOptions }));
+//     } else {
+//       setFormData(prev => ({ ...prev, [name]: value }));
+//     }
+//   };
+
+//   // Handle submit (create or update)
+//   const handleSubmit = async (e) => {
+//     e.preventDefault();
+
+//     if (!formData.name || !formData.name.trim()) {
+//       toast.error('Please enter author name');
+//       return;
+//     }
+
+//     if (!formData.bio || !formData.bio.trim()) {
+//       toast.error('Please enter author biography');
+//       return;
+//     }
+
+//     if (!formData.slug) {
+//       toast.error('Please enter a slug');
+//       return;
+//     }
+
+//     if (!slugAvailable) {
+//       toast.error('Slug already exists. Please choose a different slug.');
+//       return;
+//     }
+
+//     const authorData = {
+//       name: formData.name.trim(),
+//       slug: formData.slug,
+//       nameUrdu: formData.nameUrdu?.trim() || '',
+//       bio: formData.bio.trim(),
+//       bioUrdu: formData.bioUrdu?.trim() || '',
+//       birthDate: formData.birthDate || null,
+//       deathDate: formData.deathDate || null,
+//       birthPlace: formData.birthPlace?.trim() || '',
+//       era: formData.era,
+//       category: formData.category,
+//       genres: formData.genres,
+//       languages: formData.languages,
+//       isVerified: formData.isVerified,
+//       isFeatured: formData.isFeatured,
+//       avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+//       coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+//     };
+
+//     setLoading(true);
+//     try {
+//       if (editingAuthor) {
+//         await authorAPI.updateAuthor(editingAuthor._id, authorData);
+//         toast.success('Author updated successfully');
+//       } else {
+//         await authorAPI.createAuthor(authorData);
+//         toast.success('Author created successfully');
+//       }
+//       resetModal();
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error saving author:', error);
+//       const message = error.response?.data?.message || 'Failed to save author';
+//       toast.error(message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle delete
+//   const handleDelete = async (id, name) => {
+//     if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+//       return;
+//     }
+
+//     setLoading(true);
+//     try {
+//       await authorAPI.deleteAuthor(id);
+//       toast.success('Author deleted successfully');
+//       fetchAuthors();
+//     } catch (error) {
+//       console.error('Error deleting author:', error);
+//       toast.error(error.response?.data?.message || 'Failed to delete author');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // Handle edit
+//   const handleEdit = (author) => {
+//     setEditingAuthor(author);
+//     setFormData({
+//       name: author.name || '',
+//       slug: author.slug || '',
+//       nameUrdu: author.nameUrdu || '',
+//       bio: author.bio || '',
+//       bioUrdu: author.bioUrdu || '',
+//       birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+//       deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+//       birthPlace: author.birthPlace || '',
+//       era: author.era || 'modern',
+//       category: author.category || 'modern',
+//       genres: author.genres || [],
+//       languages: author.languages || ['urdu'],
+//       isVerified: author.isVerified || false,
+//       isFeatured: author.isFeatured || false,
+//       avatar: author.avatar || '',
+//       coverImage: author.coverImage || ''
+//     });
+//     setSlugAvailable(true);
+//     setShowAddModal(true);
+//   };
+
+//   const resetModal = () => {
+//     setShowAddModal(false);
+//     setEditingAuthor(null);
+//     setFormData({
+//       name: '',
+//       slug: '',
+//       nameUrdu: '',
+//       bio: '',
+//       bioUrdu: '',
+//       birthDate: '',
+//       deathDate: '',
+//       birthPlace: '',
+//       era: 'modern',
+//       category: 'modern',
+//       genres: [],
+//       languages: ['urdu'],
+//       isVerified: false,
+//       isFeatured: false,
+//       avatar: '',
+//       coverImage: ''
+//     });
+//     setSlugAvailable(true);
+//   };
+
+//   const clearFilters = () => {
+//     setSearchQuery('');
+//     setFilterEra('all');
+//     setPagination(prev => ({ ...prev, page: 1 }));
+//   };
+
+//   const formatDate = (dateString) => {
+//     if (!dateString) return 'N/A';
+//     try {
+//       return new Date(dateString).toLocaleDateString();
+//     } catch {
+//       return 'N/A';
+//     }
+//   };
+
+//   const getEraColor = (era) => {
+//     switch (era?.toLowerCase()) {
+//       case 'classical': return 'bg-purple-100 text-purple-700';
+//       case 'modern': return 'bg-blue-100 text-blue-700';
+//       case 'contemporary': return 'bg-green-100 text-green-700';
+//       default: return 'bg-gray-100 text-gray-700';
+//     }
+//   };
+
+//   // Detail view tabs
+//   const detailTabs = [
+//     { id: 'works', label: 'Poems', icon: BookOpen, count: authorPoems.length },
+//     { id: 'books', label: 'Books', icon: BookOpen, count: authorBooks.length },
+//     { id: 'audio', label: 'Audio', icon: Music, count: authorAudio.length },
+//     { id: 'videos', label: 'Videos', icon: Video, count: authorVideos.length },
+//     { id: 'timeline', label: 'Timeline', icon: Calendar, count: authorTimeline.length },
+//     { id: 'gallery', label: 'Gallery', icon: Image, count: authorGallery.length },
+//     { id: 'quotes', label: 'Quotes', icon: Quote, count: authorQuotes.length },
+//     { id: 'social', label: 'Social', icon: Users, count: null }
+//   ];
+
+//   // ============================================
+//   // RENDER FUNCTIONS FOR DETAIL MODAL
+//   // ============================================
+
+//   const renderWorks = () => {
+//     if (authorPoems.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No poems available for this author.</div>;
+//     }
+
+//     return (
+//       <>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Poems ({authorPoems.length})</h3>
+//           <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => setViewMode('grid')}
+//               className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <Grid className="h-4 w-4" />
+//             </button>
+//             <button
+//               onClick={() => setViewMode('list')}
+//               className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <List className="h-4 w-4" />
+//             </button>
+//           </div>
+//         </div>
+//         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+//           {authorPoems.map((poem) => (
+//             <div key={poem._id} className="card p-4 hover:shadow-md transition-all">
+//               <Link to={`/poem/${poem.slug}`} target="_blank" className="block">
+//                 <div className="flex items-start justify-between">
+//                   <div>
+//                     <h4 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">{poem.title}</h4>
+//                     <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//                       <span className="capitalize">{poem.genre}</span>
+//                       <span className="flex items-center gap-1">
+//                         <Eye className="h-3 w-3" />
+//                         {poem.stats?.views?.toLocaleString() || 0}
+//                       </span>
+//                       <span className="flex items-center gap-1">
+//                         <Heart className="h-3 w-3" />
+//                         {poem.stats?.likes?.toLocaleString() || 0}
+//                       </span>
+//                     </div>
+//                   </div>
+//                   <ExternalLink className="h-4 w-4 text-gray-400" />
+//                 </div>
+//               </Link>
+//             </div>
+//           ))}
+//         </div>
+//       </>
+//     );
+//   };
+
+//   const renderBooks = () => {
+//     if (authorBooks.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No books available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorBooks.map((book) => (
+//           <Link key={book._id} to={`/book/${book.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all">
+//             <div className="flex items-start gap-3">
+//               {book.coverImage && (
+//                 <img src={book.coverImage} alt={book.title} className="w-12 h-16 object-cover rounded" />
+//               )}
+//               <div className="flex-1">
+//                 <h4 className="font-medium text-gray-900">{book.title}</h4>
+//                 <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+//                 <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//                   <span className="capitalize">{book.type}</span>
+//                   <span className="flex items-center gap-1">
+//                     <Eye className="h-3 w-3" />
+//                     {book.stats?.views?.toLocaleString() || 0}
+//                   </span>
+//                   <span className="flex items-center gap-1">
+//                     <Download className="h-3 w-3" />
+//                     {book.stats?.downloads?.toLocaleString() || 0}
+//                   </span>
+//                 </div>
+//               </div>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   const renderAudio = () => {
+//     if (authorAudio.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No audio available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="space-y-3">
+//         {authorAudio.map((audio) => (
+//           <Link key={audio._id} to={`/audio/${audio.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all flex items-center gap-4">
+//             <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+//               <Play className="h-5 w-5 text-primary-600" />
+//             </div>
+//             <div className="flex-1">
+//               <h4 className="font-medium text-gray-900">{audio.title}</h4>
+//               <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+//             </div>
+//             <div className="text-sm text-gray-400">
+//               {audio.duration ? `${Math.floor(audio.duration / 60)}:${(audio.duration % 60).toString().padStart(2, '0')}` : '--:--'}
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   const renderVideos = () => {
+//     if (authorVideos.length === 0) {
+//       return <div className="text-center py-8 text-gray-500">No videos available for this author.</div>;
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {authorVideos.map((video) => (
+//           <Link key={video._id} to={`/video/${video.slug}`} target="_blank" className="card overflow-hidden hover:shadow-md transition-all">
+//             <div className="relative h-40 bg-gray-900">
+//               {video.thumbnail ? (
+//                 <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+//               ) : (
+//                 <div className="absolute inset-0 flex items-center justify-center">
+//                   <Play className="h-10 w-10 text-white/50" />
+//                 </div>
+//               )}
+//             </div>
+//             <div className="p-3">
+//               <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+//               <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+//                 <span className="capitalize">{video.type}</span>
+//                 <span className="flex items-center gap-1">
+//                   <Eye className="h-3 w-3" />
+//                   {video.stats?.views?.toLocaleString() || 0}
+//                 </span>
+//               </div>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     );
+//   };
+
+//   const renderTimeline = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Timeline Events ({authorTimeline.length})</h3>
+//           <button
+//             onClick={() => setShowTimelineForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Event
+//           </button>
+//         </div>
+
+//         {authorTimeline.length === 0 && !showTimelineForm && (
+//           <div className="text-center py-8 text-gray-500">No timeline events added yet.</div>
+//         )}
+
+//         {showTimelineForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingTimelineIndex !== null ? 'Edit Event' : 'Add New Event'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+//               <input
+//                 type="text"
+//                 placeholder="Year (e.g., 1797)"
+//                 value={timelineForm.year}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, year: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Event title"
+//                 value={timelineForm.event}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, event: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <textarea
+//                 placeholder="Description (optional)"
+//                 value={timelineForm.description}
+//                 onChange={(e) => setTimelineForm(prev => ({ ...prev, description: e.target.value }))}
+//                 className="input-field h-10"
+//               />
+//             </div>
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddTimeline} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetTimelineForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {authorTimeline.length > 0 && (
+//           <div className="space-y-3">
+//             {authorTimeline.map((event, index) => (
+//               <div key={index} className="card p-4 flex items-start justify-between">
+//                 <div className="flex-1">
+//                   <div className="flex items-center gap-3">
+//                     <span className="font-bold text-primary-600 text-lg">{event.year}</span>
+//                     <h4 className="font-medium text-gray-900">{event.event}</h4>
+//                   </div>
+//                   {event.description && <p className="text-sm text-gray-500 mt-1">{event.description}</p>}
+//                 </div>
+//                 <div className="flex gap-2">
+//                   <button
+//                     onClick={() => {
+//                       setTimelineForm(event);
+//                       setEditingTimelineIndex(index);
+//                       setShowTimelineForm(true);
+//                     }}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+//                   >
+//                     <Edit className="h-4 w-4" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteTimeline(index)}
+//                     className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+//                   >
+//                     <Trash2 className="h-4 w-4" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   const renderGallery = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Gallery Images ({authorGallery.length})</h3>
+//           <button
+//             onClick={() => setShowGalleryForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Image
+//           </button>
+//         </div>
+
+//         {authorGallery.length === 0 && !showGalleryForm && (
+//           <div className="text-center py-8 text-gray-500">No gallery images added yet.</div>
+//         )}
+
+//         {showGalleryForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingGalleryIndex !== null ? 'Edit Image' : 'Add New Image'}</h4>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//               <input
+//                 type="url"
+//                 placeholder="Image URL"
+//                 value={galleryForm.url}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, url: e.target.value }))}
+//                 className="input-field"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Caption (optional)"
+//                 value={galleryForm.caption}
+//                 onChange={(e) => setGalleryForm(prev => ({ ...prev, caption: e.target.value }))}
+//                 className="input-field"
+//               />
+//             </div>
+//             {galleryForm.url && (
+//               <div className="mt-2">
+//                 <img src={galleryForm.url} alt="Preview" className="h-24 w-auto rounded object-cover" />
+//               </div>
+//             )}
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddGallery} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetGalleryForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {authorGallery.length > 0 && (
+//           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+//             {authorGallery.map((item, index) => (
+//               <div key={index} className="card overflow-hidden group relative">
+//                 <img src={item.url} alt={item.caption || `Image ${index + 1}`} className="w-full h-40 object-cover" />
+//                 {item.caption && (
+//                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+//                     {item.caption}
+//                   </div>
+//                 )}
+//                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+//                   <button
+//                     onClick={() => {
+//                       setGalleryForm(item);
+//                       setEditingGalleryIndex(index);
+//                       setShowGalleryForm(true);
+//                     }}
+//                     className="p-1 rounded bg-white text-blue-600 hover:bg-gray-100"
+//                   >
+//                     <Edit className="h-3 w-3" />
+//                   </button>
+//                   <button
+//                     onClick={() => handleDeleteGallery(index)}
+//                     className="p-1 rounded bg-white text-red-600 hover:bg-gray-100"
+//                   >
+//                     <Trash2 className="h-3 w-3" />
+//                   </button>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   const renderQuotes = () => {
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Quotes ({authorQuotes.length})</h3>
+//           <button
+//             onClick={() => setShowQuoteForm(true)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             <Plus className="h-4 w-4 inline mr-1" /> Add Quote
+//           </button>
+//         </div>
+
+//         {authorQuotes.length === 0 && !showQuoteForm && (
+//           <div className="text-center py-8 text-gray-500">No quotes added yet.</div>
+//         )}
+
+//         {showQuoteForm && (
+//           <div className="card p-4 mb-4">
+//             <h4 className="font-medium text-gray-900 mb-3">{editingQuoteIndex !== null ? 'Edit Quote' : 'Add New Quote'}</h4>
+//             <div className="space-y-3">
+//               <textarea
+//                 placeholder="Quote text"
+//                 value={quoteForm.text}
+//                 onChange={(e) => setQuoteForm(prev => ({ ...prev, text: e.target.value }))}
+//                 className="input-field h-24"
+//               />
+//               <input
+//                 type="text"
+//                 placeholder="Source (optional)"
+//                 value={quoteForm.source}
+//                 onChange={(e) => setQuoteForm(prev => ({ ...prev, source: e.target.value }))}
+//                 className="input-field"
+//               />
+//             </div>
+//             <div className="flex justify-end gap-2 mt-3">
+//               <button onClick={handleAddQuote} className="btn-primary text-sm py-1.5 px-3">Save</button>
+//               <button onClick={resetQuoteForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+//             </div>
+//           </div>
+//         )}
+
+//         {authorQuotes.length > 0 && (
+//           <div className="space-y-3">
+//             {authorQuotes.map((quote, index) => (
+//               <div key={index} className="card p-4 border-l-4 border-primary-500">
+//                 <div className="flex justify-between">
+//                   <div className="flex-1">
+//                     <p className="text-gray-700 italic">"{quote.text}"</p>
+//                     {quote.source && <p className="text-sm text-gray-500 mt-2">— {quote.source}</p>}
+//                   </div>
+//                   <div className="flex gap-2 ml-4">
+//                     <button
+//                       onClick={() => {
+//                         setQuoteForm(quote);
+//                         setEditingQuoteIndex(index);
+//                         setShowQuoteForm(true);
+//                       }}
+//                       className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+//                     >
+//                       <Edit className="h-4 w-4" />
+//                     </button>
+//                     <button
+//                       onClick={() => handleDeleteQuote(index)}
+//                       className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+//                     >
+//                       <Trash2 className="h-4 w-4" />
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   const renderSocialLinks = () => {
+//     const hasSocialLinks = Object.values(authorSocialLinks).some(v => v);
+    
+//     return (
+//       <div>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">Social Media Links</h3>
+//           <button
+//             onClick={() => setShowSocialForm(!showSocialForm)}
+//             className="text-sm btn-primary py-1.5 px-3"
+//           >
+//             {showSocialForm ? <X className="h-4 w-4 inline mr-1" /> : <Edit className="h-4 w-4 inline mr-1" />}
+//             {showSocialForm ? 'Cancel' : 'Edit Links'}
+//           </button>
+//         </div>
+
+//         {showSocialForm ? (
+//           <div className="card p-4">
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.website}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, website: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://..."
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.twitter}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, twitter: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://twitter.com/..."
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.facebook}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, facebook: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://facebook.com/..."
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.instagram}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, instagram: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://instagram.com/..."
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.youtube}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, youtube: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://youtube.com/..."
+//                 />
+//               </div>
+//               <div>
+//                 <label className="block text-sm font-medium text-gray-700 mb-1">Wikipedia</label>
+//                 <input
+//                   type="url"
+//                   value={socialForm.wikipedia}
+//                   onChange={(e) => setSocialForm(prev => ({ ...prev, wikipedia: e.target.value }))}
+//                   className="input-field"
+//                   placeholder="https://wikipedia.org/..."
+//                 />
+//               </div>
+//             </div>
+//             <div className="flex justify-end gap-2 mt-4">
+//               <button onClick={handleUpdateSocialLinks} className="btn-primary text-sm py-1.5 px-3">Save Links</button>
+//             </div>
+//           </div>
+//         ) : (
+//           <div className="card p-4">
+//             {hasSocialLinks ? (
+//               <div className="flex flex-wrap gap-4">
+//                 {socialForm.website && (
+//                   <a href={socialForm.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+//                     <Globe className="h-5 w-5" /> Website
+//                   </a>
+//                 )}
+//                 {socialForm.twitter && (
+//                   <a href={socialForm.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-blue-500">
+//                     <Twitter className="h-5 w-5" /> Twitter
+//                   </a>
+//                 )}
+//                 {socialForm.facebook && (
+//                   <a href={socialForm.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-blue-700">
+//                     <Facebook className="h-5 w-5" /> Facebook
+//                   </a>
+//                 )}
+//                 {socialForm.instagram && (
+//                   <a href={socialForm.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-pink-600">
+//                     <Instagram className="h-5 w-5" /> Instagram
+//                   </a>
+//                 )}
+//                 {socialForm.youtube && (
+//                   <a href={socialForm.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-red-600">
+//                     <Youtube className="h-5 w-5" /> YouTube
+//                   </a>
+//                 )}
+//                 {socialForm.wikipedia && (
+//                   <a href={socialForm.wikipedia} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+//                     <Wikipedia className="h-5 w-5" /> Wikipedia
+//                   </a>
+//                 )}
+//               </div>
+//             ) : (
+//               <div className="text-center py-8 text-gray-500">No social links added yet.</div>
+//             )}
+//           </div>
+//         )}
+//       </div>
+//     );
+//   };
+
+//   // Loading state
+//   if (loading && authors.length === 0) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[60vh]">
+//         <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="space-y-6">
+//       {/* Header */}
+//       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+//         <div>
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+//           <p className="text-gray-500">Manage authors, biographies, poems, books, audio, videos, timeline, gallery, and quotes</p>
+//         </div>
+//         <button
+//           onClick={() => setShowAddModal(true)}
+//           className="btn-primary inline-flex items-center space-x-2"
+//         >
+//           <Plus className="h-5 w-5" />
+//           <span>Add Author</span>
+//         </button>
+//       </div>
+
+//       {/* Stats Summary */}
+//       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+//           <p className="text-sm text-gray-500">Total Authors</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-purple-600">
+//             {authors.filter(a => a.era === 'classical').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Classical Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-blue-600">
+//             {authors.filter(a => a.era === 'modern').length}
+//           </p>
+//           <p className="text-sm text-gray-500">Modern Poets</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-green-600">
+//             {authors.filter(a => a.isFeatured).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Featured</p>
+//         </div>
+//         <div className="card p-4 text-center">
+//           <p className="text-2xl font-bold text-yellow-600">
+//             {authors.filter(a => a.isVerified).length}
+//           </p>
+//           <p className="text-sm text-gray-500">Verified</p>
+//         </div>
+//       </div>
+
+//       {/* Filters */}
+//       <div className="flex flex-col md:flex-row gap-4">
+//         <div className="flex-1 relative">
+//           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+//           <input
+//             type="text"
+//             placeholder="Search authors by name..."
+//             value={searchQuery}
+//             onChange={(e) => setSearchQuery(e.target.value)}
+//             className="input-field pl-10"
+//           />
+//         </div>
+//         <select
+//           value={filterEra}
+//           onChange={(e) => setFilterEra(e.target.value)}
+//           className="input-field w-full md:w-40"
+//         >
+//           <option value="all">All Eras</option>
+//           <option value="classical">Classical</option>
+//           <option value="modern">Modern</option>
+//           <option value="contemporary">Contemporary</option>
+//         </select>
+//         {(searchQuery || filterEra !== 'all') && (
+//           <button
+//             onClick={clearFilters}
+//             className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+//           >
+//             Clear Filters
+//           </button>
+//         )}
+//       </div>
+
+//       {/* Authors Table */}
+//       <div className="card overflow-hidden">
+//         <div className="overflow-x-auto">
+//           <table className="w-full">
+//             <thead className="bg-gray-50 border-b border-gray-200">
+//               <tr>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+//                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+//                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+//               </tr>
+//             </thead>
+//             <tbody className="divide-y divide-gray-200">
+//               {authors.length === 0 ? (
+//                 <tr>
+//                   <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+//                     No authors found. Click "Add Author" to get started.
+//                   </td>
+//                 </tr>
+//               ) : (
+//                 authors.map((author) => (
+//                   <motion.tr
+//                     key={author._id}
+//                     initial={{ opacity: 0 }}
+//                     animate={{ opacity: 1 }}
+//                     className="hover:bg-gray-50"
+//                   >
+//                     <td className="px-6 py-4">
+//                       <div className="flex items-center space-x-3">
+//                         <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+//                           {author.avatar ? (
+//                             <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+//                           ) : (
+//                             <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+//                           )}
+//                         </div>
+//                         <div>
+//                           <p className="text-sm font-medium text-gray-900">{author.name}</p>
+//                           <div className="flex items-center gap-2 mt-1">
+//                             <code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+//                               slug: {author.slug}
+//                             </code>
+//                             <button
+//                               onClick={() => copySlugToClipboard(author.slug)}
+//                               className="p-1 rounded hover:bg-gray-200 transition-colors"
+//                               title="Copy link to clipboard"
+//                             >
+//                               {copiedSlug === author.slug ? (
+//                                 <Check className="h-3 w-3 text-green-600" />
+//                               ) : (
+//                                 <Copy className="h-3 w-3 text-gray-400" />
+//                               )}
+//                             </button>
+//                           </div>
+//                           {author.nameUrdu && (
+//                             <p className="urdu-text text-xs text-gray-500 mt-1" dir="rtl">{author.nameUrdu}</p>
+//                           )}
+//                         </div>
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+//                         {author.era || 'N/A'}
+//                       </span>
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex flex-wrap gap-1">
+//                         {author.genres?.slice(0, 2).map((genre, idx) => (
+//                           <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+//                             {genre}
+//                           </span>
+//                         ))}
+//                         {author.genres?.length > 2 && (
+//                           <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-900">
+//                       {author.stats?.poemsCount || 0}
+//                     </td>
+//                     <td className="px-6 py-4">
+//                       <div className="flex gap-1">
+//                         {author.isVerified && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+//                             Verified
+//                           </span>
+//                         )}
+//                         {author.isFeatured && (
+//                           <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+//                             Featured
+//                           </span>
+//                         )}
+//                       </div>
+//                     </td>
+//                     <td className="px-6 py-4 text-sm text-gray-500">
+//                       {formatDate(author.createdAt)}
+//                     </td>
+//                     <td className="px-6 py-4 text-right">
+//                       <div className="flex items-center justify-end space-x-2">
+//                         <button
+//                           onClick={() => handleManageContent(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-primary-600"
+//                           title="Manage Content (Poems, Books, Audio, Videos, Timeline, Gallery, Quotes, Social)"
+//                         >
+//                           <FolderTree className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleEdit(author)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+//                           title="Edit Author"
+//                         >
+//                           <Edit className="h-4 w-4" />
+//                         </button>
+//                         <button
+//                           onClick={() => handleDelete(author._id, author.name)}
+//                           className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+//                           title="Delete Author"
+//                         >
+//                           <Trash2 className="h-4 w-4" />
+//                         </button>
+//                       </div>
+//                     </td>
+//                   </motion.tr>
+//                 ))
+//               )}
+//             </tbody>
+//           </table>
+//         </div>
+
+//         {/* Pagination */}
+//         {pagination.totalPages > 1 && (
+//           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+//             <p className="text-sm text-gray-500">
+//               Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+//             </p>
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+//                 disabled={pagination.page === 1 || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronLeft className="h-4 w-4" />
+//               </button>
+//               <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+//                 {pagination.page} / {pagination.totalPages}
+//               </span>
+//               <button
+//                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+//                 disabled={pagination.page === pagination.totalPages || loading}
+//                 className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+//               >
+//                 <ChevronRight className="h-4 w-4" />
+//               </button>
+//             </div>
+//           </div>
+//         )}
+//       </div>
+
+//       {/* Author Detail Modal with All Content Tabs */}
+//       <AnimatePresence>
+//         {showDetailModal && selectedAuthor && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <div>
+//                   <h2 className="text-xl font-bold text-gray-900">{selectedAuthor.name}</h2>
+//                   <p className="text-sm text-gray-500">Manage all content related to this author</p>
+//                 </div>
+//                 <button onClick={() => setShowDetailModal(false)} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               {/* Tabs with Counts */}
+//               <div className="flex overflow-x-auto scrollbar-hide gap-1 px-6 pt-4 border-b border-gray-200">
+//                 {detailTabs.map((tab) => {
+//                   const Icon = tab.icon;
+//                   return (
+//                     <button
+//                       key={tab.id}
+//                       onClick={() => setActiveDetailTab(tab.id)}
+//                       className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+//                         activeDetailTab === tab.id
+//                           ? 'border-primary-600 text-primary-600'
+//                           : 'border-transparent text-gray-500 hover:text-gray-700'
+//                       }`}
+//                     >
+//                       <Icon className="h-4 w-4" />
+//                       <span>{tab.label}</span>
+//                       {tab.count !== null && tab.count > 0 && (
+//                         <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+//                           {tab.count}
+//                         </span>
+//                       )}
+//                     </button>
+//                   );
+//                 })}
+//               </div>
+
+//               {/* Tab Content */}
+//               <div className="p-6">
+//                 {detailLoading ? (
+//                   <div className="flex justify-center py-12">
+//                     <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//                   </div>
+//                 ) : (
+//                   <>
+//                     {activeDetailTab === 'works' && renderWorks()}
+//                     {activeDetailTab === 'books' && renderBooks()}
+//                     {activeDetailTab === 'audio' && renderAudio()}
+//                     {activeDetailTab === 'videos' && renderVideos()}
+//                     {activeDetailTab === 'timeline' && renderTimeline()}
+//                     {activeDetailTab === 'gallery' && renderGallery()}
+//                     {activeDetailTab === 'quotes' && renderQuotes()}
+//                     {activeDetailTab === 'social' && renderSocialLinks()}
+//                   </>
+//                 )}
+//               </div>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+
+//       {/* Add/Edit Author Modal - Basic Info Only */}
+//       <AnimatePresence>
+//         {showAddModal && (
+//           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+//             <motion.div
+//               initial={{ opacity: 0, scale: 0.95 }}
+//               animate={{ opacity: 1, scale: 1 }}
+//               exit={{ opacity: 0, scale: 0.95 }}
+//               className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+//             >
+//               <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+//                 <h2 className="text-xl font-bold text-gray-900">
+//                   {editingAuthor ? 'Edit Author' : 'Add New Author'}
+//                 </h2>
+//                 <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+//                   <X className="h-5 w-5" />
+//                 </button>
+//               </div>
+
+//               <form onSubmit={handleSubmit} className="p-6 space-y-4">
+//                 {/* Name and Slug */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Name (English) <span className="text-red-500">*</span>
+//                     </label>
+//                     <input
+//                       type="text"
+//                       name="name"
+//                       value={formData.name}
+//                       onChange={handleNameChange}
+//                       className="input-field"
+//                       placeholder="Enter author name"
+//                       required
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">
+//                       Slug (URL)
+//                     </label>
+//                     <div className="flex items-center gap-2">
+//                       <span className="text-xs text-gray-500 bg-gray-100 px-2 py-2 rounded-l">/author/</span>
+//                       <input
+//                         type="text"
+//                         name="slug"
+//                         value={formData.slug}
+//                         onChange={handleSlugChange}
+//                         className={`input-field flex-1 rounded-l-none ${!slugAvailable ? 'border-red-500 focus:ring-red-500' : ''}`}
+//                         placeholder="author-slug"
+//                       />
+//                       <button
+//                         type="button"
+//                         onClick={regenerateSlug}
+//                         className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+//                         title="Regenerate slug from name"
+//                       >
+//                         <RefreshCw className="h-4 w-4" />
+//                       </button>
+//                     </div>
+//                     {!slugAvailable && (
+//                       <p className="text-xs text-red-500 mt-1">Slug already taken. Please choose a different one.</p>
+//                     )}
+//                     {slugAvailable && formData.slug && !checkingSlug && (
+//                       <p className="text-xs text-green-500 mt-1">✓ Slug is available</p>
+//                     )}
+//                   </div>
+//                 </div>
+
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Name (Urdu)</label>
+//                   <input
+//                     type="text"
+//                     name="nameUrdu"
+//                     value={formData.nameUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field urdu-text"
+//                     dir="rtl"
+//                     placeholder="نام اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Bio */}
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">
+//                     Biography (English) <span className="text-red-500">*</span>
+//                   </label>
+//                   <textarea
+//                     name="bio"
+//                     value={formData.bio}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24"
+//                     placeholder="Enter author biography..."
+//                     required
+//                   />
+//                 </div>
+//                 <div>
+//                   <label className="block text-sm font-medium text-gray-700 mb-2">Biography (Urdu)</label>
+//                   <textarea
+//                     name="bioUrdu"
+//                     value={formData.bioUrdu}
+//                     onChange={handleInputChange}
+//                     className="input-field h-24 urdu-text"
+//                     dir="rtl"
+//                     placeholder="سوانح حیات اردو میں"
+//                   />
+//                 </div>
+
+//                 {/* Life Details */}
+//                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+//                     <input
+//                       type="date"
+//                       name="birthDate"
+//                       value={formData.birthDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+//                     <input
+//                       type="date"
+//                       name="deathDate"
+//                       value={formData.deathDate}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                     />
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+//                     <input
+//                       type="text"
+//                       name="birthPlace"
+//                       value={formData.birthPlace}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="e.g., Agra, India"
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Classification */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+//                     <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="contemporary">Contemporary</option>
+//                     </select>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+//                     <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+//                       <option value="classical">Classical</option>
+//                       <option value="modern">Modern</option>
+//                       <option value="female">Female</option>
+//                       <option value="trending">Trending</option>
+//                       <option value="emerging">Emerging</option>
+//                     </select>
+//                   </div>
+//                 </div>
+
+//                 {/* Genres & Languages */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+//                     <select
+//                       multiple
+//                       name="genres"
+//                       value={formData.genres}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="ghazal">Ghazal</option>
+//                       <option value="nazm">Nazm</option>
+//                       <option value="sher">Sher</option>
+//                       <option value="rubai">Rubai</option>
+//                       <option value="rekhti">Rekhti</option>
+//                       <option value="qasida">Qasida</option>
+//                       <option value="marsiya">Marsiya</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+//                     <select
+//                       multiple
+//                       name="languages"
+//                       value={formData.languages}
+//                       onChange={handleInputChange}
+//                       className="input-field h-24"
+//                     >
+//                       <option value="urdu">Urdu</option>
+//                       <option value="hindi">Hindi</option>
+//                       <option value="english">English</option>
+//                       <option value="persian">Persian</option>
+//                       <option value="arabic">Arabic</option>
+//                       <option value="punjabi">Punjabi</option>
+//                     </select>
+//                     <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+//                   </div>
+//                 </div>
+
+//                 {/* Status */}
+//                 <div className="flex flex-wrap gap-4">
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isVerified"
+//                       checked={formData.isVerified}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Verified Author</span>
+//                   </label>
+//                   <label className="flex items-center space-x-2 cursor-pointer">
+//                     <input
+//                       type="checkbox"
+//                       name="isFeatured"
+//                       checked={formData.isFeatured}
+//                       onChange={handleInputChange}
+//                       className="h-4 w-4 rounded border-gray-300 text-primary-600"
+//                     />
+//                     <span className="text-sm text-gray-700">Featured Author</span>
+//                   </label>
+//                 </div>
+
+//                 {/* Images */}
+//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+//                     <input
+//                       type="url"
+//                       name="avatar"
+//                       value={formData.avatar}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                     <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+//                   </div>
+//                   <div>
+//                     <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+//                     <input
+//                       type="url"
+//                       name="coverImage"
+//                       value={formData.coverImage}
+//                       onChange={handleInputChange}
+//                       className="input-field"
+//                       placeholder="https://..."
+//                     />
+//                   </div>
+//                 </div>
+
+//                 {/* Info Note */}
+//                 <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-700">
+//                   <p>📌 After creating the author, you can manage their:</p>
+//                   <ul className="list-disc list-inside mt-1 text-xs">
+//                     <li>Poems, Books, Audio, and Videos</li>
+//                     <li>Timeline events</li>
+//                     <li>Gallery images</li>
+//                     <li>Quotes</li>
+//                     <li>Social media links</li>
+//                   </ul>
+//                   <p className="mt-1">Use the "Manage Content" button (📁) in the table to access these features.</p>
+//                 </div>
+
+//                 {/* Form Actions */}
+//                 <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+//                   <button
+//                     type="submit"
+//                     disabled={loading || !slugAvailable || checkingSlug}
+//                     className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+//                   >
+//                     {loading ? (
+//                       <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+//                     ) : (
+//                       editingAuthor ? 'Update Author' : 'Create Author'
+//                     )}
+//                   </button>
+//                   <button
+//                     type="button"
+//                     onClick={resetModal}
+//                     className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+//                   >
+//                     Cancel
+//                   </button>
+//                 </div>
+//               </form>
+//             </motion.div>
+//           </div>
+//         )}
+//       </AnimatePresence>
+//     </div>
+//   );
+// };
+
+// export default AuthorCMSPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/pages/admin/AuthorCMSPage.jsx
+import React, { useState, useEffect, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Search, Plus, Edit, Trash2, Eye, Upload, Calendar,
+  ChevronLeft, ChevronRight, Image, FileText, X, Loader2,
+  AlertTriangle, Check, Copy, RefreshCw, User, BookOpen, Video, Music,
+  Grid, List, Play, Download, Heart, Clock, MapPin, Users, FolderTree,
+  ExternalLink, Quote, MessageCircle, Globe, Twitter, Facebook, Instagram, Youtube
+} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import authorAPI from '../../api/authorAPI';
+import toast from 'react-hot-toast';
+
+const AuthorCMSPage = () => {
+  const [authors, setAuthors] = useState([]);
+  const [selectedAuthor, setSelectedAuthor] = useState(null);
+  const [selectedAuthorSlug, setSelectedAuthorSlug] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterEra, setFilterEra] = useState('all');
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [editingAuthor, setEditingAuthor] = useState(null);
+  const [activeDetailTab, setActiveDetailTab] = useState('works');
+  const [copiedSlug, setCopiedSlug] = useState(null);
+  const [slugAvailable, setSlugAvailable] = useState(true);
+  const [checkingSlug, setCheckingSlug] = useState(false);
+  const [pagination, setPagination] = useState({
+    page: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0
+  });
+
+  // Detail view data states
+  const [authorPoems, setAuthorPoems] = useState([]);
+  const [authorBooks, setAuthorBooks] = useState([]);
+  const [authorAudio, setAuthorAudio] = useState([]);
+  const [authorVideos, setAuthorVideos] = useState([]);
+  const [authorTimeline, setAuthorTimeline] = useState([]);
+  const [authorGallery, setAuthorGallery] = useState([]);
+  const [authorQuotes, setAuthorQuotes] = useState([]);
+  const [authorSocialLinks, setAuthorSocialLinks] = useState({});
+  const [detailLoading, setDetailLoading] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
+
+  const [formData, setFormData] = useState({
+    name: '',
+    slug: '',
+    nameUrdu: '',
+    bio: '',
+    bioUrdu: '',
+    birthDate: '',
+    deathDate: '',
+    birthPlace: '',
+    era: 'modern',
+    category: 'modern',
+    genres: [],
+    languages: ['urdu'],
+    isVerified: false,
+    isFeatured: false,
+    avatar: '',
+    coverImage: ''
+  });
+
+  // Timeline form state
+  const [timelineForm, setTimelineForm] = useState({ year: '', event: '', description: '' });
+  const [showTimelineForm, setShowTimelineForm] = useState(false);
+  const [editingTimelineIndex, setEditingTimelineIndex] = useState(null);
+
+  // Gallery form state
+  const [galleryForm, setGalleryForm] = useState({ url: '', caption: '' });
+  const [showGalleryForm, setShowGalleryForm] = useState(false);
+  const [editingGalleryIndex, setEditingGalleryIndex] = useState(null);
+
+  // Quotes form state
+  const [quoteForm, setQuoteForm] = useState({ text: '', source: '' });
+  const [showQuoteForm, setShowQuoteForm] = useState(false);
+  const [editingQuoteIndex, setEditingQuoteIndex] = useState(null);
+
+  // Social links form state
+  const [socialForm, setSocialForm] = useState({
+    website: '',
+    twitter: '',
+    facebook: '',
+    instagram: '',
+    youtube: '',
+    wikipedia: ''
+  });
+  const [showSocialForm, setShowSocialForm] = useState(false);
+
+  // Generate slug from name
+  const generateSlugFromName = (name) => {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
+  };
+
+  // Check slug availability
+  const checkSlugAvailability = async (slug, excludeId = null) => {
+    if (!slug || slug.length < 2) {
+      setSlugAvailable(true);
+      return true;
+    }
+
+    setCheckingSlug(true);
+    try {
+      const response = await authorAPI.getAuthors({ limit: 1000 });
+      let authorsList = [];
+      if (response?.data?.data) {
+        authorsList = response.data.data;
+      } else if (response?.data) {
+        authorsList = response.data;
+      } else if (Array.isArray(response)) {
+        authorsList = response;
+      } else {
+        authorsList = [];
+      }
+
+      const exists = authorsList.some(author => 
+        author.slug === slug && author._id !== excludeId
+      );
+      
+      setSlugAvailable(!exists);
+      return !exists;
+    } catch (error) {
+      console.error('Error checking slug:', error);
+      setSlugAvailable(true);
+      return true;
+    } finally {
+      setCheckingSlug(false);
+    }
+  };
+
+  // Handle name change to auto-generate slug
+  const handleNameChange = async (e) => {
+    const name = e.target.value;
+    const newSlug = generateSlugFromName(name);
+    setFormData(prev => ({
+      ...prev,
+      name: name,
+      slug: newSlug
+    }));
+    if (newSlug) {
+      await checkSlugAvailability(newSlug, editingAuthor?._id);
+    }
+  };
+
+  // Handle slug manual edit
+  const handleSlugChange = async (e) => {
+    const slug = e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    setFormData(prev => ({ ...prev, slug }));
+    await checkSlugAvailability(slug, editingAuthor?._id);
+  };
+
+  // Regenerate slug from name
+  const regenerateSlug = async () => {
+    const newSlug = generateSlugFromName(formData.name);
+    setFormData(prev => ({ ...prev, slug: newSlug }));
+    await checkSlugAvailability(newSlug, editingAuthor?._id);
+    toast.success('Slug regenerated');
+  };
+
+  // Copy slug to clipboard
+  const copySlugToClipboard = (slug) => {
+    navigator.clipboard.writeText(`${window.location.origin}/author/${slug}`);
+    setCopiedSlug(slug);
+    toast.success('Link copied to clipboard!');
+    setTimeout(() => setCopiedSlug(null), 2000);
+  };
+
+  // ============================================
+  // FETCH AUTHOR DETAILS - UPDATED TO USE SLUG
+  // ============================================
+  const fetchAuthorDetails = async (authorId, authorSlug) => {
+    setDetailLoading(true);
+    try {
+      // Use the author's slug for content endpoints
+      const slug = authorSlug;
+      
+      const [poemsRes, booksRes, audioRes, videosRes, timelineRes, galleryRes, quotesRes, authorRes] = await Promise.all([
+        authorAPI.getAuthorPoems(slug, { limit: 100 }),
+        authorAPI.getAuthorBooks(slug, { limit: 100 }),
+        authorAPI.getAuthorAudio(slug, { limit: 100 }),
+        authorAPI.getAuthorVideos(slug, { limit: 100 }),
+        authorAPI.getAuthorTimeline(slug),
+        authorAPI.getAuthorGallery(slug),
+        authorAPI.getAuthorQuotes(slug),
+        authorAPI.getAuthor(slug)
+      ]);
+
+      setAuthorPoems(poemsRes?.data || poemsRes || []);
+      setAuthorBooks(booksRes?.data || booksRes || []);
+      setAuthorAudio(audioRes?.data || audioRes || []);
+      setAuthorVideos(videosRes?.data || videosRes || []);
+      setAuthorTimeline(timelineRes?.data || timelineRes || []);
+      setAuthorGallery(galleryRes?.data || galleryRes || []);
+      setAuthorQuotes(quotesRes?.data || quotesRes || []);
+      
+      const authorData = authorRes?.data || authorRes;
+      if (authorData?.socialLinks) {
+        setAuthorSocialLinks(authorData.socialLinks);
+        setSocialForm(authorData.socialLinks);
+      }
+    } catch (error) {
+      console.error('Error fetching author details:', error);
+      toast.error('Failed to load author details');
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  // Handle view details
+  const handleManageContent = async (author) => {
+    setSelectedAuthor(author);
+    setSelectedAuthorSlug(author.slug);
+    setShowDetailModal(true);
+    setActiveDetailTab('works');
+    await fetchAuthorDetails(author._id, author.slug);
+  };
+
+  // ============================================
+  // TIMELINE MANAGEMENT (using ID for updates)
+  // ============================================
+  const handleAddTimeline = async () => {
+    if (!timelineForm.year || !timelineForm.event) {
+      toast.error('Please enter year and event');
+      return;
+    }
+
+    const updatedTimeline = [...authorTimeline];
+    if (editingTimelineIndex !== null) {
+      updatedTimeline[editingTimelineIndex] = timelineForm;
+    } else {
+      updatedTimeline.push(timelineForm);
+    }
+
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+      setAuthorTimeline(updatedTimeline);
+      toast.success(editingTimelineIndex !== null ? 'Timeline updated' : 'Timeline event added');
+      resetTimelineForm();
+    } catch (error) {
+      toast.error('Failed to save timeline');
+    }
+  };
+
+  const handleDeleteTimeline = async (index) => {
+    const updatedTimeline = authorTimeline.filter((_, i) => i !== index);
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { timeline: updatedTimeline });
+      setAuthorTimeline(updatedTimeline);
+      toast.success('Timeline event deleted');
+    } catch (error) {
+      toast.error('Failed to delete timeline');
+    }
+  };
+
+  const resetTimelineForm = () => {
+    setTimelineForm({ year: '', event: '', description: '' });
+    setShowTimelineForm(false);
+    setEditingTimelineIndex(null);
+  };
+
+  // ============================================
+  // GALLERY MANAGEMENT
+  // ============================================
+  const handleAddGallery = async () => {
+    if (!galleryForm.url) {
+      toast.error('Please enter image URL');
+      return;
+    }
+
+    const updatedGallery = [...authorGallery];
+    if (editingGalleryIndex !== null) {
+      updatedGallery[editingGalleryIndex] = galleryForm;
+    } else {
+      updatedGallery.push(galleryForm);
+    }
+
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+      setAuthorGallery(updatedGallery);
+      toast.success(editingGalleryIndex !== null ? 'Gallery image updated' : 'Gallery image added');
+      resetGalleryForm();
+    } catch (error) {
+      toast.error('Failed to save gallery');
+    }
+  };
+
+  const handleDeleteGallery = async (index) => {
+    const updatedGallery = authorGallery.filter((_, i) => i !== index);
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { gallery: updatedGallery });
+      setAuthorGallery(updatedGallery);
+      toast.success('Gallery image deleted');
+    } catch (error) {
+      toast.error('Failed to delete gallery image');
+    }
+  };
+
+  const resetGalleryForm = () => {
+    setGalleryForm({ url: '', caption: '' });
+    setShowGalleryForm(false);
+    setEditingGalleryIndex(null);
+  };
+
+  // ============================================
+  // QUOTES MANAGEMENT
+  // ============================================
+  const handleAddQuote = async () => {
+    if (!quoteForm.text) {
+      toast.error('Please enter quote text');
+      return;
+    }
+
+    const updatedQuotes = [...authorQuotes];
+    if (editingQuoteIndex !== null) {
+      updatedQuotes[editingQuoteIndex] = quoteForm;
+    } else {
+      updatedQuotes.push(quoteForm);
+    }
+
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { quotes: updatedQuotes });
+      setAuthorQuotes(updatedQuotes);
+      toast.success(editingQuoteIndex !== null ? 'Quote updated' : 'Quote added');
+      resetQuoteForm();
+    } catch (error) {
+      toast.error('Failed to save quote');
+    }
+  };
+
+  const handleDeleteQuote = async (index) => {
+    const updatedQuotes = authorQuotes.filter((_, i) => i !== index);
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { quotes: updatedQuotes });
+      setAuthorQuotes(updatedQuotes);
+      toast.success('Quote deleted');
+    } catch (error) {
+      toast.error('Failed to delete quote');
+    }
+  };
+
+  const resetQuoteForm = () => {
+    setQuoteForm({ text: '', source: '' });
+    setShowQuoteForm(false);
+    setEditingQuoteIndex(null);
+  };
+
+  // ============================================
+  // SOCIAL LINKS MANAGEMENT
+  // ============================================
+  const handleUpdateSocialLinks = async () => {
+    try {
+      await authorAPI.updateAuthor(selectedAuthor._id, { socialLinks: socialForm });
+      setAuthorSocialLinks(socialForm);
+      setShowSocialForm(false);
+      toast.success('Social links updated successfully');
+    } catch (error) {
+      toast.error('Failed to update social links');
+    }
+  };
+
+  // ============================================
+  // FETCH AUTHORS
+  // ============================================
+  const fetchAuthors = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = {
+        page: pagination.page,
+        limit: pagination.limit,
+        ...(searchQuery && { search: searchQuery }),
+        ...(filterEra !== 'all' && { era: filterEra.toLowerCase() })
+      };
+
+      const response = await authorAPI.getAuthors(params);
+      
+      let authorsData = [];
+      if (response?.data?.data) {
+        authorsData = response.data.data;
+        if (response.data.pagination) setPagination(response.data.pagination);
+      } else if (response?.data) {
+        authorsData = response.data;
+      } else if (Array.isArray(response)) {
+        authorsData = response;
+      } else if (response?.authors) {
+        authorsData = response.authors;
+      } else {
+        authorsData = [];
+      }
+      
+      setAuthors(Array.isArray(authorsData) ? authorsData : []);
+    } catch (error) {
+      console.error('Error fetching authors:', error);
+      toast.error('Failed to load authors');
+      setAuthors([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [pagination.page, pagination.limit, searchQuery, filterEra]);
+
+  useEffect(() => {
+    fetchAuthors();
+  }, [fetchAuthors]);
+
+  // Handle form input changes
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setFormData(prev => ({ ...prev, [name]: checked }));
+    } else if (name === 'genres') {
+      const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+      setFormData(prev => ({ ...prev, genres: selectedOptions }));
+    } else if (name === 'languages') {
+      const selectedOptions = Array.from(e.target.selectedOptions, option => option.value);
+      setFormData(prev => ({ ...prev, languages: selectedOptions }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  // Handle submit (create or update)
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.name.trim()) {
+      toast.error('Please enter author name');
+      return;
+    }
+
+    if (!formData.bio || !formData.bio.trim()) {
+      toast.error('Please enter author biography');
+      return;
+    }
+
+    if (!formData.slug) {
+      toast.error('Please enter a slug');
+      return;
+    }
+
+    if (!slugAvailable) {
+      toast.error('Slug already exists. Please choose a different slug.');
+      return;
+    }
+
+    const authorData = {
+      name: formData.name.trim(),
+      slug: formData.slug,
+      nameUrdu: formData.nameUrdu?.trim() || '',
+      bio: formData.bio.trim(),
+      bioUrdu: formData.bioUrdu?.trim() || '',
+      birthDate: formData.birthDate || null,
+      deathDate: formData.deathDate || null,
+      birthPlace: formData.birthPlace?.trim() || '',
+      era: formData.era,
+      category: formData.category,
+      genres: formData.genres,
+      languages: formData.languages,
+      isVerified: formData.isVerified,
+      isFeatured: formData.isFeatured,
+      avatar: formData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=8B4513&color=fff`,
+      coverImage: formData.coverImage || 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1200'
+    };
+
+    setLoading(true);
+    try {
+      if (editingAuthor) {
+        await authorAPI.updateAuthor(editingAuthor._id, authorData);
+        toast.success('Author updated successfully');
+      } else {
+        await authorAPI.createAuthor(authorData);
+        toast.success('Author created successfully');
+      }
+      resetModal();
+      fetchAuthors();
+    } catch (error) {
+      console.error('Error saving author:', error);
+      const message = error.response?.data?.message || 'Failed to save author';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle delete
+  const handleDelete = async (id, name) => {
+    if (!window.confirm(`Are you sure you want to delete "${name}"? This will also affect all associated poems, books, etc.`)) {
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authorAPI.deleteAuthor(id);
+      toast.success('Author deleted successfully');
+      fetchAuthors();
+    } catch (error) {
+      console.error('Error deleting author:', error);
+      toast.error(error.response?.data?.message || 'Failed to delete author');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Handle edit
+  const handleEdit = (author) => {
+    setEditingAuthor(author);
+    setFormData({
+      name: author.name || '',
+      slug: author.slug || '',
+      nameUrdu: author.nameUrdu || '',
+      bio: author.bio || '',
+      bioUrdu: author.bioUrdu || '',
+      birthDate: author.birthDate ? new Date(author.birthDate).toISOString().split('T')[0] : '',
+      deathDate: author.deathDate ? new Date(author.deathDate).toISOString().split('T')[0] : '',
+      birthPlace: author.birthPlace || '',
+      era: author.era || 'modern',
+      category: author.category || 'modern',
+      genres: author.genres || [],
+      languages: author.languages || ['urdu'],
+      isVerified: author.isVerified || false,
+      isFeatured: author.isFeatured || false,
+      avatar: author.avatar || '',
+      coverImage: author.coverImage || ''
+    });
+    setSlugAvailable(true);
+    setShowAddModal(true);
+  };
+
+  const resetModal = () => {
+    setShowAddModal(false);
+    setEditingAuthor(null);
+    setFormData({
+      name: '',
+      slug: '',
+      nameUrdu: '',
+      bio: '',
+      bioUrdu: '',
+      birthDate: '',
+      deathDate: '',
+      birthPlace: '',
+      era: 'modern',
+      category: 'modern',
+      genres: [],
+      languages: ['urdu'],
+      isVerified: false,
+      isFeatured: false,
+      avatar: '',
+      coverImage: ''
+    });
+    setSlugAvailable(true);
+  };
+
+  const clearFilters = () => {
+    setSearchQuery('');
+    setFilterEra('all');
+    setPagination(prev => ({ ...prev, page: 1 }));
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString();
+    } catch {
+      return 'N/A';
+    }
+  };
+
+  const getEraColor = (era) => {
+    switch (era?.toLowerCase()) {
+      case 'classical': return 'bg-purple-100 text-purple-700';
+      case 'modern': return 'bg-blue-100 text-blue-700';
+      case 'contemporary': return 'bg-green-100 text-green-700';
+      default: return 'bg-gray-100 text-gray-700';
+    }
+  };
+
+  // Detail view tabs
+  const detailTabs = [
+    { id: 'works', label: 'Poems', icon: BookOpen, count: authorPoems.length },
+    { id: 'books', label: 'Books', icon: BookOpen, count: authorBooks.length },
+    { id: 'audio', label: 'Audio', icon: Music, count: authorAudio.length },
+    { id: 'videos', label: 'Videos', icon: Video, count: authorVideos.length },
+    { id: 'timeline', label: 'Timeline', icon: Calendar, count: authorTimeline.length },
+    { id: 'gallery', label: 'Gallery', icon: Image, count: authorGallery.length },
+    { id: 'quotes', label: 'Quotes', icon: Quote, count: authorQuotes.length },
+    { id: 'social', label: 'Social', icon: Users, count: null }
+  ];
+
+  // ============================================
+  // RENDER FUNCTIONS FOR DETAIL MODAL
+  // ============================================
+
+  const renderWorks = () => {
+    if (authorPoems.length === 0) {
+      return <div className="text-center py-8 text-gray-500">No poems available for this author.</div>;
+    }
+
+    return (
+      <>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-gray-900">Poems ({authorPoems.length})</h3>
+          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+            >
+              <Grid className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+            >
+              <List className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+          {authorPoems.map((poem) => (
+            <div key={poem._id} className="card p-4 hover:shadow-md transition-all">
+              <Link to={`/poem/${poem.slug}`} target="_blank" className="block">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h4 className="font-medium text-gray-900 hover:text-primary-600 transition-colors">{poem.title}</h4>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                      <span className="capitalize">{poem.genre}</span>
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {poem.stats?.views?.toLocaleString() || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-3 w-3" />
+                        {poem.stats?.likes?.toLocaleString() || 0}
+                      </span>
+                    </div>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-gray-400" />
+                </div>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </>
+    );
+  };
+
+  const renderBooks = () => {
+    if (authorBooks.length === 0) {
+      return <div className="text-center py-8 text-gray-500">No books available for this author.</div>;
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {authorBooks.map((book) => (
+          <Link key={book._id} to={`/book/${book.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all">
+            <div className="flex items-start gap-3">
+              {book.coverImage && (
+                <img src={book.coverImage} alt={book.title} className="w-12 h-16 object-cover rounded" />
+              )}
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900">{book.title}</h4>
+                <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                  <span className="capitalize">{book.type}</span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {book.stats?.views?.toLocaleString() || 0}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Download className="h-3 w-3" />
+                    {book.stats?.downloads?.toLocaleString() || 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  };
+
+  const renderAudio = () => {
+    if (authorAudio.length === 0) {
+      return <div className="text-center py-8 text-gray-500">No audio available for this author.</div>;
+    }
+
+    return (
+      <div className="space-y-3">
+        {authorAudio.map((audio) => (
+          <Link key={audio._id} to={`/audio/${audio.slug}`} target="_blank" className="card p-4 hover:shadow-md transition-all flex items-center gap-4">
+            <div className="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center">
+              <Play className="h-5 w-5 text-primary-600" />
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-gray-900">{audio.title}</h4>
+              <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+            </div>
+            <div className="text-sm text-gray-400">
+              {audio.duration ? `${Math.floor(audio.duration / 60)}:${(audio.duration % 60).toString().padStart(2, '0')}` : '--:--'}
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  };
+
+  const renderVideos = () => {
+    if (authorVideos.length === 0) {
+      return <div className="text-center py-8 text-gray-500">No videos available for this author.</div>;
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {authorVideos.map((video) => (
+          <Link key={video._id} to={`/video/${video.slug}`} target="_blank" className="card overflow-hidden hover:shadow-md transition-all">
+            <div className="relative h-40 bg-gray-900">
+              {video.thumbnail ? (
+                <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+              ) : (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <Play className="h-10 w-10 text-white/50" />
+                </div>
+              )}
+            </div>
+            <div className="p-3">
+              <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+              <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                <span className="capitalize">{video.type}</span>
+                <span className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" />
+                  {video.stats?.views?.toLocaleString() || 0}
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+    );
+  };
+
+  const renderTimeline = () => {
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-gray-900">Timeline Events ({authorTimeline.length})</h3>
+          <button
+            onClick={() => setShowTimelineForm(true)}
+            className="text-sm btn-primary py-1.5 px-3"
+          >
+            <Plus className="h-4 w-4 inline mr-1" /> Add Event
+          </button>
+        </div>
+
+        {authorTimeline.length === 0 && !showTimelineForm && (
+          <div className="text-center py-8 text-gray-500">No timeline events added yet.</div>
+        )}
+
+        {showTimelineForm && (
+          <div className="card p-4 mb-4">
+            <h4 className="font-medium text-gray-900 mb-3">{editingTimelineIndex !== null ? 'Edit Event' : 'Add New Event'}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <input
+                type="text"
+                placeholder="Year (e.g., 1797)"
+                value={timelineForm.year}
+                onChange={(e) => setTimelineForm(prev => ({ ...prev, year: e.target.value }))}
+                className="input-field"
+              />
+              <input
+                type="text"
+                placeholder="Event title"
+                value={timelineForm.event}
+                onChange={(e) => setTimelineForm(prev => ({ ...prev, event: e.target.value }))}
+                className="input-field"
+              />
+              <textarea
+                placeholder="Description (optional)"
+                value={timelineForm.description}
+                onChange={(e) => setTimelineForm(prev => ({ ...prev, description: e.target.value }))}
+                className="input-field h-10"
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-3">
+              <button onClick={handleAddTimeline} className="btn-primary text-sm py-1.5 px-3">Save</button>
+              <button onClick={resetTimelineForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {authorTimeline.length > 0 && (
+          <div className="space-y-3">
+            {authorTimeline.map((event, index) => (
+              <div key={index} className="card p-4 flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <span className="font-bold text-primary-600 text-lg">{event.year}</span>
+                    <h4 className="font-medium text-gray-900">{event.event}</h4>
+                  </div>
+                  {event.description && <p className="text-sm text-gray-500 mt-1">{event.description}</p>}
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      setTimelineForm(event);
+                      setEditingTimelineIndex(index);
+                      setShowTimelineForm(true);
+                    }}
+                    className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteTimeline(index)}
+                    className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderGallery = () => {
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-gray-900">Gallery Images ({authorGallery.length})</h3>
+          <button
+            onClick={() => setShowGalleryForm(true)}
+            className="text-sm btn-primary py-1.5 px-3"
+          >
+            <Plus className="h-4 w-4 inline mr-1" /> Add Image
+          </button>
+        </div>
+
+        {authorGallery.length === 0 && !showGalleryForm && (
+          <div className="text-center py-8 text-gray-500">No gallery images added yet.</div>
+        )}
+
+        {showGalleryForm && (
+          <div className="card p-4 mb-4">
+            <h4 className="font-medium text-gray-900 mb-3">{editingGalleryIndex !== null ? 'Edit Image' : 'Add New Image'}</h4>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <input
+                type="url"
+                placeholder="Image URL"
+                value={galleryForm.url}
+                onChange={(e) => setGalleryForm(prev => ({ ...prev, url: e.target.value }))}
+                className="input-field"
+              />
+              <input
+                type="text"
+                placeholder="Caption (optional)"
+                value={galleryForm.caption}
+                onChange={(e) => setGalleryForm(prev => ({ ...prev, caption: e.target.value }))}
+                className="input-field"
+              />
+            </div>
+            {galleryForm.url && (
+              <div className="mt-2">
+                <img src={galleryForm.url} alt="Preview" className="h-24 w-auto rounded object-cover" />
+              </div>
+            )}
+            <div className="flex justify-end gap-2 mt-3">
+              <button onClick={handleAddGallery} className="btn-primary text-sm py-1.5 px-3">Save</button>
+              <button onClick={resetGalleryForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {authorGallery.length > 0 && (
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {authorGallery.map((item, index) => (
+              <div key={index} className="card overflow-hidden group relative">
+                <img src={item.url} alt={item.caption || `Image ${index + 1}`} className="w-full h-40 object-cover" />
+                {item.caption && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-xs p-2 truncate">
+                    {item.caption}
+                  </div>
+                )}
+                <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={() => {
+                      setGalleryForm(item);
+                      setEditingGalleryIndex(index);
+                      setShowGalleryForm(true);
+                    }}
+                    className="p-1 rounded bg-white text-blue-600 hover:bg-gray-100"
+                  >
+                    <Edit className="h-3 w-3" />
+                  </button>
+                  <button
+                    onClick={() => handleDeleteGallery(index)}
+                    className="p-1 rounded bg-white text-red-600 hover:bg-gray-100"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderQuotes = () => {
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-gray-900">Quotes ({authorQuotes.length})</h3>
+          <button
+            onClick={() => setShowQuoteForm(true)}
+            className="text-sm btn-primary py-1.5 px-3"
+          >
+            <Plus className="h-4 w-4 inline mr-1" /> Add Quote
+          </button>
+        </div>
+
+        {authorQuotes.length === 0 && !showQuoteForm && (
+          <div className="text-center py-8 text-gray-500">No quotes added yet.</div>
+        )}
+
+        {showQuoteForm && (
+          <div className="card p-4 mb-4">
+            <h4 className="font-medium text-gray-900 mb-3">{editingQuoteIndex !== null ? 'Edit Quote' : 'Add New Quote'}</h4>
+            <div className="space-y-3">
+              <textarea
+                placeholder="Quote text"
+                value={quoteForm.text}
+                onChange={(e) => setQuoteForm(prev => ({ ...prev, text: e.target.value }))}
+                className="input-field h-24"
+              />
+              <input
+                type="text"
+                placeholder="Source (optional)"
+                value={quoteForm.source}
+                onChange={(e) => setQuoteForm(prev => ({ ...prev, source: e.target.value }))}
+                className="input-field"
+              />
+            </div>
+            <div className="flex justify-end gap-2 mt-3">
+              <button onClick={handleAddQuote} className="btn-primary text-sm py-1.5 px-3">Save</button>
+              <button onClick={resetQuoteForm} className="px-3 py-1.5 text-gray-600 hover:text-gray-800">Cancel</button>
+            </div>
+          </div>
+        )}
+
+        {authorQuotes.length > 0 && (
+          <div className="space-y-3">
+            {authorQuotes.map((quote, index) => (
+              <div key={index} className="card p-4 border-l-4 border-primary-500">
+                <div className="flex justify-between">
+                  <div className="flex-1">
+                    <p className="text-gray-700 italic">"{quote.text}"</p>
+                    {quote.source && <p className="text-sm text-gray-500 mt-2">— {quote.source}</p>}
+                  </div>
+                  <div className="flex gap-2 ml-4">
+                    <button
+                      onClick={() => {
+                        setQuoteForm(quote);
+                        setEditingQuoteIndex(index);
+                        setShowQuoteForm(true);
+                      }}
+                      className="p-1.5 rounded hover:bg-gray-100 text-blue-600"
+                    >
+                      <Edit className="h-4 w-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteQuote(index)}
+                      className="p-1.5 rounded hover:bg-gray-100 text-red-600"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderSocialLinks = () => {
+    const hasSocialLinks = Object.values(authorSocialLinks).some(v => v);
+    
+    return (
+      <div>
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-semibold text-gray-900">Social Media Links</h3>
+          <button
+            onClick={() => setShowSocialForm(!showSocialForm)}
+            className="text-sm btn-primary py-1.5 px-3"
+          >
+            {showSocialForm ? <X className="h-4 w-4 inline mr-1" /> : <Edit className="h-4 w-4 inline mr-1" />}
+            {showSocialForm ? 'Cancel' : 'Edit Links'}
+          </button>
+        </div>
+
+        {showSocialForm ? (
+          <div className="card p-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                <input
+                  type="url"
+                  value={socialForm.website}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, website: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Twitter</label>
+                <input
+                  type="url"
+                  value={socialForm.twitter}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, twitter: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://twitter.com/..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Facebook</label>
+                <input
+                  type="url"
+                  value={socialForm.facebook}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, facebook: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://facebook.com/..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Instagram</label>
+                <input
+                  type="url"
+                  value={socialForm.instagram}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, instagram: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://instagram.com/..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">YouTube</label>
+                <input
+                  type="url"
+                  value={socialForm.youtube}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, youtube: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://youtube.com/..."
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Wikipedia</label>
+                <input
+                  type="url"
+                  value={socialForm.wikipedia}
+                  onChange={(e) => setSocialForm(prev => ({ ...prev, wikipedia: e.target.value }))}
+                  className="input-field"
+                  placeholder="https://wikipedia.org/..."
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-4">
+              <button onClick={handleUpdateSocialLinks} className="btn-primary text-sm py-1.5 px-3">Save Links</button>
+            </div>
+          </div>
+        ) : (
+          <div className="card p-4">
+            {hasSocialLinks ? (
+              <div className="flex flex-wrap gap-4">
+                {socialForm.website && (
+                  <a href={socialForm.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+                    <Globe className="h-5 w-5" /> Website
+                  </a>
+                )}
+                {socialForm.twitter && (
+                  <a href={socialForm.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-blue-500">
+                    <Twitter className="h-5 w-5" /> Twitter
+                  </a>
+                )}
+                {socialForm.facebook && (
+                  <a href={socialForm.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-blue-700">
+                    <Facebook className="h-5 w-5" /> Facebook
+                  </a>
+                )}
+                {socialForm.instagram && (
+                  <a href={socialForm.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-pink-600">
+                    <Instagram className="h-5 w-5" /> Instagram
+                  </a>
+                )}
+                {socialForm.youtube && (
+                  <a href={socialForm.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-red-600">
+                    <Youtube className="h-5 w-5" /> YouTube
+                  </a>
+                )}
+                {socialForm.wikipedia && (
+                  <a href={socialForm.wikipedia} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-gray-600 hover:text-primary-600">
+                    <Wikipedia className="h-5 w-5" /> Wikipedia
+                  </a>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-500">No social links added yet.</div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Loading state
+  if (loading && authors.length === 0) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Author CMS</h1>
+          <p className="text-gray-500">Manage authors, biographies, poems, books, audio, videos, timeline, gallery, and quotes</p>
+        </div>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="btn-primary inline-flex items-center space-x-2"
+        >
+          <Plus className="h-5 w-5" />
+          <span>Add Author</span>
+        </button>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+        <div className="card p-4 text-center">
+          <p className="text-2xl font-bold text-gray-900">{pagination.total}</p>
+          <p className="text-sm text-gray-500">Total Authors</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="text-2xl font-bold text-purple-600">
+            {authors.filter(a => a.era === 'classical').length}
+          </p>
+          <p className="text-sm text-gray-500">Classical Poets</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="text-2xl font-bold text-blue-600">
+            {authors.filter(a => a.era === 'modern').length}
+          </p>
+          <p className="text-sm text-gray-500">Modern Poets</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="text-2xl font-bold text-green-600">
+            {authors.filter(a => a.isFeatured).length}
+          </p>
+          <p className="text-sm text-gray-500">Featured</p>
+        </div>
+        <div className="card p-4 text-center">
+          <p className="text-2xl font-bold text-yellow-600">
+            {authors.filter(a => a.isVerified).length}
+          </p>
+          <p className="text-sm text-gray-500">Verified</p>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search authors by name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="input-field pl-10"
+          />
+        </div>
+        <select
+          value={filterEra}
+          onChange={(e) => setFilterEra(e.target.value)}
+          className="input-field w-full md:w-40"
+        >
+          <option value="all">All Eras</option>
+          <option value="classical">Classical</option>
+          <option value="modern">Modern</option>
+          <option value="contemporary">Contemporary</option>
+        </select>
+        {(searchQuery || filterEra !== 'all') && (
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2.5 text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Clear Filters
+          </button>
+        )}
+      </div>
+
+      {/* Authors Table */}
+      <div className="card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Era</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genres</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Poems</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {authors.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="px-6 py-12 text-center text-gray-500">
+                    No authors found. Click "Add Author" to get started.
+                  </td>
+                </tr>
+              ) : (
+                authors.map((author) => (
+                  <motion.tr
+                    key={author._id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="hover:bg-gray-50"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-3">
+                        <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center overflow-hidden">
+                          {author.avatar ? (
+                            <img src={author.avatar} alt={author.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <span className="text-sm font-medium text-gray-600">{author.name.charAt(0)}</span>
+                          )}
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{author.name}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <code className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                              slug: {author.slug}
+                            </code>
+                            <button
+                              onClick={() => copySlugToClipboard(author.slug)}
+                              className="p-1 rounded hover:bg-gray-200 transition-colors"
+                              title="Copy link to clipboard"
+                            >
+                              {copiedSlug === author.slug ? (
+                                <Check className="h-3 w-3 text-green-600" />
+                              ) : (
+                                <Copy className="h-3 w-3 text-gray-400" />
+                              )}
+                            </button>
+                          </div>
+                          {author.nameUrdu && (
+                            <p className="urdu-text text-xs text-gray-500 mt-1" dir="rtl">{author.nameUrdu}</p>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${getEraColor(author.era)} capitalize`}>
+                        {author.era || 'N/A'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex flex-wrap gap-1">
+                        {author.genres?.slice(0, 2).map((genre, idx) => (
+                          <span key={idx} className="inline-flex px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 capitalize">
+                            {genre}
+                          </span>
+                        ))}
+                        {author.genres?.length > 2 && (
+                          <span className="text-xs text-gray-400">+{author.genres.length - 2}</span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      {author.stats?.poemsCount || 0}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-1">
+                        {author.isVerified && (
+                          <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
+                            Verified
+                          </span>
+                        )}
+                        {author.isFeatured && (
+                          <span className="inline-flex px-1.5 py-0.5 text-xs rounded bg-yellow-100 text-yellow-700">
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {formatDate(author.createdAt)}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end space-x-2">
+                        <button
+                          onClick={() => handleManageContent(author)}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-primary-600"
+                          title="Manage Content (Poems, Books, Audio, Videos, Timeline, Gallery, Quotes, Social)"
+                        >
+                          <FolderTree className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleEdit(author)}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-blue-600"
+                          title="Edit Author"
+                        >
+                          <Edit className="h-4 w-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(author._id, author.name)}
+                          className="p-1.5 rounded-lg hover:bg-gray-100 text-red-600"
+                          title="Delete Author"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))
+              )}
+            </tbody>
+         </table>   ✅ CLOSE TABLE HERE
+        </div>
+           
+
+        {/* Pagination */}
+        {pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              Showing {((pagination.page - 1) * pagination.limit) + 1} to {Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total} results
+            </p>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
+                disabled={pagination.page === 1 || loading}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <span className="px-3 py-1.5 rounded-lg bg-primary-600 text-white text-sm font-medium">
+                {pagination.page} / {pagination.totalPages}
+              </span>
+              <button
+                onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
+                disabled={pagination.page === pagination.totalPages || loading}
+                className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 text-gray-600 disabled:opacity-50"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Author Detail Modal with All Content Tabs */}
+      <AnimatePresence>
+        {showDetailModal && selectedAuthor && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-gray-900">{selectedAuthor.name}</h2>
+                  <p className="text-sm text-gray-500">Manage all content related to this author</p>
+                </div>
+                <button onClick={() => setShowDetailModal(false)} className="p-2 rounded-lg hover:bg-gray-100">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              {/* Tabs with Counts */}
+              <div className="flex overflow-x-auto scrollbar-hide gap-1 px-6 pt-4 border-b border-gray-200">
+                {detailTabs.map((tab) => {
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveDetailTab(tab.id)}
+                      className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                        activeDetailTab === tab.id
+                          ? 'border-primary-600 text-primary-600'
+                          : 'border-transparent text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{tab.label}</span>
+                      {tab.count !== null && tab.count > 0 && (
+                        <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+                          {tab.count}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Tab Content */}
+              <div className="p-6">
+                {detailLoading ? (
+                  <div className="flex justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+                  </div>
+                ) : (
+                  <>
+                    {activeDetailTab === 'works' && renderWorks()}
+                    {activeDetailTab === 'books' && renderBooks()}
+                    {activeDetailTab === 'audio' && renderAudio()}
+                    {activeDetailTab === 'videos' && renderVideos()}
+                    {activeDetailTab === 'timeline' && renderTimeline()}
+                    {activeDetailTab === 'gallery' && renderGallery()}
+                    {activeDetailTab === 'quotes' && renderQuotes()}
+                    {activeDetailTab === 'social' && renderSocialLinks()}
+                  </>
+                )}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Add/Edit Author Modal - Basic Info Only */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+            >
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-xl font-bold text-gray-900">
+                  {editingAuthor ? 'Edit Author' : 'Add New Author'}
+                </h2>
+                <button onClick={resetModal} className="p-2 rounded-lg hover:bg-gray-100">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                {/* Name and Slug */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Name (English) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleNameChange}
+                      className="input-field"
+                      placeholder="Enter author name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Slug (URL)
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 bg-gray-100 px-2 py-2 rounded-l">/author/</span>
+                      <input
+                        type="text"
+                        name="slug"
+                        value={formData.slug}
+                        onChange={handleSlugChange}
+                        className={`input-field flex-1 rounded-l-none ${!slugAvailable ? 'border-red-500 focus:ring-red-500' : ''}`}
+                        placeholder="author-slug"
+                      />
+                      <button
+                        type="button"
+                        onClick={regenerateSlug}
+                        className="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+                        title="Regenerate slug from name"
+                      >
+                        <RefreshCw className="h-4 w-4" />
+                      </button>
+                    </div>
+                    {!slugAvailable && (
+                      <p className="text-xs text-red-500 mt-1">Slug already taken. Please choose a different one.</p>
+                    )}
+                    {slugAvailable && formData.slug && !checkingSlug && (
+                      <p className="text-xs text-green-500 mt-1">✓ Slug is available</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Name (Urdu)</label>
+                  <input
+                    type="text"
+                    name="nameUrdu"
+                    value={formData.nameUrdu}
+                    onChange={handleInputChange}
+                    className="input-field urdu-text"
+                    dir="rtl"
+                    placeholder="نام اردو میں"
+                  />
+                </div>
+
+                {/* Bio */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Biography (English) <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="input-field h-24"
+                    placeholder="Enter author biography..."
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Biography (Urdu)</label>
+                  <textarea
+                    name="bioUrdu"
+                    value={formData.bioUrdu}
+                    onChange={handleInputChange}
+                    className="input-field h-24 urdu-text"
+                    dir="rtl"
+                    placeholder="سوانح حیات اردو میں"
+                  />
+                </div>
+
+                {/* Life Details */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Birth Date</label>
+                    <input
+                      type="date"
+                      name="birthDate"
+                      value={formData.birthDate}
+                      onChange={handleInputChange}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Death Date</label>
+                    <input
+                      type="date"
+                      name="deathDate"
+                      value={formData.deathDate}
+                      onChange={handleInputChange}
+                      className="input-field"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Birth Place</label>
+                    <input
+                      type="text"
+                      name="birthPlace"
+                      value={formData.birthPlace}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="e.g., Agra, India"
+                    />
+                  </div>
+                </div>
+
+                {/* Classification */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Era</label>
+                    <select name="era" value={formData.era} onChange={handleInputChange} className="input-field">
+                      <option value="classical">Classical</option>
+                      <option value="modern">Modern</option>
+                      <option value="contemporary">Contemporary</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select name="category" value={formData.category} onChange={handleInputChange} className="input-field">
+                      <option value="classical">Classical</option>
+                      <option value="modern">Modern</option>
+                      <option value="female">Female</option>
+                      <option value="trending">Trending</option>
+                      <option value="emerging">Emerging</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Genres & Languages */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Genres</label>
+                    <select
+                      multiple
+                      name="genres"
+                      value={formData.genres}
+                      onChange={handleInputChange}
+                      className="input-field h-24"
+                    >
+                      <option value="ghazal">Ghazal</option>
+                      <option value="nazm">Nazm</option>
+                      <option value="sher">Sher</option>
+                      <option value="rubai">Rubai</option>
+                      <option value="rekhti">Rekhti</option>
+                      <option value="qasida">Qasida</option>
+                      <option value="marsiya">Marsiya</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Languages</label>
+                    <select
+                      multiple
+                      name="languages"
+                      value={formData.languages}
+                      onChange={handleInputChange}
+                      className="input-field h-24"
+                    >
+                      <option value="urdu">Urdu</option>
+                      <option value="hindi">Hindi</option>
+                      <option value="english">English</option>
+                      <option value="persian">Persian</option>
+                      <option value="arabic">Arabic</option>
+                      <option value="punjabi">Punjabi</option>
+                    </select>
+                    <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+                  </div>
+                </div>
+
+                {/* Status */}
+                <div className="flex flex-wrap gap-4">
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isVerified"
+                      checked={formData.isVerified}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                    />
+                    <span className="text-sm text-gray-700">Verified Author</span>
+                  </label>
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="isFeatured"
+                      checked={formData.isFeatured}
+                      onChange={handleInputChange}
+                      className="h-4 w-4 rounded border-gray-300 text-primary-600"
+                    />
+                    <span className="text-sm text-gray-700">Featured Author</span>
+                  </label>
+                </div>
+
+                {/* Images */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Avatar URL</label>
+                    <input
+                      type="url"
+                      name="avatar"
+                      value={formData.avatar}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="https://..."
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty for auto-generated avatar</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cover Image URL</label>
+                    <input
+                      type="url"
+                      name="coverImage"
+                      value={formData.coverImage}
+                      onChange={handleInputChange}
+                      className="input-field"
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+                {/* Info Note */}
+                <div className="bg-blue-50 rounded-lg p-3 text-sm text-blue-700">
+                  <p>📌 After creating the author, you can manage their:</p>
+                  <ul className="list-disc list-inside mt-1 text-xs">
+                    <li>Poems, Books, Audio, and Videos</li>
+                    <li>Timeline events</li>
+                    <li>Gallery images</li>
+                    <li>Quotes</li>
+                    <li>Social media links</li>
+                  </ul>
+                  <p className="mt-1">Use the "Manage Content" button (📁) in the table to access these features.</p>
+                </div>
+
+                {/* Form Actions */}
+                <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
+                  <button
+                    type="submit"
+                    disabled={loading || !slugAvailable || checkingSlug}
+                    className="btn-primary flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-5 w-5 animate-spin mx-auto" />
+                    ) : (
+                      editingAuthor ? 'Update Author' : 'Create Author'
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={resetModal}
+                    className="px-4 py-2.5 text-gray-600 hover:text-gray-800 font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default AuthorCMSPage;
