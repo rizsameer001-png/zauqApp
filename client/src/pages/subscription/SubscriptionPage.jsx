@@ -1,4 +1,6 @@
 // //client/src/pages/public/SubscriptionPage.jsx
+//client/src/pages/subscription/SubscriptionPage.jsx
+
 // import React, { useState } from 'react'
 // import { useTranslation } from 'react-i18next'
 // import { motion } from 'framer-motion'
@@ -162,12 +164,425 @@
 
 
 
+// //client/src/pages/subscription/SubscriptionPage.jsx
+// import React, { useState, useEffect } from 'react';
+// import { useNavigate, Link } from 'react-router-dom';
+// import { Check, Star, Crown, Zap, Shield, Headphones, BookOpen, Download, Sparkles, CreditCard } from 'lucide-react';
+// import axios from 'axios';
+// import { SUBSCRIPTION_PLANS, getAllPlans, getRecommendedPlans } from '../../utils/constants';
 
+// const SubscriptionPage = () => {
+//   const navigate = useNavigate();
+//   const [selectedPlan, setSelectedPlan] = useState(null);
+//   const [billingCycle, setBillingCycle] = useState('monthly');
+//   const [loading, setLoading] = useState(false);
+//   const [user, setUser] = useState(null);
+//   const [currentSubscription, setCurrentSubscription] = useState(null);
+//   const [plans, setPlans] = useState([]);
+
+//   useEffect(() => {
+//     fetchUserAndSubscription();
+//     fetchPlansFromAPI();
+//   }, []);
+
+//   const fetchUserAndSubscription = async () => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       if (token) {
+//         const response = await axios.get('/api/auth/me', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//         setUser(response.data.data);
+        
+//         // Get current subscription
+//         const subResponse = await axios.get('/api/subscriptions/current', {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//         setCurrentSubscription(subResponse.data.data);
+//       }
+//     } catch (error) {
+//       console.error('Error fetching user:', error);
+//     }
+//   };
+
+//   const fetchPlansFromAPI = async () => {
+//     try {
+//       const response = await axios.get('/api/subscriptions/plans');
+//       if (response.data.data) {
+//         // Transform API response to our format
+//         const apiPlans = Object.entries(response.data.data).map(([key, value]) => ({
+//           id: key,
+//           name: value.name,
+//           price: value.price,
+//           currency: value.currency || 'INR',
+//           features: value.features || [],
+//           limits: value.limits || {},
+//           badge: value.badgeText,
+//           recommended: value.recommended,
+//           description: value.description
+//         }));
+//         setPlans(apiPlans);
+//       } else {
+//         // Fallback to constants
+//         setPlans(getAllPlans());
+//       }
+//     } catch (error) {
+//       console.error('Error fetching plans:', error);
+//       // Fallback to constants
+//       setPlans(getAllPlans());
+//     }
+//   };
+
+//   const calculatePrice = (plan, cycle) => {
+//     const basePrice = plan.price;
+//     if (cycle === 'quarterly') {
+//       return {
+//         amount: basePrice * 3,
+//         savings: 10,
+//         period: 'quarter'
+//       };
+//     } else if (cycle === 'yearly') {
+//       return {
+//         amount: basePrice * 12,
+//         savings: 20,
+//         period: 'year'
+//       };
+//     }
+//     return {
+//       amount: basePrice,
+//       savings: 0,
+//       period: 'month'
+//     };
+//   };
+
+//   const handleSubscribe = async (plan) => {
+//     if (!user) {
+//       // Redirect to login
+//       navigate('/login', { state: { from: '/subscription', selectedPlan: plan.id } });
+//       return;
+//     }
+
+//     setSelectedPlan(plan);
+//     setLoading(true);
+
+//     try {
+//       const token = localStorage.getItem('token');
+//       const response = await axios.post(
+//         '/api/subscriptions/subscribe',
+//         {
+//           plan: plan.id,
+//           billingCycle,
+//           paymentMethod: 'card'
+//         },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+
+//       if (response.data.success) {
+//         // Redirect to payment gateway or success page
+//         if (response.data.data.paymentUrl) {
+//           window.location.href = response.data.data.paymentUrl;
+//         } else {
+//           navigate('/subscription/success', {
+//             state: { subscription: response.data.data }
+//           });
+//         }
+//       }
+//     } catch (error) {
+//       console.error('Subscription error:', error);
+//       alert(error.response?.data?.message || 'Failed to subscribe. Please try again.');
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const getPlanIcon = (planName) => {
+//     switch (planName?.toLowerCase()) {
+//       case 'free':
+//         return <Sparkles className="h-8 w-8 text-gray-500" />;
+//       case 'basic':
+//         return <BookOpen className="h-8 w-8 text-blue-500" />;
+//       case 'premium':
+//         return <Crown className="h-8 w-8 text-amber-500" />;
+//       case 'pro':
+//         return <Zap className="h-8 w-8 text-purple-500" />;
+//       default:
+//         return <Star className="h-8 w-8 text-primary-500" />;
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+//       <div className="max-w-7xl mx-auto">
+//         {/* Header */}
+//         <div className="text-center mb-12">
+//           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+//             Choose Your Perfect Plan
+//           </h1>
+//           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+//             Unlock unlimited access to premium poems, books, and audio content
+//           </p>
+          
+//           {user && currentSubscription?.plan?.plan !== 'free' && (
+//             <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-100 rounded-full">
+//               <Shield className="h-4 w-4 text-green-600 mr-2" />
+//               <span className="text-sm text-green-700">
+//                 Current Plan: {currentSubscription?.plan?.plan || 'Free'}
+//               </span>
+//             </div>
+//           )}
+//         </div>
+
+//         {/* Billing Cycle Toggle */}
+//         <div className="flex justify-center mb-12">
+//           <div className="bg-white rounded-lg p-1 shadow-md inline-flex">
+//             <button
+//               onClick={() => setBillingCycle('monthly')}
+//               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+//                 billingCycle === 'monthly'
+//                   ? 'bg-primary-600 text-white'
+//                   : 'text-gray-600 hover:text-gray-900'
+//               }`}
+//             >
+//               Monthly
+//             </button>
+//             <button
+//               onClick={() => setBillingCycle('quarterly')}
+//               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+//                 billingCycle === 'quarterly'
+//                   ? 'bg-primary-600 text-white'
+//                   : 'text-gray-600 hover:text-gray-900'
+//               }`}
+//             >
+//               Quarterly
+//             </button>
+//             <button
+//               onClick={() => setBillingCycle('yearly')}
+//               className={`px-6 py-2 rounded-md text-sm font-medium transition-colors relative ${
+//                 billingCycle === 'yearly'
+//                   ? 'bg-primary-600 text-white'
+//                   : 'text-gray-600 hover:text-gray-900'
+//               }`}
+//             >
+//               Yearly
+//               <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+//                 Save 20%
+//               </span>
+//             </button>
+//           </div>
+//         </div>
+
+//         {/* Plans Grid */}
+//         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+//           {plans.map((plan) => {
+//             const priceInfo = calculatePrice(plan, billingCycle);
+//             const isCurrentPlan = currentSubscription?.plan?.plan === plan.id;
+            
+//             return (
+//               <div
+//                 key={plan.id}
+//                 className={`relative bg-white rounded-2xl shadow-xl overflow-hidden transition-transform duration-300 hover:scale-105 ${
+//                   plan.recommended ? 'ring-2 ring-primary-500' : ''
+//                 }`}
+//               >
+//                 {plan.recommended && (
+//                   <div className="absolute top-0 right-0 bg-primary-500 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
+//                     Recommended
+//                   </div>
+//                 )}
+                
+//                 {plan.badge && (
+//                   <div className="absolute top-0 left-0 bg-amber-500 text-white px-4 py-1 text-sm font-semibold rounded-br-lg">
+//                     {plan.badge}
+//                   </div>
+//                 )}
+
+//                 <div className="p-6">
+//                   {/* Plan Icon */}
+//                   <div className="flex justify-center mb-4">
+//                     {getPlanIcon(plan.name)}
+//                   </div>
+
+//                   {/* Plan Name */}
+//                   <h3 className="text-2xl font-bold text-center text-gray-900 mb-2">
+//                     {plan.name}
+//                   </h3>
+                  
+//                   {/* Price */}
+//                   <div className="text-center mb-4">
+//                     <div className="flex items-baseline justify-center">
+//                       <span className="text-4xl font-bold text-gray-900">
+//                         ₹{priceInfo.amount}
+//                       </span>
+//                       <span className="text-gray-600 ml-2">
+//                         /{priceInfo.period}
+//                       </span>
+//                     </div>
+//                     {priceInfo.savings > 0 && (
+//                       <p className="text-sm text-green-600 mt-1">
+//                         Save {priceInfo.savings}% compared to monthly
+//                       </p>
+//                     )}
+//                   </div>
+
+//                   {/* Description */}
+//                   <p className="text-gray-600 text-center text-sm mb-6">
+//                     {plan.description}
+//                   </p>
+
+//                   {/* Features List */}
+//                   <ul className="space-y-3 mb-6">
+//                     {plan.features.slice(0, 5).map((feature, index) => (
+//                       <li key={index} className="flex items-start text-sm">
+//                         <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+//                         <span className="text-gray-700">{feature}</span>
+//                       </li>
+//                     ))}
+//                     {plan.features.length > 5 && (
+//                       <li className="text-xs text-gray-500 text-center">
+//                         +{plan.features.length - 5} more features
+//                       </li>
+//                     )}
+//                   </ul>
+
+//                   {/* Subscribe Button */}
+//                   <button
+//                     onClick={() => handleSubscribe(plan)}
+//                     disabled={loading && selectedPlan?.id === plan.id || isCurrentPlan}
+//                     className={`w-full py-3 rounded-lg font-semibold transition-colors ${
+//                       isCurrentPlan
+//                         ? 'bg-gray-300 cursor-not-allowed text-gray-600'
+//                         : plan.id === 'free'
+//                         ? 'bg-gray-600 hover:bg-gray-700 text-white'
+//                         : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white'
+//                     }`}
+//                   >
+//                     {loading && selectedPlan?.id === plan.id ? (
+//                       <div className="flex items-center justify-center">
+//                         <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+//                       </div>
+//                     ) : isCurrentPlan ? (
+//                       'Current Plan'
+//                     ) : plan.price === 0 ? (
+//                       'Get Started'
+//                     ) : (
+//                       `Subscribe to ${plan.name}`
+//                     )}
+//                   </button>
+
+//                   {/* Payment Methods */}
+//                   {plan.price > 0 && (
+//                     <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-500">
+//                       <CreditCard className="h-3 w-3" />
+//                       <span>Secure payment</span>
+//                     </div>
+//                   )}
+//                 </div>
+//               </div>
+//             );
+//           })}
+//         </div>
+
+//         {/* Features Comparison Table (Mobile) */}
+//         <div className="mt-16 bg-white rounded-2xl shadow-xl overflow-hidden lg:hidden">
+//           <div className="p-6">
+//             <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
+//               Compare All Features
+//             </h2>
+//             <div className="space-y-4">
+//               {plans.map((plan) => (
+//                 <div key={plan.id} className="border-b border-gray-200 pb-4">
+//                   <h3 className="font-bold text-lg text-gray-900 mb-2">{plan.name}</h3>
+//                   <ul className="space-y-1">
+//                     {plan.features.map((feature, idx) => (
+//                       <li key={idx} className="flex items-center text-sm">
+//                         <Check className="h-4 w-4 text-green-500 mr-2" />
+//                         <span className="text-gray-600">{feature}</span>
+//                       </li>
+//                     ))}
+//                   </ul>
+//                 </div>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* FAQ Section */}
+//         <div className="mt-16 text-center">
+//           <h2 className="text-2xl font-bold text-gray-900 mb-4">
+//             Frequently Asked Questions
+//           </h2>
+//           <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+//             <div>
+//               <h3 className="font-semibold text-gray-900 mb-2">Can I cancel anytime?</h3>
+//               <p className="text-gray-600 text-sm">
+//                 Yes, you can cancel your subscription at any time. No questions asked!
+//               </p>
+//             </div>
+//             <div>
+//               <h3 className="font-semibold text-gray-900 mb-2">Is there a free trial?</h3>
+//               <p className="text-gray-600 text-sm">
+//                 We offer a 7-day free trial on all paid plans. Cancel anytime during trial.
+//               </p>
+//             </div>
+//             <div>
+//               <h3 className="font-semibold text-gray-900 mb-2">What payment methods do you accept?</h3>
+//               <p className="text-gray-600 text-sm">
+//                 We accept all major credit cards, UPI, net banking, and digital wallets.
+//               </p>
+//             </div>
+//             <div>
+//               <h3 className="font-semibold text-gray-900 mb-2">Can I change my plan later?</h3>
+//               <p className="text-gray-600 text-sm">
+//                 Yes, you can upgrade or downgrade your plan at any time from your account settings.
+//               </p>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Trust Badges */}
+//         <div className="mt-12 text-center">
+//           <div className="flex flex-wrap justify-center gap-6">
+//             <div className="flex items-center text-gray-500">
+//               <Shield className="h-5 w-5 mr-2" />
+//               <span className="text-sm">Secure Payments</span>
+//             </div>
+//             <div className="flex items-center text-gray-500">
+//               <Headphones className="h-5 w-5 mr-2" />
+//               <span className="text-sm">24/7 Support</span>
+//             </div>
+//             <div className="flex items-center text-gray-500">
+//               <Download className="h-5 w-5 mr-2" />
+//               <span className="text-sm">Cancel Anytime</span>
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default SubscriptionPage;
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/pages/subscription/SubscriptionPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Check, Star, Crown, Zap, Shield, Headphones, BookOpen, Download, Sparkles, CreditCard } from 'lucide-react';
+import { Check, Star, Crown, Zap, Shield, Headphones, BookOpen, Download, Sparkles, CreditCard, Loader2, AlertCircle } from 'lucide-react';
 import axios from 'axios';
-import { SUBSCRIPTION_PLANS, getAllPlans, getRecommendedPlans } from '../../utils/constants';
+import toast from 'react-hot-toast';
+import { loadRazorpayScript, initRazorpayPayment, initStripePayment } from '../../utils/paymentHelper';
+import subscriptionAPI from '../../api/subscriptionAPI';
 
 const SubscriptionPage = () => {
   const navigate = useNavigate();
@@ -177,10 +592,13 @@ const SubscriptionPage = () => {
   const [user, setUser] = useState(null);
   const [currentSubscription, setCurrentSubscription] = useState(null);
   const [plans, setPlans] = useState([]);
+  const [paymentMethod, setPaymentMethod] = useState('razorpay');
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   useEffect(() => {
     fetchUserAndSubscription();
     fetchPlansFromAPI();
+    loadRazorpayScript();
   }, []);
 
   const fetchUserAndSubscription = async () => {
@@ -193,10 +611,8 @@ const SubscriptionPage = () => {
         setUser(response.data.data);
         
         // Get current subscription
-        const subResponse = await axios.get('/api/subscriptions/current', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        setCurrentSubscription(subResponse.data.data);
+        const subResponse = await subscriptionAPI.getCurrent();
+        setCurrentSubscription(subResponse.data || subResponse);
       }
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -205,10 +621,12 @@ const SubscriptionPage = () => {
 
   const fetchPlansFromAPI = async () => {
     try {
-      const response = await axios.get('/api/subscriptions/plans');
-      if (response.data.data) {
+      const response = await subscriptionAPI.getPlans();
+      const plansData = response.data || response;
+      
+      if (plansData && typeof plansData === 'object') {
         // Transform API response to our format
-        const apiPlans = Object.entries(response.data.data).map(([key, value]) => ({
+        const apiPlans = Object.entries(plansData).map(([key, value]) => ({
           id: key,
           name: value.name,
           price: value.price,
@@ -221,14 +639,54 @@ const SubscriptionPage = () => {
         }));
         setPlans(apiPlans);
       } else {
-        // Fallback to constants
-        setPlans(getAllPlans());
+        // Fallback plans
+        setPlans(getFallbackPlans());
       }
     } catch (error) {
       console.error('Error fetching plans:', error);
-      // Fallback to constants
-      setPlans(getAllPlans());
+      setPlans(getFallbackPlans());
     }
+  };
+
+  const getFallbackPlans = () => {
+    return [
+      {
+        id: 'free',
+        name: 'Free',
+        price: 0,
+        currency: 'INR',
+        features: ['Browse all content', 'Read public poems', 'Basic search', 'Limited downloads'],
+        recommended: false,
+        description: 'Perfect for getting started'
+      },
+      {
+        id: 'basic',
+        name: 'Basic',
+        price: 99,
+        currency: 'INR',
+        features: ['All free features', 'Unlimited poem reading', 'Download 5 ebooks/month', 'Basic audio streaming'],
+        recommended: true,
+        description: 'Great for regular readers'
+      },
+      {
+        id: 'premium',
+        name: 'Premium',
+        price: 199,
+        currency: 'INR',
+        features: ['All Basic features', 'Unlimited downloads', 'HD audio streaming', 'Ad-free experience', 'AI explanations'],
+        recommended: true,
+        description: 'For serious literature enthusiasts'
+      },
+      {
+        id: 'pro',
+        name: 'Pro',
+        price: 499,
+        currency: 'INR',
+        features: ['All Premium features', 'Creator tools', 'Priority support', 'Analytics dashboard', 'Early access'],
+        recommended: false,
+        description: 'For creators and power users'
+      }
+    ];
   };
 
   const calculatePrice = (plan, cycle) => {
@@ -237,59 +695,108 @@ const SubscriptionPage = () => {
       return {
         amount: basePrice * 3,
         savings: 10,
-        period: 'quarter'
+        period: 'quarter',
+        monthlyEquivalent: basePrice
       };
     } else if (cycle === 'yearly') {
       return {
         amount: basePrice * 12,
         savings: 20,
-        period: 'year'
+        period: 'year',
+        monthlyEquivalent: basePrice * 0.8
       };
     }
     return {
       amount: basePrice,
       savings: 0,
-      period: 'month'
+      period: 'month',
+      monthlyEquivalent: basePrice
     };
   };
 
   const handleSubscribe = async (plan) => {
     if (!user) {
-      // Redirect to login
+      toast.error('Please login to subscribe');
       navigate('/login', { state: { from: '/subscription', selectedPlan: plan.id } });
       return;
     }
 
+    // Check if already subscribed to this plan
+    if (currentSubscription?.plan === plan.id && currentSubscription?.status === 'active') {
+      toast.info(`You are already on the ${plan.name} plan`);
+      return;
+    }
+
     setSelectedPlan(plan);
-    setLoading(true);
+    
+    // For free plan
+    if (plan.price === 0 || plan.id === 'free') {
+      setLoading(true);
+      try {
+        const response = await subscriptionAPI.subscribe(plan.id, billingCycle, 'free');
+        if (response.success !== false) {
+          toast.success('Free subscription activated successfully!');
+          navigate('/dashboard/subscriptions');
+        } else {
+          toast.error(response.message || 'Failed to activate free subscription');
+        }
+      } catch (error) {
+        console.error('Free subscription error:', error);
+        toast.error(error.message || 'Failed to activate free subscription');
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
 
+    // For paid plans - process payment
+    setProcessingPayment(true);
+    
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post(
-        '/api/subscriptions/subscribe',
-        {
-          plan: plan.id,
+      if (paymentMethod === 'razorpay') {
+        await initRazorpayPayment(
+          plan.id,
           billingCycle,
-          paymentMethod: 'card'
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      if (response.data.success) {
-        // Redirect to payment gateway or success page
-        if (response.data.data.paymentUrl) {
-          window.location.href = response.data.data.paymentUrl;
+          (response) => {
+            toast.success('Subscription activated successfully!');
+            navigate('/dashboard/subscriptions');
+            setProcessingPayment(false);
+          },
+          (error) => {
+            toast.error(error);
+            setProcessingPayment(false);
+          }
+        );
+      } else if (paymentMethod === 'stripe') {
+        await initStripePayment(
+          plan.id,
+          billingCycle,
+          (response) => {
+            toast.success('Subscription activated successfully!');
+            navigate('/dashboard/subscriptions');
+            setProcessingPayment(false);
+          },
+          (error) => {
+            toast.error(error);
+            setProcessingPayment(false);
+          }
+        );
+      } else {
+        // Fallback to regular subscribe
+        const response = await subscriptionAPI.subscribe(plan.id, billingCycle, 'card');
+        if (response.data?.paymentUrl) {
+          window.location.href = response.data.paymentUrl;
         } else {
           navigate('/subscription/success', {
-            state: { subscription: response.data.data }
+            state: { subscription: response.data }
           });
         }
+        setProcessingPayment(false);
       }
     } catch (error) {
-      console.error('Subscription error:', error);
-      alert(error.response?.data?.message || 'Failed to subscribe. Please try again.');
-    } finally {
-      setLoading(false);
+      console.error('Payment error:', error);
+      toast.error(error.message || 'Payment failed. Please try again.');
+      setProcessingPayment(false);
     }
   };
 
@@ -308,6 +815,25 @@ const SubscriptionPage = () => {
     }
   };
 
+  const getPlanColor = (planName) => {
+    switch (planName?.toLowerCase()) {
+      case 'free':
+        return 'from-gray-500 to-gray-600';
+      case 'basic':
+        return 'from-blue-600 to-blue-700';
+      case 'premium':
+        return 'from-primary-600 to-primary-700';
+      case 'pro':
+        return 'from-purple-600 to-purple-700';
+      default:
+        return 'from-primary-600 to-primary-700';
+    }
+  };
+
+  const isCurrentPlan = (planId) => {
+    return currentSubscription?.plan === planId && currentSubscription?.status === 'active';
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
@@ -320,22 +846,22 @@ const SubscriptionPage = () => {
             Unlock unlimited access to premium poems, books, and audio content
           </p>
           
-          {user && currentSubscription?.plan?.plan !== 'free' && (
+          {user && currentSubscription?.plan !== 'free' && currentSubscription?.status === 'active' && (
             <div className="mt-4 inline-flex items-center px-4 py-2 bg-green-100 rounded-full">
               <Shield className="h-4 w-4 text-green-600 mr-2" />
               <span className="text-sm text-green-700">
-                Current Plan: {currentSubscription?.plan?.plan || 'Free'}
+                Current Plan: {currentSubscription?.plan || 'Free'}
               </span>
             </div>
           )}
         </div>
 
         {/* Billing Cycle Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-white rounded-lg p-1 shadow-md inline-flex">
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-lg p-1 shadow-md inline-flex flex-wrap justify-center">
             <button
               onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                 billingCycle === 'monthly'
                   ? 'bg-primary-600 text-white'
                   : 'text-gray-600 hover:text-gray-900'
@@ -345,26 +871,53 @@ const SubscriptionPage = () => {
             </button>
             <button
               onClick={() => setBillingCycle('quarterly')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-colors ${
                 billingCycle === 'quarterly'
                   ? 'bg-primary-600 text-white'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Quarterly
+              <span className="ml-1 text-xs text-green-600">Save 10%</span>
             </button>
             <button
               onClick={() => setBillingCycle('yearly')}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors relative ${
+              className={`px-4 sm:px-6 py-2 rounded-md text-sm font-medium transition-colors relative ${
                 billingCycle === 'yearly'
                   ? 'bg-primary-600 text-white'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Yearly
-              <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs px-1.5 py-0.5 rounded-full">
-                Save 20%
-              </span>
+              <span className="ml-1 text-xs text-green-600">Save 20%</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Payment Method Selector */}
+        <div className="flex justify-center mb-8">
+          <div className="bg-white rounded-lg p-1 shadow-md inline-flex">
+            <button
+              onClick={() => setPaymentMethod('razorpay')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                paymentMethod === 'razorpay'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <CreditCard className="h-4 w-4" />
+              Razorpay
+            </button>
+            <button
+              onClick={() => setPaymentMethod('stripe')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+                paymentMethod === 'stripe'
+                  ? 'bg-primary-600 text-white'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <CreditCard className="h-4 w-4" />
+              Stripe
             </button>
           </div>
         </div>
@@ -373,7 +926,8 @@ const SubscriptionPage = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {plans.map((plan) => {
             const priceInfo = calculatePrice(plan, billingCycle);
-            const isCurrentPlan = currentSubscription?.plan?.plan === plan.id;
+            const current = isCurrentPlan(plan.id);
+            const isProcessing = processingPayment && selectedPlan?.id === plan.id;
             
             return (
               <div
@@ -384,7 +938,7 @@ const SubscriptionPage = () => {
               >
                 {plan.recommended && (
                   <div className="absolute top-0 right-0 bg-primary-500 text-white px-4 py-1 text-sm font-semibold rounded-bl-lg">
-                    Recommended
+                    Most Popular
                   </div>
                 )}
                 
@@ -394,39 +948,46 @@ const SubscriptionPage = () => {
                   </div>
                 )}
 
-                <div className="p-6">
+                <div className={`p-6 bg-gradient-to-br ${getPlanColor(plan.name)} text-white`}>
                   {/* Plan Icon */}
                   <div className="flex justify-center mb-4">
                     {getPlanIcon(plan.name)}
                   </div>
 
                   {/* Plan Name */}
-                  <h3 className="text-2xl font-bold text-center text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-center mb-2">
                     {plan.name}
                   </h3>
                   
                   {/* Price */}
                   <div className="text-center mb-4">
                     <div className="flex items-baseline justify-center">
-                      <span className="text-4xl font-bold text-gray-900">
+                      <span className="text-4xl font-bold">
                         ₹{priceInfo.amount}
                       </span>
-                      <span className="text-gray-600 ml-2">
+                      <span className="ml-2 opacity-80">
                         /{priceInfo.period}
                       </span>
                     </div>
                     {priceInfo.savings > 0 && (
-                      <p className="text-sm text-green-600 mt-1">
+                      <p className="text-sm text-green-200 mt-1">
                         Save {priceInfo.savings}% compared to monthly
+                      </p>
+                    )}
+                    {billingCycle !== 'monthly' && (
+                      <p className="text-xs text-white/70 mt-1">
+                        (₹{Math.round(priceInfo.monthlyEquivalent)}/month equivalent)
                       </p>
                     )}
                   </div>
 
                   {/* Description */}
-                  <p className="text-gray-600 text-center text-sm mb-6">
+                  <p className="text-center text-white/80 text-sm mb-4">
                     {plan.description}
                   </p>
+                </div>
 
+                <div className="p-6">
                   {/* Features List */}
                   <ul className="space-y-3 mb-6">
                     {plan.features.slice(0, 5).map((feature, index) => (
@@ -445,20 +1006,21 @@ const SubscriptionPage = () => {
                   {/* Subscribe Button */}
                   <button
                     onClick={() => handleSubscribe(plan)}
-                    disabled={loading && selectedPlan?.id === plan.id || isCurrentPlan}
+                    disabled={isProcessing || (current && plan.price > 0)}
                     className={`w-full py-3 rounded-lg font-semibold transition-colors ${
-                      isCurrentPlan
+                      current && plan.price > 0
                         ? 'bg-gray-300 cursor-not-allowed text-gray-600'
-                        : plan.id === 'free'
+                        : plan.price === 0
                         ? 'bg-gray-600 hover:bg-gray-700 text-white'
-                        : 'bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white'
+                        : `bg-gradient-to-r ${getPlanColor(plan.name)} hover:opacity-90 text-white`
                     }`}
                   >
-                    {loading && selectedPlan?.id === plan.id ? (
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    {isProcessing ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <Loader2 className="h-5 w-5 animate-spin" />
+                        Processing...
                       </div>
-                    ) : isCurrentPlan ? (
+                    ) : current && plan.price > 0 ? (
                       'Current Plan'
                     ) : plan.price === 0 ? (
                       'Get Started'
@@ -467,11 +1029,11 @@ const SubscriptionPage = () => {
                     )}
                   </button>
 
-                  {/* Payment Methods */}
+                  {/* Payment Methods Info */}
                   {plan.price > 0 && (
                     <div className="mt-4 flex items-center justify-center space-x-2 text-xs text-gray-500">
                       <CreditCard className="h-3 w-3" />
-                      <span>Secure payment</span>
+                      <span>Secure payment via {paymentMethod === 'razorpay' ? 'Razorpay' : 'Stripe'}</span>
                     </div>
                   )}
                 </div>
@@ -525,7 +1087,7 @@ const SubscriptionPage = () => {
             <div>
               <h3 className="font-semibold text-gray-900 mb-2">What payment methods do you accept?</h3>
               <p className="text-gray-600 text-sm">
-                We accept all major credit cards, UPI, net banking, and digital wallets.
+                We accept all major credit cards, UPI, net banking, and digital wallets via Razorpay and Stripe.
               </p>
             </div>
             <div>

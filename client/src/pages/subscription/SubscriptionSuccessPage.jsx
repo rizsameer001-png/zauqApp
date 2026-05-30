@@ -1,3 +1,4 @@
+//client/src/pages/subscription/SubscriptionSuccessPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { CheckCircle, Home, BookOpen, Headphones, Award, ArrowRight } from 'lucide-react';

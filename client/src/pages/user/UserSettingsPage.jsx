@@ -1,3 +1,4 @@
+// client/src/pages/user/UserSettingsPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Bell, Lock, CreditCard, Globe, Shield, Save, Camera } from 'lucide-react';
