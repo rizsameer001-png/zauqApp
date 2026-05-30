@@ -162,7 +162,7 @@ const videoSchema = new mongoose.Schema({
 // Indexes
 videoSchema.index({ title: 'text', description: 'text' });
 videoSchema.index({ type: 1, language: 1, isPublished: 1 });
-videoSchema.index({ slug: 1 });
+//videoSchema.index({ slug: 1 });
 videoSchema.index({ createdAt: -1 });
 videoSchema.index({ isFeatured: 1, createdAt: -1 });
 

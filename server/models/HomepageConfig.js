@@ -1,3 +1,4 @@
+// //server/models/HomepageConfig.js
 import mongoose from 'mongoose';
 
 const homepageConfigSchema = new mongoose.Schema({

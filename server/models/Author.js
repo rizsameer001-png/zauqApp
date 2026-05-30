@@ -107,138 +107,6 @@
 
 
 
-// // server/models/Author.js
-// import mongoose from 'mongoose';
-// import slugify from 'slugify';
-
-// const authorSchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: [true, 'Name is required'],
-//     trim: true
-//   },
-//   slug: {
-//     type: String,
-//     unique: true,
-//     index: true
-//   },
-//   nameUrdu: String,
-//   nameHindi: String,
-//   avatar: String,
-//   coverImage: String,
-//   bio: {
-//     type: String,
-//     required: true
-//   },
-//   bioUrdu: String,
-//   bioHindi: String,
-//   birthDate: Date,
-//   deathDate: Date,
-//   birthPlace: String,
-//   era: {
-//     type: String,
-//     enum: ['classical', 'modern', 'contemporary']
-//   },
-//   category: {
-//     type: String,
-//     enum: ['classical', 'modern', 'female', 'trending', 'emerging']
-//   },
-//   genres: [{
-//     type: String,
-//     enum: ['ghazal', 'nazm', 'sher', 'rubai', 'rekhti', 'qasida', 'marsiya']
-//   }],
-//   languages: [{
-//     type: String,
-//     enum: ['urdu', 'hindi', 'english', 'persian', 'arabic', 'punjabi']
-//   }],
-//   timeline: [{
-//     year: Number,
-//     event: String,
-//     description: String
-//   }],
-//   gallery: [{
-//     url: String,
-//     caption: String
-//   }],
-//   quotes: [{
-//     text: String,
-//     source: String
-//   }],
-//   socialLinks: {
-//     website: String,
-//     twitter: String,
-//     facebook: String,
-//     instagram: String,
-//     youtube: String
-//   },
-//   stats: {
-//     poemsCount: { type: Number, default: 0 },
-//     booksCount: { type: Number, default: 0 },
-//     followers: { type: Number, default: 0 },
-//     views: { type: Number, default: 0 }
-//   },
-//   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-//   relatedAuthors: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }],
-//   isVerified: {
-//     type: Boolean,
-//     default: false
-//   },
-//   isFeatured: {
-//     type: Boolean,
-//     default: false
-//   },
-//   metaTitle: String,
-//   metaDescription: String,
-//   metaKeywords: [String]
-// }, {
-//   timestamps: true
-// });
-
-// authorSchema.index({ name: 'text', bio: 'text', nameUrdu: 'text' });
-// authorSchema.index({ era: 1, category: 1 });
-// authorSchema.index({ isFeatured: 1 });
-
-// // REMOVE ANY IMPORT OF Poem MODEL FROM HERE - DO NOT IMPORT Poem in Author.js
-
-// // FIXED: Generate clean slug without random characters
-// authorSchema.pre('save', async function(next) {
-//   if (this.isModified('name')) {
-//     // Create base slug from name (e.g., "Allama Iqbal" -> "allama-iqbal")
-//     let baseSlug = slugify(this.name, { lower: true, strict: true });
-    
-//     // Check if slug already exists in database
-//     const existingAuthor = await this.constructor.findOne({ slug: baseSlug });
-    
-//     // If slug exists and it's not the same document being updated
-//     if (existingAuthor && existingAuthor._id.toString() !== this._id?.toString()) {
-//       // Add number suffix to make it unique
-//       let counter = 1;
-//       let newSlug = `${baseSlug}-${counter}`;
-      
-//       // Keep checking until we find a unique slug
-//       while (await this.constructor.findOne({ slug: newSlug })) {
-//         counter++;
-//         newSlug = `${baseSlug}-${counter}`;
-//       }
-//       this.slug = newSlug;
-//     } else {
-//       // Use clean slug without random characters
-//       this.slug = baseSlug;
-//     }
-//   }
-//   next();
-// });
-
-// // Check if model already exists to prevent overwrite error
-// const Author = mongoose.models.Author || mongoose.model('Author', authorSchema);
-// export default Author;
-
-
-
-
-
-
-
 
 
 
@@ -387,7 +255,7 @@ authorSchema.index({ era: 1, category: 1 });
 authorSchema.index({ isFeatured: 1, 'stats.views': -1 });
 authorSchema.index({ 'stats.followers': -1 });
 authorSchema.index({ createdAt: -1 });
-authorSchema.index({ slug: 1 });
+//authorSchema.index({ slug: 1 });
 
 // ============================================
 // VIRTUAL FIELDS
@@ -584,7 +452,7 @@ authorSchema.statics.getByEra = function(era, limit = 50) {
 // ============================================
 // COMPOUND INDEXES
 // ============================================
-authorSchema.index({ isFeatured: 1, 'stats.views': -1 });
+//authorSchema.index({ isFeatured: 1, 'stats.views': -1 });
 authorSchema.index({ era: 1, 'stats.views': -1 });
 authorSchema.index({ category: 1, isFeatured: 1 });
 
