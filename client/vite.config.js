@@ -14,16 +14,6 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          ui: ['framer-motion', 'lucide-react', 'swiper'],
-          state: ['@reduxjs/toolkit', 'react-redux', 'react-query'],
-          i18n: ['i18next', 'react-i18next', 'i18next-browser-languagedetector']
-        }
-      }
-    }
+    sourcemap: true
   }
 })
