@@ -455,6 +455,8 @@ const startServer = async () => {
       console.log(`   POST   /api/upload/audio`);
       console.log(`   POST   /api/upload/video`);
       console.log(`   DELETE /api/upload/delete`);
+      console.log('MONGODB_URI exists:', !!process.env.MONGODB_URI);
+      console.log('PORT:', process.env.PORT);
       console.log(`\n❤️  Health check: http://localhost:${PORT}/api/health`);
     });
   } catch (error) {
