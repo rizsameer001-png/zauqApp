@@ -1394,8 +1394,8 @@ const Navbar = () => {
 
   // Dynamic logo configuration
   const logoConfig = {
-    text: 'Zauq',
-    subtitle: 'Literary Platform',
+    text: '',
+    subtitle: '',
     image: 'https://res.cloudinary.com/dp8wwgs1y/image/upload/v1780172847/lms/banners/yhwihcwidhh6f6hjxott.png',
     fallbackIcon: BookOpen,
     gradient: 'from-amber-500 to-rose-500'
@@ -1476,7 +1476,7 @@ const Navbar = () => {
           <img 
             src={logoConfig.image} 
             alt={logoConfig.text}
-            className="relative h-12 w-auto object-contain"
+            className="relative h-16 w-auto object-contain"
             onError={() => setLogoError(true)}
           />
         </div>
@@ -1496,10 +1496,10 @@ const Navbar = () => {
   }
 
   return (
-    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-300 pt-2 ${
       scrolled 
-        ? 'bg-white/98 backdrop-blur-xl shadow-xl border-b border-gray-100/50' 
-        : 'bg-white/95 backdrop-blur-sm shadow-md'
+        ? 'bg-white/98 backdrop-blur-xl shadow-xl border-b border-gray-100/50 pt-1' 
+        : 'bg-white/95 backdrop-blur-sm shadow-md pt-2'
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-14 lg:h-16">
