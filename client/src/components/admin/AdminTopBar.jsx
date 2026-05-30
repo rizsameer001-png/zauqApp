@@ -96,11 +96,11 @@ const AdminTopBar = () => {
     if (path === '/admin/audio') return 'Audio Dashboard'
     if (path.includes('/admin/audio/analytics')) return 'Audio Analytics'
     if (path.includes('/admin/audio/types')) return 'Audio Types'
-    if (path.includes('/admin/audio/categories')) return 'Audio Categories'
-    if (path.includes('/admin/audio/occasions')) return 'Audio Occasions'
+    // if (path.includes('/admin/audio/categories')) return 'Audio Categories'
+    // if (path.includes('/admin/audio/occasions')) return 'Audio Occasions'
     if (path.includes('/admin/audio/playlists')) return 'Audio Playlists'
     if (path.includes('/admin/audio/bulk-upload')) return 'Bulk Upload'
-    if (path.includes('/admin/audio/reports')) return 'Audio Reports'
+    // if (path.includes('/admin/audio/reports')) return 'Audio Reports'
     
     // Dynamic type pages
     if (path.includes('/admin/audio/type/nauha')) return 'Nauha Management'

@@ -421,8 +421,8 @@ const Sidebar = () => {
     { path: '/creator/upload-audio', icon: Headphones, label: 'Upload Audio' },
     { path: '/creator/upload-video', icon: Video, label: 'Upload Video' },
     { path: '/creator/content', icon: Layout, label: 'My Content' },
-    { path: '/creator/analytics', icon: BarChart3, label: 'Analytics' },
-    { path: '/creator/revenue', icon: DollarSign, label: 'Revenue' },
+    // { path: '/creator/analytics', icon: BarChart3, label: 'Analytics' },
+    // { path: '/creator/revenue', icon: DollarSign, label: 'Revenue' },
     // Audio specific creator items
     { path: '/creator/audio/analytics', icon: TrendingUp, label: 'Audio Analytics' },
     { path: '/creator/audio/playlists', icon: ListMusic, label: 'Manage Playlists' },
@@ -440,17 +440,17 @@ const Sidebar = () => {
     
     // Audio Management Section
     { path: '/admin/audio', icon: Headphones, label: 'Audio CMS', divider: true },
-    { path: '/admin/audio/analytics', icon: TrendingUp, label: 'Audio Analytics' },
+    // { path: '/admin/audio/analytics', icon: TrendingUp, label: 'Audio Analytics' },
     { path: '/admin/audio/types', icon: FolderTree, label: 'Audio Types' },
     { path: '/admin/audio/categories', icon: FolderTree, label: 'Audio Categories' },
     { path: '/admin/audio/occasions', icon: Calendar, label: 'Occasions' },
     { path: '/admin/audio/playlists', icon: ListMusic, label: 'Playlists' },
     { path: '/admin/audio/bulk-upload', icon: Upload, label: 'Bulk Upload' },
-    { path: '/admin/audio/reports', icon: FileText, label: 'Audio Reports' },
+    // { path: '/admin/audio/reports', icon: FileText, label: 'Audio Reports' },
     
     // Video Management
     { path: '/admin/videos', icon: Video, label: 'Video CMS', divider: true },
-    { path: '/admin/videos/types', icon: FolderTree, label: 'Video Types' },
+    // { path: '/admin/videos/types', icon: FolderTree, label: 'Video Types' },
     { path: '/admin/videos/categories', icon: FolderTree, label: 'Video Categories' },
     
     // Subscription Management
@@ -567,13 +567,13 @@ const Sidebar = () => {
           Quick Access
         </p>
         <div className="space-y-1">
-          <Link
+{/*          <Link
             to="/audio"
             className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <Headphones className="h-5 w-5 text-gray-400" />
             <span>Audio Library</span>
-          </Link>
+          </Link>*/}
           <Link
             to="/videos"
             className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
@@ -588,13 +588,13 @@ const Sidebar = () => {
             <BookOpen className="h-5 w-5 text-gray-400" />
             <span>Ebook Library</span>
           </Link>
-          <Link
+{/*          <Link
             to="/subscription"
             className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
           >
             <CreditCard className="h-5 w-5 text-gray-400" />
             <span>Subscribe</span>
-          </Link>
+          </Link>*/}
         </div>
         
         {/* Audio Categories Quick Links (for Admin) */}
@@ -618,7 +618,7 @@ const Sidebar = () => {
                 <Music className="h-3 w-3" />
                 <span>Marsiya</span>
               </Link>
-              <Link
+{/*              <Link
                 to="/admin/audio/types?type=majlis"
                 className="flex items-center space-x-3 px-3 py-1.5 rounded-lg text-xs text-gray-600 hover:bg-gray-50"
               >
@@ -631,7 +631,7 @@ const Sidebar = () => {
               >
                 <Star className="h-3 w-3" />
                 <span>Naat</span>
-              </Link>
+              </Link>*/}
             </div>
           </div>
         )}
