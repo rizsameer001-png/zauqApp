@@ -245,16 +245,174 @@
 
 
 
+// // client/src/services/subscriptionAPI.js
+// import api from './apiConfig'
+
+// // Helper function to handle responses and errors
+// const handleResponse = (promise) => {
+//   return promise
+//     .then(res => res.data)
+//     .catch(error => {
+//       console.error('API Error:', error.response?.data || error.message);
+//       throw error.response?.data || { message: 'An error occurred' };
+//     });
+// };
+
+// const subscriptionAPI = {
+//   // ============== Public Routes ==============
+//   getPlans: () => handleResponse(api.get('/subscriptions/plans')),
+//   getFeatures: () => handleResponse(api.get('/subscriptions/features')),
+  
+//   // ============== Payment Gateway Configuration ==============
+//   getRazorpayKey: () => handleResponse(api.get('/subscriptions/config/razorpay-key')),
+//   getStripeKey: () => handleResponse(api.get('/subscriptions/config/stripe-key')),
+//   getPaymentGatewayStatus: () => handleResponse(api.get('/subscriptions/config/payment-status')),
+  
+//   // ============== User Routes ==============
+//   getCurrent: () => handleResponse(api.get('/subscriptions/current')),
+//   getBillingHistory: () => handleResponse(api.get('/subscriptions/billing-history')),
+//   subscribe: (plan, billingCycle, paymentMethod) => 
+//     handleResponse(api.post('/subscriptions/subscribe', { plan, billingCycle, paymentMethod })),
+//   verifyPayment: (subscriptionId, paymentId, paymentDetails) => 
+//     handleResponse(api.post('/subscriptions/verify-payment', { subscriptionId, paymentId, paymentDetails })),
+//   cancel: () => handleResponse(api.post('/subscriptions/cancel')),
+  
+//   // ============== Payment Gateway Routes ==============
+  
+//   // Razorpay Payment Gateway
+//   createRazorpayOrder: (plan, billingCycle) => 
+//     handleResponse(api.post('/subscriptions/create-razorpay-order', { plan, billingCycle })),
+  
+//   verifyRazorpayPayment: (orderId, paymentId, signature, subscriptionId) => 
+//     handleResponse(api.post('/subscriptions/verify-razorpay', { 
+//       orderId, 
+//       paymentId, 
+//       signature, 
+//       subscriptionId 
+//     })),
+  
+//   // Stripe Payment Gateway
+//   createStripePaymentIntent: (plan, billingCycle) => 
+//     handleResponse(api.post('/subscriptions/create-stripe-payment', { plan, billingCycle })),
+  
+//   verifyStripePayment: (paymentIntentId, subscriptionId) => 
+//     handleResponse(api.post('/subscriptions/verify-stripe', { 
+//       paymentIntentId, 
+//       subscriptionId 
+//     })),
+  
+//   // ============== Analytics Routes ==============
+//   getDailySubscriptionAnalytics: (params) => 
+//     handleResponse(api.get('/subscriptions/analytics/daily', { params })),
+//   getMonthlySubscriptionAnalytics: (params) => 
+//     handleResponse(api.get('/subscriptions/analytics/monthly', { params })),
+//   getYearlySubscriptionAnalytics: (params) => 
+//     handleResponse(api.get('/subscriptions/analytics/yearly', { params })),
+  
+//   // ============== Invoice Routes ==============
+//   getInvoiceById: (id) => handleResponse(api.get(`/subscriptions/invoices/${id}`)),
+//   downloadInvoice: (id) => 
+//     api.get(`/subscriptions/invoices/download/${id}`, { responseType: 'blob' })
+//       .then(res => res.data),
+//   sendInvoiceEmail: (id) => handleResponse(api.post(`/subscriptions/invoices/send/${id}`)),
+  
+//   // ============== Coupon/Discount Routes ==============
+//   validateCoupon: (code) => handleResponse(api.get(`/subscriptions/coupons/validate/${code}`)),
+//   applyCoupon: (data) => handleResponse(api.post('/subscriptions/coupons/apply', data)),
+  
+//   // ============== Admin CMS Routes - Plans ==============
+//   getAllPlansCMS: () => handleResponse(api.get('/subscriptions/cms/plans')),
+//   getPlanByIdCMS: (id) => handleResponse(api.get(`/subscriptions/cms/plans/${id}`)),
+//   createPlanCMS: (planData) => handleResponse(api.post('/subscriptions/cms/plans', planData)),
+//   updatePlanCMS: (id, planData) => handleResponse(api.put(`/subscriptions/cms/plans/${id}`, planData)),
+//   deletePlanCMS: (id, permanent = false) => 
+//     handleResponse(api.delete(`/subscriptions/cms/plans/${id}`, { params: { permanent } })),
+//   togglePlanStatusCMS: (id) => handleResponse(api.patch(`/subscriptions/cms/plans/${id}/toggle`)),
+//   reorderPlansCMS: (orders) => handleResponse(api.post('/subscriptions/cms/plans/reorder', { orders })),
+//   getSubscriptionStatsCMS: () => handleResponse(api.get('/subscriptions/cms/stats')),
+  
+//   // ============== Admin CMS Routes - Subscribers ==============
+//   getAllSubscribers: (params) => handleResponse(api.get('/subscriptions/cms/subscribers', { params })),
+//   getSubscriberById: (id) => handleResponse(api.get(`/subscriptions/cms/subscribers/${id}`)),
+//   getSubscribersByPlan: (plan) => handleResponse(api.get(`/subscriptions/cms/subscribers/plan/${plan}`)),
+//   getSubscribersByStatus: (status) => handleResponse(api.get(`/subscriptions/cms/subscribers/status/${status}`)),
+//   updateSubscriberStatus: (id, status) => 
+//     handleResponse(api.patch(`/subscriptions/cms/subscribers/${id}/status`, { status })),
+//   cancelSubscriberSubscription: (id) => 
+//     handleResponse(api.post(`/subscriptions/cms/subscribers/${id}/cancel`)),
+//   getSubscriberStats: () => handleResponse(api.get('/subscriptions/cms/subscribers/stats')),
+//   exportSubscribers: (format = 'csv') => 
+//     api.get(`/subscriptions/cms/subscribers/export/${format}`, { responseType: 'blob' })
+//       .then(res => res.data),
+  
+//   // ============== Admin CMS Routes - Transactions ==============
+//   getAllTransactions: (params) => handleResponse(api.get('/subscriptions/cms/transactions', { params })),
+//   getTransactionById: (id) => handleResponse(api.get(`/subscriptions/cms/transactions/${id}`)),
+//   getTransactionsByUser: (userId) => handleResponse(api.get(`/subscriptions/cms/transactions/user/${userId}`)),
+//   getTransactionsByStatus: (status) => handleResponse(api.get(`/subscriptions/cms/transactions/status/${status}`)),
+//   getTransactionsByDateRange: (startDate, endDate) => 
+//     handleResponse(api.get('/subscriptions/cms/transactions/date-range', { params: { startDate, endDate } })),
+//   getTransactionStats: () => handleResponse(api.get('/subscriptions/cms/transactions/stats')),
+//   exportTransactions: (format = 'csv') => 
+//     api.get(`/subscriptions/cms/transactions/export/${format}`, { responseType: 'blob' })
+//       .then(res => res.data),
+//   refundTransaction: (id, reason) => 
+//     handleResponse(api.post(`/subscriptions/cms/transactions/${id}/refund`, { reason })),
+  
+//   // ============== Subscription Upgrade/Downgrade ==============
+//   upgradeSubscription: (currentPlanId, newPlanId, billingCycle) => 
+//     handleResponse(api.post('/subscriptions/upgrade', { currentPlanId, newPlanId, billingCycle })),
+//   downgradeSubscription: (currentPlanId, newPlanId, billingCycle) => 
+//     handleResponse(api.post('/subscriptions/downgrade', { currentPlanId, newPlanId, billingCycle })),
+  
+//   // ============== Payment Method Management ==============
+//   getPaymentMethods: () => handleResponse(api.get('/subscriptions/payment-methods')),
+//   addPaymentMethod: (paymentMethodData) => 
+//     handleResponse(api.post('/subscriptions/payment-methods', paymentMethodData)),
+//   removePaymentMethod: (methodId) => 
+//     handleResponse(api.delete(`/subscriptions/payment-methods/${methodId}`)),
+//   setDefaultPaymentMethod: (methodId) => 
+//     handleResponse(api.patch(`/subscriptions/payment-methods/${methodId}/default`)),
+  
+//   // ============== Subscription Features ==============
+//   getSubscriptionFeatures: () => handleResponse(api.get('/subscriptions/features')),
+//   getFeatureUsage: () => handleResponse(api.get('/subscriptions/features/usage')),
+  
+//   // ============== Webhook Management (Admin only) ==============
+//   getWebhookLogs: (params) => handleResponse(api.get('/subscriptions/cms/webhook-logs', { params })),
+//   retryFailedWebhook: (logId) => handleResponse(api.post(`/subscriptions/cms/webhook-logs/${logId}/retry`)),
+// }
+
+// export default subscriptionAPI;
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/services/subscriptionAPI.js
 import api from './apiConfig'
 
 // Helper function to handle responses and errors
 const handleResponse = (promise) => {
   return promise
-    .then(res => res.data)
+    .then(res => {
+      // Handle both wrapped and unwrapped responses
+      if (res.data && res.data.success !== undefined) {
+        return res.data;
+      }
+      return { success: true, data: res.data };
+    })
     .catch(error => {
       console.error('API Error:', error.response?.data || error.message);
-      throw error.response?.data || { message: 'An error occurred' };
+      throw error.response?.data || { success: false, message: 'An error occurred' };
     });
 };
 
@@ -311,14 +469,81 @@ const subscriptionAPI = {
   
   // ============== Invoice Routes ==============
   getInvoiceById: (id) => handleResponse(api.get(`/subscriptions/invoices/${id}`)),
-  downloadInvoice: (id) => 
-    api.get(`/subscriptions/invoices/download/${id}`, { responseType: 'blob' })
-      .then(res => res.data),
+  downloadInvoice: async (id) => {
+    try {
+      const response = await api.get(`/subscriptions/invoices/download/${id}`, { 
+        responseType: 'blob' 
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Download invoice error:', error);
+      throw error.response?.data || { message: 'Failed to download invoice' };
+    }
+  },
   sendInvoiceEmail: (id) => handleResponse(api.post(`/subscriptions/invoices/send/${id}`)),
   
   // ============== Coupon/Discount Routes ==============
-  validateCoupon: (code) => handleResponse(api.get(`/subscriptions/coupons/validate/${code}`)),
+  validateCoupon: (code, params) => handleResponse(api.get(`/subscriptions/coupons/validate/${code}`, { params })),
   applyCoupon: (data) => handleResponse(api.post('/subscriptions/coupons/apply', data)),
+  
+  // ============== Payment Method Management ==============
+  getPaymentMethods: async () => {
+    try {
+      const response = await api.get('/subscriptions/payment-methods');
+      // Handle response consistently
+      if (response.data && response.data.success !== undefined) {
+        return response.data;
+      }
+      return { success: true, data: response.data || [] };
+    } catch (error) {
+      console.error('Get payment methods error:', error);
+      // Return empty array instead of throwing for better UX
+      return { success: true, data: [] };
+    }
+  },
+  
+  addPaymentMethod: async (paymentMethodData) => {
+    try {
+      const response = await api.post('/subscriptions/payment-methods', paymentMethodData);
+      if (response.data && response.data.success !== undefined) {
+        return response.data;
+      }
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Add payment method error:', error);
+      throw error.response?.data || { success: false, message: 'Failed to add payment method' };
+    }
+  },
+  
+  removePaymentMethod: async (methodId) => {
+    try {
+      const response = await api.delete(`/subscriptions/payment-methods/${methodId}`);
+      if (response.data && response.data.success !== undefined) {
+        return response.data;
+      }
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Remove payment method error:', error);
+      throw error.response?.data || { success: false, message: 'Failed to remove payment method' };
+    }
+  },
+  
+  setDefaultPaymentMethod: async (methodId) => {
+    try {
+      const response = await api.patch(`/subscriptions/payment-methods/${methodId}/default`);
+      if (response.data && response.data.success !== undefined) {
+        return response.data;
+      }
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('Set default payment method error:', error);
+      throw error.response?.data || { success: false, message: 'Failed to set default payment method' };
+    }
+  },
+  
+  // ============== Subscription Features ==============
+  getSubscriptionFeatures: () => handleResponse(api.get('/subscriptions/features')),
+  getFeatureUsage: () => handleResponse(api.get('/subscriptions/features/usage')),
   
   // ============== Admin CMS Routes - Plans ==============
   getAllPlansCMS: () => handleResponse(api.get('/subscriptions/cms/plans')),
@@ -365,22 +590,54 @@ const subscriptionAPI = {
   downgradeSubscription: (currentPlanId, newPlanId, billingCycle) => 
     handleResponse(api.post('/subscriptions/downgrade', { currentPlanId, newPlanId, billingCycle })),
   
-  // ============== Payment Method Management ==============
-  getPaymentMethods: () => handleResponse(api.get('/subscriptions/payment-methods')),
-  addPaymentMethod: (paymentMethodData) => 
-    handleResponse(api.post('/subscriptions/payment-methods', paymentMethodData)),
-  removePaymentMethod: (methodId) => 
-    handleResponse(api.delete(`/subscriptions/payment-methods/${methodId}`)),
-  setDefaultPaymentMethod: (methodId) => 
-    handleResponse(api.patch(`/subscriptions/payment-methods/${methodId}/default`)),
-  
-  // ============== Subscription Features ==============
-  getSubscriptionFeatures: () => handleResponse(api.get('/subscriptions/features')),
-  getFeatureUsage: () => handleResponse(api.get('/subscriptions/features/usage')),
-  
   // ============== Webhook Management (Admin only) ==============
   getWebhookLogs: (params) => handleResponse(api.get('/subscriptions/cms/webhook-logs', { params })),
   retryFailedWebhook: (logId) => handleResponse(api.post(`/subscriptions/cms/webhook-logs/${logId}/retry`)),
-}
+  
+  // ============== Helper Methods ==============
+  
+  // Format payment method for display
+  formatPaymentMethod: (paymentMethod) => {
+    if (!paymentMethod) return null;
+    return {
+      ...paymentMethod,
+      cardNumberDisplay: `•••• •••• •••• ${paymentMethod.lastFourDigits || paymentMethod.cardNumber?.slice(-4)}`,
+      expiryDisplay: `${paymentMethod.expiryMonth}/${paymentMethod.expiryYear}`,
+      cardBrandIcon: subscriptionAPI.getCardBrandIcon(paymentMethod.cardBrand)
+    };
+  },
+  
+  // Get card brand icon
+  getCardBrandIcon: (brand) => {
+    const icons = {
+      visa: '💳',
+      mastercard: '💳',
+      amex: '💳',
+      rupay: '💳',
+      other: '💳'
+    };
+    return icons[brand] || icons.other;
+  },
+  
+  // Format invoice for display
+  formatInvoice: (invoice) => {
+    if (!invoice) return null;
+    return {
+      ...invoice,
+      amountDisplay: `${invoice.currency} ${invoice.amount?.toLocaleString()}`,
+      dateDisplay: new Date(invoice.createdAt).toLocaleDateString(),
+      statusBadge: invoice.status === 'paid' ? 'success' : invoice.status === 'pending' ? 'warning' : 'error',
+      statusText: invoice.status === 'paid' ? 'Paid' : invoice.status === 'pending' ? 'Pending' : 'Failed'
+    };
+  },
+  
+  // Calculate subscription savings
+  calculateSavings: (monthlyPrice, yearlyPrice) => {
+    const monthlyTotal = monthlyPrice * 12;
+    const savings = monthlyTotal - yearlyPrice;
+    const savingsPercentage = Math.round((savings / monthlyTotal) * 100);
+    return { savings, savingsPercentage };
+  }
+};
 
 export default subscriptionAPI;

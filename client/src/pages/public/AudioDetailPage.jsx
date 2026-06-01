@@ -512,3 +512,325 @@ const AudioDetailPage = () => {
 };
 
 export default AudioDetailPage;
+
+
+
+
+
+
+
+
+
+// // client/src/pages/public/AudioDetailPage.jsx
+// // Glassmorphism + gradient surfaces
+// // Spotify/Apple Music–style player feel
+
+// import React, { useState, useEffect, useRef } from 'react';
+// import { useParams, Link, useNavigate } from 'react-router-dom';
+// import { motion } from 'framer-motion';
+// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+// import { useSelector } from 'react-redux';
+// import toast from 'react-hot-toast';
+// import {
+//   Headphones, Play, Pause, Heart, Share2, Bookmark,
+//   ChevronLeft, Eye, Calendar, User, Loader2, AlertCircle,
+//   FileText, Volume2, SkipBack, SkipForward,
+//   Repeat, Shuffle, ListMusic, Maximize2, Minimize2
+// } from 'lucide-react';
+// import audioAPI from '../../api/audioAPI';
+
+// const AudioDetailPage = () => {
+//   const { slug } = useParams();
+//   const navigate = useNavigate();
+//   const queryClient = useQueryClient();
+//   const { user } = useSelector(state => state.auth);
+//   const audioRef = useRef(null);
+//   const playerContainerRef = useRef(null);
+
+//   const [isPlaying, setIsPlaying] = useState(false);
+//   const [currentTime, setCurrentTime] = useState(0);
+//   const [duration, setDuration] = useState(0);
+//   const [volume, setVolume] = useState(1);
+//   const [isMuted, setIsMuted] = useState(false);
+//   const [isLiked, setIsLiked] = useState(false);
+//   const [isBookmarked, setIsBookmarked] = useState(false);
+//   const [showTranscript, setShowTranscript] = useState(false);
+//   const [isFullscreen, setIsFullscreen] = useState(false);
+
+//   const { data: audioData, isLoading, error } = useQuery({
+//     queryKey: ['audio', slug],
+//     queryFn: () => audioAPI.getAudio(slug),
+//     enabled: !!slug
+//   });
+
+//   const audio = audioData?.data || audioData;
+
+//   const { data: relatedData } = useQuery({
+//     queryKey: ['related-audio', audio?._id],
+//     queryFn: () => audioAPI.getAudioItems({ limit: 4, type: audio?.type }),
+//     enabled: !!audio?._id
+//   });
+
+//   const relatedAudio = relatedData?.data?.data || [];
+
+//   const likeMutation = useMutation({
+//     mutationFn: () => audioAPI.likeAudio(audio?._id),
+//     onSuccess: () => {
+//       setIsLiked(!isLiked);
+//       queryClient.invalidateQueries(['audio', slug]);
+//     }
+//   });
+
+//   const bookmarkMutation = useMutation({
+//     mutationFn: () => audioAPI.bookmarkAudio(audio?._id),
+//     onSuccess: () => {
+//       setIsBookmarked(!isBookmarked);
+//       queryClient.invalidateQueries(['audio', slug]);
+//     }
+//   });
+
+//   const togglePlay = () => {
+//     if (!audioRef.current) return;
+//     isPlaying ? audioRef.current.pause() : audioRef.current.play();
+//     setIsPlaying(!isPlaying);
+//   };
+
+//   const formatTime = (t) => {
+//     if (!t) return "0:00";
+//     const m = Math.floor(t / 60);
+//     const s = Math.floor(t % 60);
+//     return `${m}:${s.toString().padStart(2, '0')}`;
+//   };
+
+//   const handleSeek = (e) => {
+//     const t = e.target.value;
+//     setCurrentTime(t);
+//     audioRef.current.currentTime = t;
+//   };
+
+//   const toggleFullscreen = () => {
+//     if (!isFullscreen) playerContainerRef.current?.requestFullscreen();
+//     else document.exitFullscreen();
+//   };
+
+//   useEffect(() => {
+//     const handleFs = () => setIsFullscreen(!!document.fullscreenElement);
+//     document.addEventListener('fullscreenchange', handleFs);
+//     return () => document.removeEventListener('fullscreenchange', handleFs);
+//   }, []);
+
+//   if (isLoading) {
+//     return (
+//       <div className="min-h-screen flex items-center justify-center bg-black">
+//         <Loader2 className="animate-spin text-green-400 w-10 h-10" />
+//       </div>
+//     );
+//   }
+
+//   if (error || !audio) {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center text-white bg-black">
+//         <AlertCircle className="w-12 h-12 mb-4 text-red-500" />
+//         <p>Audio not found</p>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-black text-white pt-20 pb-16">
+
+//       <div className="max-w-6xl mx-auto px-4">
+
+//         {/* Back */}
+//         <Link to="/audio" className="flex items-center text-gray-400 hover:text-white mb-6">
+//           <ChevronLeft className="w-4 h-4 mr-1" />
+//           Back
+//         </Link>
+
+//         <div className="grid lg:grid-cols-3 gap-10">
+
+//           {/* COVER */}
+//           <motion.div
+//             initial={{ opacity: 0, scale: 0.9 }}
+//             animate={{ opacity: 1, scale: 1 }}
+//             className="relative group"
+//           >
+//             <div className="rounded-2xl overflow-hidden shadow-2xl">
+//               {audio.thumbnail ? (
+//                 <img src={audio.thumbnail} className="w-full aspect-square object-cover group-hover:scale-105 transition duration-500" />
+//               ) : (
+//                 <div className="aspect-square flex items-center justify-center bg-gradient-to-br from-green-500 to-emerald-700">
+//                   <Headphones size={60} />
+//                 </div>
+//               )}
+//             </div>
+//           </motion.div>
+
+//           {/* INFO + PLAYER */}
+//           <div className="lg:col-span-2 space-y-6">
+
+//             <div>
+//               <h1 className="text-3xl font-bold">{audio.title}</h1>
+//               <p className="text-gray-400 mt-2">{audio.description}</p>
+
+//               <div className="flex gap-4 mt-4 text-sm text-gray-400">
+//                 <span className="flex items-center gap-1">
+//                   <User size={14} /> {audio.author?.name || 'Unknown'}
+//                 </span>
+//                 <span className="flex items-center gap-1">
+//                   <Calendar size={14} /> {new Date(audio.createdAt).toLocaleDateString()}
+//                 </span>
+//               </div>
+//             </div>
+
+//             {/* PLAYER */}
+//             <div
+//               ref={playerContainerRef}
+//               className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-xl"
+//             >
+//               <audio
+//                 ref={audioRef}
+//                 src={audio.audioUrl}
+//                 onTimeUpdate={() => setCurrentTime(audioRef.current.currentTime)}
+//                 onLoadedMetadata={() => setDuration(audioRef.current.duration)}
+//                 onEnded={() => setIsPlaying(false)}
+//               />
+
+//               {/* progress */}
+//               <input
+//                 type="range"
+//                 min="0"
+//                 max={duration}
+//                 value={currentTime}
+//                 onChange={handleSeek}
+//                 className="w-full accent-green-400"
+//               />
+
+//               <div className="flex justify-between text-xs text-gray-400 mt-1">
+//                 <span>{formatTime(currentTime)}</span>
+//                 <span>{formatTime(duration)}</span>
+//               </div>
+
+//               {/* controls */}
+//               <div className="flex justify-center items-center gap-6 mt-6">
+//                 <Shuffle className="cursor-pointer opacity-70 hover:opacity-100" />
+//                 <SkipBack className="cursor-pointer" />
+
+//                 <button
+//                   onClick={togglePlay}
+//                   className="w-14 h-14 flex items-center justify-center rounded-full bg-green-500 hover:scale-105 transition"
+//                 >
+//                   {isPlaying ? <Pause /> : <Play className="ml-1" />}
+//                 </button>
+
+//                 <SkipForward className="cursor-pointer" />
+//                 <Repeat className="cursor-pointer opacity-70 hover:opacity-100" />
+//               </div>
+
+//               {/* bottom controls */}
+//               <div className="flex justify-between items-center mt-6">
+//                 <div className="flex items-center gap-2">
+//                   <Volume2 />
+//                   <input
+//                     type="range"
+//                     min="0"
+//                     max="1"
+//                     step="0.01"
+//                     value={volume}
+//                     onChange={(e) => {
+//                       const v = e.target.value;
+//                       setVolume(v);
+//                       audioRef.current.volume = v;
+//                     }}
+//                   />
+//                 </div>
+
+//                 <div className="flex gap-3">
+//                   <button onClick={() => setShowTranscript(!showTranscript)}>
+//                     <FileText />
+//                   </button>
+//                   <button onClick={toggleFullscreen}>
+//                     {isFullscreen ? <Minimize2 /> : <Maximize2 />}
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+
+//             {/* ACTIONS */}
+//             <div className="flex gap-3">
+//               <button
+//                 onClick={() => likeMutation.mutate()}
+//                 className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 flex items-center gap-2"
+//               >
+//                 <Heart className={isLiked ? "fill-red-500 text-red-500" : ""} />
+//                 Like
+//               </button>
+
+//               <button
+//                 onClick={() => bookmarkMutation.mutate()}
+//                 className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 flex items-center gap-2"
+//               >
+//                 <Bookmark />
+//                 Save
+//               </button>
+
+//               <button className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 flex items-center gap-2">
+//                 <Share2 />
+//                 Share
+//               </button>
+//             </div>
+
+//             {/* STATS */}
+//             <div className="flex gap-6 text-sm text-gray-400">
+//               <span className="flex items-center gap-1">
+//                 <Play size={14} /> {audio.stats?.plays || 0}
+//               </span>
+//               <span className="flex items-center gap-1">
+//                 <Eye size={14} /> {audio.stats?.views || 0}
+//               </span>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* TRANSCRIPT */}
+//         {showTranscript && audio.transcript && (
+//           <div className="mt-10 bg-white/5 p-6 rounded-xl backdrop-blur">
+//             <h3 className="mb-3 font-semibold">Transcript</h3>
+//             <p className="text-gray-300 whitespace-pre-line">{audio.transcript}</p>
+//           </div>
+//         )}
+
+//         {/* RELATED */}
+//         {relatedAudio.length > 0 && (
+//           <div className="mt-12">
+//             <h3 className="mb-4 font-semibold flex items-center gap-2">
+//               <ListMusic /> More Like This
+//             </h3>
+
+//             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+//               {relatedAudio.slice(0, 4).map(item => (
+//                 <Link key={item._id} to={`/audio/${item.slug}`}>
+//                   <div className="bg-white/5 hover:bg-white/10 rounded-xl overflow-hidden transition group">
+//                     <div className="aspect-square">
+//                       <img
+//                         src={item.thumbnail}
+//                         className="w-full h-full object-cover group-hover:scale-105 transition"
+//                       />
+//                     </div>
+//                     <div className="p-3">
+//                       <p className="text-sm font-medium">{item.title}</p>
+//                       <p className="text-xs text-gray-400">{item.author?.name}</p>
+//                     </div>
+//                   </div>
+//                 </Link>
+//               ))}
+//             </div>
+//           </div>
+//         )}
+
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default AudioDetailPage;

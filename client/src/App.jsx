@@ -1100,6 +1100,317 @@
 
 
 
+// // client/src/App.jsx
+// import React from 'react'
+// import { Routes, Route, Navigate } from 'react-router-dom'
+// import { useSelector } from 'react-redux'
+
+// // Layouts
+// import MainLayout from './layouts/MainLayout.jsx'
+// import DashboardLayout from './layouts/DashboardLayout.jsx'
+// import AdminLayout from './layouts/AdminLayout.jsx'
+
+// // Public Pages
+// import HomePage from './pages/public/HomePage.jsx'
+// import ExplorePage from './pages/public/ExplorePage.jsx'
+// import PoetryListPage from './pages/public/PoetryListPage.jsx'
+// import PoetryDetailPage from './pages/public/PoetryDetailPage.jsx'
+// import AuthorsListPage from './pages/public/AuthorsListPage.jsx'
+// import AuthorDetailPage from './pages/public/AuthorDetailPage.jsx'
+// import BooksListPage from './pages/public/BooksListPage.jsx'
+// import BookDetailPage from './pages/public/BookDetailPage.jsx'
+
+// // Audio Public Pages
+// import AudioListPage from './pages/public/AudioListPage.jsx'
+// import AudioDetailPage from './pages/public/AudioDetailPage.jsx'
+// import AudioByTypePage from './pages/public/AudioByTypePage.jsx'
+// import AudioByOccasionPage from './pages/public/AudioByOccasionPage.jsx'
+
+// // Video Public Pages
+// import VideoListPage from './pages/public/VideoListPage.jsx'
+// import VideoDetailPage from './pages/public/VideoDetailPage.jsx'
+
+// // Other Public Pages
+// import SearchPage from './pages/public/SearchPage.jsx'
+// import AboutPage from './pages/public/AboutPage.jsx'
+
+// // Subscription Pages
+// import SubscriptionPage from './pages/subscription/SubscriptionPage.jsx'
+// import SubscriptionSuccessPage from './pages/subscription/SubscriptionSuccessPage.jsx'
+// import SubscriptionCancelPage from './pages/subscription/SubscriptionCancelPage.jsx'
+
+// // Auth Pages
+// import LoginPage from './pages/auth/LoginPage.jsx'
+// import RegisterPage from './pages/auth/RegisterPage.jsx'
+
+// // User Dashboard Pages
+// import UserDashboardPage from './pages/user/UserDashboard.jsx'
+// import ProfilePage from './pages/user/UserProfile.jsx'
+// import FavoritesPage from './pages/user/UserFavorites.jsx'
+// import HistoryPage from './pages/user/UserHistory.jsx'
+// import DownloadsPage from './pages/user/DownloadsPage.jsx'
+// import UserSubscriptionsPage from './pages/user/UserSubscriptionsPage.jsx'
+// import UserBillingPage from './pages/user/UserBillingPage.jsx'
+// import PaymentMethodsPage from './pages/user/PaymentMethodsPage.jsx';
+// import InvoicesPage from './pages/user/InvoicesPage.jsx';
+
+// // Creator Dashboard Pages
+// import CreatorDashboardPage from './pages/creator/CreatorDashboardPage.jsx'
+// import UploadPoetryPage from './pages/creator/UploadPoetryPage.jsx'
+// import RevenueAnalyticsPage from './pages/creator/RevenueAnalyticsPage.jsx'
+
+// // Admin Pages
+// import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
+// import UserManagementPage from './pages/admin/UserManagementPage.jsx'
+// import PoetryCMSPage from './pages/admin/PoetryCMSPage.jsx'
+// import AuthorCMSPage from './pages/admin/AuthorCMSPage.jsx'
+// import EbookCMSPage from './pages/admin/EbookCMSPage.jsx'
+// import AudioCMSPage from './pages/admin/AudioCMSPage.jsx'
+// import VideoCMSPage from './pages/admin/VideoCMSPage.jsx'
+// import SubscriptionCMSPage from './pages/admin/SubscriptionCMSPage.jsx'
+// import HomepageCMSPage from './pages/admin/HomepageCMSPage.jsx'
+// import SEOManagementPage from './pages/admin/SEOManagementPage.jsx'
+// import AnalyticsPage from './pages/admin/AnalyticsPage.jsx'
+// import SubscribersListPage from './pages/admin/SubscribersListPage.jsx'
+// import TransactionsPage from './pages/admin/TransactionsPage.jsx'
+// import SubscriptionAnalyticsPage from './pages/admin/SubscriptionAnalyticsPage.jsx'
+// import SettingsPage from './pages/admin/SettingsPage.jsx'
+
+// // Protected Route Component
+// const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+//   const { isAuthenticated, user } = useSelector((state) => state.auth)
+
+//   if (!isAuthenticated) {
+//     return <Navigate to="/login" replace />
+//   }
+
+//   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+//     return <Navigate to="/" replace />
+//   }
+
+//   return children
+// }
+
+// // Temporary placeholder component for missing pages
+// const PlaceholderPage = ({ title }) => (
+//   <div className="flex items-center justify-center min-h-[60vh]">
+//     <div className="text-center">
+//       <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
+//       <p className="text-gray-500">This page is under construction.</p>
+//     </div>
+//   </div>
+// )
+
+// const App = () => {
+//   return (
+//     <Routes>
+//       {/* ============================================
+//           PUBLIC ROUTES - Using SLUGS instead of IDs
+//       ============================================ */}
+//       <Route element={<MainLayout />}>
+//         {/* Home & Explore */}
+//         <Route path="/" element={<HomePage />} />
+//         <Route path="/explore" element={<ExplorePage />} />
+//         <Route path="/search" element={<SearchPage />} />
+//         <Route path="/about" element={<AboutPage />} />
+
+//         {/* Poetry Routes */}
+//         <Route path="/poetry" element={<PoetryListPage />} />
+//         <Route path="/poem/:slug" element={<PoetryDetailPage />} />
+//         <Route path="/poetry/:id" element={<Navigate to="/poetry" replace />} />
+
+//         {/* Author Routes */}
+//         <Route path="/authors" element={<AuthorsListPage />} />
+//         <Route path="/author/:slug" element={<AuthorDetailPage />} />
+//         <Route path="/authors/:id" element={<Navigate to="/authors" replace />} />
+
+//         {/* Book Routes */}
+//         <Route path="/books" element={<BooksListPage />} />
+//         <Route path="/book/:slug" element={<BookDetailPage />} />
+//         <Route path="/books/:id" element={<Navigate to="/books" replace />} />
+
+//         {/* Audio Routes - Public */}
+//         <Route path="/audio" element={<AudioListPage />} />
+//         <Route path="/audio/:slug" element={<AudioDetailPage />} />
+//         <Route path="/audio/type/:type" element={<AudioByTypePage />} />
+//         <Route path="/audio/occasion/:occasion" element={<AudioByOccasionPage />} />
+//         <Route path="/audio/category/:type" element={<AudioByTypePage />} />
+//         <Route path="/audio/id/:id" element={<Navigate to="/audio" replace />} />
+
+//         {/* Video Routes */}
+//         <Route path="/videos" element={<VideoListPage />} />
+//         <Route path="/video/:slug" element={<VideoDetailPage />} />
+//         <Route path="/videos/:id" element={<Navigate to="/videos" replace />} />
+//       </Route>
+
+//       {/* ============================================
+//           AUTH ROUTES
+//       ============================================ */}
+//       <Route path="/login" element={<LoginPage />} />
+//       <Route path="/register" element={<RegisterPage />} />
+
+//       {/* ============================================
+//           SUBSCRIPTION ROUTES - PUBLIC
+//       ============================================ */}
+//       <Route path="/subscription" element={<SubscriptionPage />} />
+//       <Route path="/subscription/success" element={<SubscriptionSuccessPage />} />
+//       <Route path="/subscription/cancel" element={<SubscriptionCancelPage />} />
+
+//       {/* ============================================
+//           USER DASHBOARD ROUTES
+//       ============================================ */}
+//       <Route
+//         path="/dashboard"
+//         element={
+//           <ProtectedRoute>
+//             <DashboardLayout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route index element={<UserDashboardPage />} />
+//         <Route path="profile" element={<ProfilePage />} />
+//         <Route path="favorites" element={<FavoritesPage />} />
+//         <Route path="downloads" element={<DownloadsPage />} />
+//         <Route path="history" element={<HistoryPage />} />
+        
+//         {/* User Subscription Routes */}
+// {/*        <Route path="subscriptions" element={<UserSubscriptionsPage />} />
+//         <Route path="billing" element={<UserBillingPage />} />
+//         <Route path="payment-methods" element={<PlaceholderPage title="Payment Methods" />} />
+//         <Route path="invoices" element={<PlaceholderPage title="Invoices" />} />
+//       </Route>*/}
+
+//         <Route path="subscriptions" element={<UserSubscriptionsPage />} />
+//         <Route path="billing" element={<UserBillingPage />} />
+//         <Route path="payment-methods" element={<PaymentMethodsPage />} />
+//         <Route path="invoices" element={<InvoicesPage />} />
+
+//       {/* ============================================
+//           CREATOR DASHBOARD ROUTES
+//       ============================================ */}
+//       <Route
+//         path="/creator"
+//         element={
+//           <ProtectedRoute allowedRoles={['creator', 'admin']}>
+//             <DashboardLayout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         <Route index element={<CreatorDashboardPage />} />
+//         <Route path="upload-poetry" element={<UploadPoetryPage />} />
+//         <Route path="analytics" element={<RevenueAnalyticsPage />} />
+//         <Route path="revenue" element={<RevenueAnalyticsPage />} />
+        
+//         {/* Creator Subscription Routes */}
+//         <Route path="subscription" element={<PlaceholderPage title="Creator Subscription" />} />
+//         <Route path="earnings" element={<PlaceholderPage title="Earnings" />} />
+//       </Route>
+
+//       {/* ============================================
+//           ADMIN ROUTES
+//       ============================================ */}
+//       <Route
+//         path="/admin"
+//         element={
+//           <ProtectedRoute allowedRoles={['admin']}>
+//             <AdminLayout />
+//           </ProtectedRoute>
+//         }
+//       >
+//         {/* Main Admin */}
+//         <Route index element={<AdminDashboardPage />} />
+        
+//         {/* User Management */}
+//         <Route path="users" element={<UserManagementPage />} />
+//         <Route path="users/:id" element={<PlaceholderPage title="User Details" />} />
+        
+//         {/* Content Management */}
+//         <Route path="poetry" element={<PoetryCMSPage />} />
+//         <Route path="authors" element={<AuthorCMSPage />} />
+//         <Route path="books" element={<EbookCMSPage />} />
+        
+//         {/* Audio CMS - Admin */}
+//         <Route path="audio" element={<AudioCMSPage />} />
+//         <Route path="audio/types" element={<PlaceholderPage title="Audio Types Management" />} />
+//         <Route path="audio/playlists" element={<PlaceholderPage title="Audio Playlists" />} />
+//         <Route path="audio/analytics" element={<PlaceholderPage title="Audio Analytics" />} />
+//         <Route path="audio/bulk-upload" element={<PlaceholderPage title="Bulk Audio Upload" />} />
+        
+//         {/* Video CMS - Admin */}
+//         <Route path="videos" element={<VideoCMSPage />} />
+//         <Route path="videos/types" element={<PlaceholderPage title="Video Types Management" />} />
+
+//         {/* ============================================
+//             SUBSCRIPTION CMS - ADMIN (FULLY CONFIGURED)
+//         ============================================ */}
+//         {/* Main Subscription Management */}
+//         <Route path="subscriptions" element={<SubscriptionCMSPage />} />
+//         <Route path="subscriptions/plans" element={<SubscriptionCMSPage />} />
+        
+//         {/* Subscriber Management */}
+//         <Route path="subscriptions/users" element={<SubscribersListPage />} />
+//         <Route path="subscriptions/subscribers" element={<SubscribersListPage />} />
+//         <Route path="subscriptions/subscribers/:id" element={<PlaceholderPage title="Subscriber Details" />} />
+        
+//         {/* Transaction Management */}
+//         <Route path="subscriptions/transactions" element={<TransactionsPage />} />
+//         <Route path="subscriptions/payments" element={<TransactionsPage />} />
+//         <Route path="subscriptions/transactions/:id" element={<PlaceholderPage title="Transaction Details" />} />
+        
+//         {/* Subscription Analytics */}
+//         <Route path="subscriptions/analytics" element={<SubscriptionAnalyticsPage />} />
+//         <Route path="subscriptions/stats" element={<SubscriptionAnalyticsPage />} />
+//         <Route path="subscriptions/reports" element={<PlaceholderPage title="Subscription Reports" />} />
+        
+//         {/* Feature Management */}
+//         <Route path="subscriptions/features" element={<PlaceholderPage title="Feature Toggles" />} />
+        
+//         {/* Coupon/Discount Management */}
+//         <Route path="subscriptions/coupons" element={<PlaceholderPage title="Coupon Management" />} />
+//         <Route path="subscriptions/discounts" element={<PlaceholderPage title="Discount Management" />} />
+
+//         {/* Site Management */}
+//         <Route path="homepage" element={<HomepageCMSPage />} />
+//         <Route path="seo" element={<SEOManagementPage />} />
+//         <Route path="analytics" element={<AnalyticsPage />} />
+//         <Route path="settings" element={<SettingsPage />} />
+        
+//         {/* Category Management */}
+//         <Route path="categories" element={<PlaceholderPage title="Categories Management" />} />
+//         <Route path="categories/audio" element={<PlaceholderPage title="Audio Categories" />} />
+//         <Route path="categories/video" element={<PlaceholderPage title="Video Categories" />} />
+        
+//         {/* Reports */}
+//         <Route path="reports" element={<PlaceholderPage title="Reports" />} />
+//         <Route path="reports/audio" element={<PlaceholderPage title="Audio Reports" />} />
+//         <Route path="reports/payments" element={<PlaceholderPage title="Payment Reports" />} />
+//       </Route>
+
+//       {/* ============================================
+//           FALLBACK - 404 PAGE
+//       ============================================ */}
+//       <Route path="*" element={<Navigate to="/" replace />} />
+//     </Routes>
+//   )
+// }
+
+// export default App
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/App.jsx
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
@@ -1151,6 +1462,8 @@ import HistoryPage from './pages/user/UserHistory.jsx'
 import DownloadsPage from './pages/user/DownloadsPage.jsx'
 import UserSubscriptionsPage from './pages/user/UserSubscriptionsPage.jsx'
 import UserBillingPage from './pages/user/UserBillingPage.jsx'
+import PaymentMethodsPage from './pages/user/PaymentMethodsPage.jsx'
+import InvoicesPage from './pages/user/InvoicesPage.jsx'
 
 // Creator Dashboard Pages
 import CreatorDashboardPage from './pages/creator/CreatorDashboardPage.jsx'
@@ -1274,8 +1587,8 @@ const App = () => {
         {/* User Subscription Routes */}
         <Route path="subscriptions" element={<UserSubscriptionsPage />} />
         <Route path="billing" element={<UserBillingPage />} />
-        <Route path="payment-methods" element={<PlaceholderPage title="Payment Methods" />} />
-        <Route path="invoices" element={<PlaceholderPage title="Invoices" />} />
+        <Route path="payment-methods" element={<PaymentMethodsPage />} />
+        <Route path="invoices" element={<InvoicesPage />} />
       </Route>
 
       {/* ============================================

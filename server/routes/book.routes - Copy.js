@@ -99,112 +99,6 @@
 
 
 
-// // server/routes/book.routes.js
-// import express from 'express';
-// import { body } from 'express-validator';
-// import { protect, optionalAuth } from '../middleware/auth.js';
-// import { cacheMiddleware } from '../middleware/cache.js';
-// import {
-//   getBooks,
-//   getBookBySlug,
-//   createBook,
-//   updateBook,
-//   deleteBook,
-//   getFeaturedBooks,
-//   getBookReader,
-//   downloadBook,
-//   rateBook,
-//   getBookPreview,
-//   getBooksByAuthor,
-//   getRelatedBooks,
-//   // ============================================
-//   // NEW: Import page-related controller functions
-//   // ============================================
-//   getBookPages,
-//   getBookPage
-// } from '../controllers/book.controller.js';
-
-// const router = express.Router();
-
-// // ============================================
-// // PUBLIC ROUTES
-// // ============================================
-
-// // Get all books with pagination and filters
-// router.get('/', cacheMiddleware(300), optionalAuth, getBooks);
-
-// // Get featured books
-// router.get('/featured', cacheMiddleware(600), getFeaturedBooks);
-
-// // Get books by author ID
-// router.get('/author/:authorId', getBooksByAuthor);
-
-// // ============================================
-// // SLUG-BASED PUBLIC ROUTES
-// // ============================================
-
-// // Get single book by slug
-// router.get('/:slug', optionalAuth, getBookBySlug);
-
-// // Get book preview (lightweight version)
-// router.get('/:slug/preview', getBookPreview);
-
-// // Get related books
-// router.get('/:slug/related', getRelatedBooks);
-
-// // ============================================
-// // NEW: Book Reader Routes (Page-by-Page Navigation)
-// // ============================================
-
-// // Get all pages for a book (for the reader - returns array of image URLs)
-// // Example: GET /api/books/my-book-slug/pages
-// router.get('/:slug/pages', optionalAuth, getBookPages);
-
-// // Get a single page by number (for progressive loading)
-// // Example: GET /api/books/my-book-slug/page/1
-// router.get('/:slug/page/:pageNumber', optionalAuth, getBookPage);
-
-// // Get book reader (PDF/EPUB fallback)
-// router.get('/:slug/reader', protect, getBookReader);
-
-// // Download book (PDF/EPUB)
-// router.get('/:slug/download', protect, downloadBook);
-
-// // ============================================
-// // PROTECTED ROUTES (Admin/Creator only)
-// // ============================================
-
-// // Create new book
-// router.post('/', protect, [
-//   body('title').trim().notEmpty().withMessage('Title is required'),
-//   body('author').notEmpty().withMessage('Author is required'),
-//   body('description').optional().trim()
-// ], createBook);
-
-// // Update book by ID
-// router.put('/:id', protect, updateBook);
-
-// // Delete book by ID
-// router.delete('/:id', protect, deleteBook);
-
-// // Rate a book
-// router.post('/:id/rate', protect, [
-//   body('rating').isInt({ min: 1, max: 5 }).withMessage('Rating must be between 1 and 5'),
-//   body('review').optional().trim().isLength({ max: 2000 })
-// ], rateBook);
-
-// export default router;
-
-
-
-
-
-
-
-
-
-
-
 // server/routes/book.routes.js
 import express from 'express';
 import { body } from 'express-validator';
@@ -223,12 +117,11 @@ import {
   getBookPreview,
   getBooksByAuthor,
   getRelatedBooks,
+  // ============================================
+  // NEW: Import page-related controller functions
+  // ============================================
   getBookPages,
-  getBookPage,
-  likeBook,
-  bookmarkBook,
-  getBookLikeStatus,
-  getBookBookmarkStatus
+  getBookPage
 } from '../controllers/book.controller.js';
 
 const router = express.Router();
@@ -260,7 +153,7 @@ router.get('/:slug/preview', getBookPreview);
 router.get('/:slug/related', getRelatedBooks);
 
 // ============================================
-// BOOK READER ROUTES (Page-by-Page Navigation)
+// NEW: Book Reader Routes (Page-by-Page Navigation)
 // ============================================
 
 // Get all pages for a book (for the reader - returns array of image URLs)
@@ -276,22 +169,6 @@ router.get('/:slug/reader', protect, getBookReader);
 
 // Download book (PDF/EPUB)
 router.get('/:slug/download', protect, downloadBook);
-
-// ============================================
-// LIKE & BOOKMARK ROUTES (Using ID)
-// ============================================
-
-// Like/Unlike a book (works with both POST and DELETE)
-router.post('/:id/like', protect, likeBook);
-router.delete('/:id/like', protect, likeBook);
-
-// Bookmark/Remove bookmark
-router.post('/:id/bookmark', protect, bookmarkBook);
-router.delete('/:id/bookmark', protect, bookmarkBook);
-
-// Get like/bookmark status (optional helper routes)
-router.get('/:id/like-status', protect, getBookLikeStatus);
-router.get('/:id/bookmark-status', protect, getBookBookmarkStatus);
 
 // ============================================
 // PROTECTED ROUTES (Admin/Creator only)
