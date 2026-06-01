@@ -1464,6 +1464,7 @@ import UserSubscriptionsPage from './pages/user/UserSubscriptionsPage.jsx'
 import UserBillingPage from './pages/user/UserBillingPage.jsx'
 import PaymentMethodsPage from './pages/user/PaymentMethodsPage.jsx'
 import InvoicesPage from './pages/user/InvoicesPage.jsx'
+import NotificationsPage from './pages/user/NotificationsPage'; // Import notifications page
 
 // Creator Dashboard Pages
 import CreatorDashboardPage from './pages/creator/CreatorDashboardPage.jsx'
@@ -1486,6 +1487,7 @@ import SubscribersListPage from './pages/admin/SubscribersListPage.jsx'
 import TransactionsPage from './pages/admin/TransactionsPage.jsx'
 import SubscriptionAnalyticsPage from './pages/admin/SubscriptionAnalyticsPage.jsx'
 import SettingsPage from './pages/admin/SettingsPage.jsx'
+import NotificationCMSPage from './pages/admin/NotificationCMSPage'; // Import notification CMS
 
 // Protected Route Component
 const ProtectedRoute = ({ children, allowedRoles = [] }) => {
@@ -1589,6 +1591,8 @@ const App = () => {
         <Route path="billing" element={<UserBillingPage />} />
         <Route path="payment-methods" element={<PaymentMethodsPage />} />
         <Route path="invoices" element={<InvoicesPage />} />
+        {/* NEW: User Notifications Route */}
+        <Route path="notifications" element={<NotificationsPage />} />
       </Route>
 
       {/* ============================================
@@ -1645,6 +1649,9 @@ const App = () => {
         {/* Video CMS - Admin */}
         <Route path="videos" element={<VideoCMSPage />} />
         <Route path="videos/types" element={<PlaceholderPage title="Video Types Management" />} />
+
+        {/* NEW: Notification CMS Page */}
+        <Route path="/admin/notifications" element={<NotificationCMSPage />} />
 
         {/* ============================================
             SUBSCRIPTION CMS - ADMIN (FULLY CONFIGURED)
