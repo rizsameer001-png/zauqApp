@@ -1,3 +1,12 @@
+# Backend
+cd server
+npm install openai @google/generative-ai
+
+# Frontend
+cd client
+npm install @xenova/transformers
+
+
 zauqapp/
 ├── client/ (React + Vite)
 │   ├── src/

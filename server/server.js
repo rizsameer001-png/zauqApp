@@ -293,6 +293,7 @@ import seoRoutes from './routes/seo.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import publicSettingsRoutes from './routes/publicSettings.routes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 //dotenv.config();
 
@@ -382,6 +383,7 @@ app.use('/api/upload', uploadRoutes); // Upload routes
 // Admin settings routes (protected)
 app.use('/api/admin/settings', settingsRoutes);
 app.use('/api/settings', publicSettingsRoutes);
+app.use('/api/ai', aiRoutes);
 
 // ============================================
 // Health Checks

@@ -167,100 +167,6 @@
 
 
 
-// // server/routes/poem.routes.js
-// import express from 'express';
-// import { body } from 'express-validator';
-// import { protect, optionalAuth } from '../middleware/auth.js';
-// import { cacheMiddleware } from '../middleware/cache.js';
-// import {
-//   getPoems,
-//   getPoemBySlug,
-//   createPoem,
-//   updatePoem,
-//   deletePoem,
-//   likePoem,
-//   bookmarkPoem,
-//   addComment,
-//   getFeaturedPoems,
-//   getTrendingPoems,
-//   getPoemsByAuthor,
-//   getAIExplanation,
-//   getRelatedPoems
-// } from '../controllers/poem.controller.js';
-
-// const router = express.Router();
-
-// // ============================================
-// // PUBLIC ROUTES (Using slugs)
-// // ============================================
-
-// // Get all poems with pagination and filters
-// router.get('/', cacheMiddleware(300), optionalAuth, getPoems);
-
-// // Get featured poems
-// router.get('/featured', cacheMiddleware(600), getFeaturedPoems);
-
-// // Get trending poems
-// router.get('/trending', cacheMiddleware(300), getTrendingPoems);
-
-// // Get poems by author ID (still uses authorId from database)
-// router.get('/author/:authorId', getPoemsByAuthor);
-
-// // ============================================
-// // SLUG-BASED ROUTES (Public)
-// // ============================================
-
-// // Get single poem by slug (NOT by ID)
-// router.get('/:slug', optionalAuth, getPoemBySlug);
-
-// // Get related poems by slug
-// router.get('/:slug/related', getRelatedPoems);
-
-// // Get AI explanation by slug
-// router.get('/:slug/ai-explanation', getAIExplanation);
-
-// // ============================================
-// // PROTECTED ROUTES (Using slugs for actions)
-// // ============================================
-
-// // Create new poem
-// router.post('/', protect, [
-//   body('title').trim().notEmpty().withMessage('Title is required'),
-//   body('content').trim().notEmpty().withMessage('Content is required'),
-//   body('author').notEmpty().withMessage('Author is required'),
-//   body('genre').isIn(['ghazal', 'nazm', 'sher', 'rubai', 'rekhti', 'qasida', 'marsiya', 'other'])
-// ], createPoem);
-
-// // FIXED: Update poem by slug (was using :id, now using :slug)
-// router.put('/:slug', protect, updatePoem);
-
-// // FIXED: Delete poem by slug (was using :id, now using :slug)
-// router.delete('/:slug', protect, deletePoem);
-
-// // FIXED: Like poem by slug (was using :id, now using :slug)
-// router.post('/:slug/like', protect, likePoem);
-
-// // FIXED: Bookmark poem by slug (was using :id, now using :slug)
-// router.post('/:slug/bookmark', protect, bookmarkPoem);
-
-// // FIXED: Add comment by slug (was using :id, now using :slug)
-// router.post('/:slug/comment', protect, [
-//   body('text').trim().notEmpty().isLength({ max: 1000 })
-// ], addComment);
-
-// export default router;
-
-
-
-
-
-
-
-
-
-
-
-
 // server/routes/poem.routes.js
 import express from 'express';
 import { body } from 'express-validator';
@@ -279,14 +185,7 @@ import {
   getTrendingPoems,
   getPoemsByAuthor,
   getAIExplanation,
-  getRelatedPoems,
-  // ============================================
-  // NEW AI FEATURE CONTROLLERS
-  // ============================================
-  getPoemSentiment,
-  getPoemThemes,
-  getAIAnalysis,
-  analyzePoemContent
+  getRelatedPoems
 } from '../controllers/poem.controller.js';
 
 const router = express.Router();
@@ -317,29 +216,8 @@ router.get('/:slug', optionalAuth, getPoemBySlug);
 // Get related poems by slug
 router.get('/:slug/related', getRelatedPoems);
 
-// Get AI explanation by slug (legacy)
+// Get AI explanation by slug
 router.get('/:slug/ai-explanation', getAIExplanation);
-
-// ============================================
-// AI FEATURE ROUTES (New)
-// ============================================
-
-// Get sentiment analysis for a poem by slug
-// Example: GET /api/poems/my-poem-slug/sentiment
-router.get('/:slug/sentiment', optionalAuth, getPoemSentiment);
-
-// Get theme extraction for a poem by slug
-// Example: GET /api/poems/my-poem-slug/themes
-router.get('/:slug/themes', optionalAuth, getPoemThemes);
-
-// Get full AI literary analysis for a poem by slug
-// Example: GET /api/poems/my-poem-slug/ai-analysis
-router.get('/:slug/ai-analysis', optionalAuth, getAIAnalysis);
-
-// Analyze poem content directly (for AJAX / real-time analysis)
-// Example: POST /api/poems/analyze-content
-// Body: { poemText: "...", language: "urdu" }
-router.post('/analyze-content', optionalAuth, analyzePoemContent);
 
 // ============================================
 // PROTECTED ROUTES (Using slugs for actions)
@@ -353,19 +231,19 @@ router.post('/', protect, [
   body('genre').isIn(['ghazal', 'nazm', 'sher', 'rubai', 'rekhti', 'qasida', 'marsiya', 'other'])
 ], createPoem);
 
-// Update poem by slug
+// FIXED: Update poem by slug (was using :id, now using :slug)
 router.put('/:slug', protect, updatePoem);
 
-// Delete poem by slug
+// FIXED: Delete poem by slug (was using :id, now using :slug)
 router.delete('/:slug', protect, deletePoem);
 
-// Like poem by slug
+// FIXED: Like poem by slug (was using :id, now using :slug)
 router.post('/:slug/like', protect, likePoem);
 
-// Bookmark poem by slug
+// FIXED: Bookmark poem by slug (was using :id, now using :slug)
 router.post('/:slug/bookmark', protect, bookmarkPoem);
 
-// Add comment by slug
+// FIXED: Add comment by slug (was using :id, now using :slug)
 router.post('/:slug/comment', protect, [
   body('text').trim().notEmpty().isLength({ max: 1000 })
 ], addComment);
