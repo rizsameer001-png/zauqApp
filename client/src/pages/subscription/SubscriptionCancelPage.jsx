@@ -1,4 +1,4 @@
-//client/src/pages/public/SubscriptionCancelPage.jsx:
+//client/src/pages/subscription/SubscriptionCancelPage.jsx:
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { XCircle, Home, RefreshCw, HelpCircle, Mail, ArrowRight, Sparkles } from 'lucide-react';

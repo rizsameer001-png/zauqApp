@@ -1,3 +1,6 @@
+//client/src/components/layout/Footer.jsx
+//this Footer.jsx from client/src/layouts/MainLayout.jsx
+
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'

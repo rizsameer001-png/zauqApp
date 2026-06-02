@@ -1593,6 +1593,7 @@ const App = () => {
         <Route path="invoices" element={<InvoicesPage />} />
         {/* NEW: User Notifications Route */}
         <Route path="notifications" element={<NotificationsPage />} />
+        
       </Route>
 
       {/* ============================================

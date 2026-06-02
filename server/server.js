@@ -291,6 +291,8 @@ import creatorRoutes from './routes/creator.routes.js';
 import homepageRoutes from './routes/homepage.routes.js';
 import seoRoutes from './routes/seo.routes.js';
 import uploadRoutes from './routes/upload.routes.js';
+import settingsRoutes from './routes/settings.routes.js';
+import publicSettingsRoutes from './routes/publicSettings.routes.js';
 
 //dotenv.config();
 
@@ -375,6 +377,11 @@ app.use('/api/creator', creatorRoutes);
 app.use('/api/homepage', homepageRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/upload', uploadRoutes); // Upload routes
+// Add this middleware
+//app.use('/api/admin/settings', settingsRoutes);
+// Admin settings routes (protected)
+app.use('/api/admin/settings', settingsRoutes);
+app.use('/api/settings', publicSettingsRoutes);
 
 // ============================================
 // Health Checks

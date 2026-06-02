@@ -1,0 +1,52 @@
+zauqapp/
+├── client/ (React + Vite)
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── ai/
+│   │   │   │   ├── AIAnalysisPanel.jsx
+│   │   │   │   ├── AIGenerator.jsx
+│   │   │   │   ├── TransliterationToggle.jsx
+│   │   │   │   └── LanguageToggle.jsx
+│   │   │   ├── search/
+│   │   │   │   ├── SmartSearchBar.jsx
+│   │   │   │   ├── VoiceSearch.jsx
+│   │   │   │   └── GenreFilter.jsx
+│   │   │   └── schedule/
+│   │   │       └── PublishScheduler.jsx
+│   │   ├── pages/
+│   │   │   ├── admin/
+│   │   │   │   ├── PoetryCMSPage.jsx (UPGRADED)
+│   │   │   │   └── ScheduleManager.jsx
+│   │   │   └── public/
+│   │   │       └── PoemDetailPage.jsx (UPGRADED)
+│   │   ├── services/
+│   │   │   ├── aiService.js
+│   │   │   ├── translationService.js
+│   │   │   └── voiceService.js
+│   │   └── hooks/
+│   │       ├── useVoiceSearch.js
+│   │       └── useAIAnalysis.js
+│   └── package.json
+│
+├── server/ (Node.js + Express)
+│   ├── controllers/
+│   │   ├── poem.controller.js (UPGRADED)
+│   │   ├── ai.controller.js
+│   │   ├── schedule.controller.js
+│   │   └── search.controller.js
+│   ├── models/
+│   │   ├── Poem.js (UPGRADED)
+│   │   ├── Schedule.js
+│   │   └── AnalysisCache.js
+│   ├── services/
+│   │   ├── aiService.js
+│   │   ├── embeddingService.js
+│   │   ├── translationService.js
+│   │   └── schedulerService.js
+│   ├── routes/
+│   │   ├── ai.routes.js
+│   │   ├── schedule.routes.js
+│   │   └── search.routes.js
+│   └── utils/
+│       └── vectorSearch.js
+└── package.json

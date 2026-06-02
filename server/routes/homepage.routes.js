@@ -206,17 +206,167 @@
 
 
 
+// // server/routes/homepage.routes.js
+// import express from 'express';
+// import { protect, adminOnly } from '../middleware/auth.js';
+// import {
+//   // Public routes (no authentication)
+//   getHomepageData,
+//   getDailyQuote,
+//   getFeaturedContent,
+//   getPublicBanners,
+//   getPublicConfig,
+//   // Admin routes (require authentication)
+//   getHomepageConfig,
+//   getHomepageConfigCMS,
+//   getHomepageStats,
+//   // Section management
+//   updateSection,
+//   toggleSection,
+//   reorderSections,
+//   // Banner management
+//   getAllBannersCMS,
+//   getBannerById,
+//   addBanner,
+//   updateBanner,
+//   removeBanner,
+//   updateBanners,
+//   reorderBanners,
+//   toggleBannerStatus,
+//   bulkUploadBanners,
+//   // Featured content
+//   updateFeaturedContent,
+//   getFeaturedContentCMS,
+//   // Quote settings
+//   getQuoteSettings,
+//   updateQuoteSettings
+// } from '../controllers/homepage.controller.js';
+
+// const router = express.Router();
+
+// // ============================================
+// // PUBLIC ROUTES - No authentication required
+// // ============================================
+
+// // Main homepage data
+// router.get('/', getHomepageData);
+
+// // Daily quote
+// router.get('/daily-quote', getDailyQuote);
+
+// // Featured content (public)
+// router.get('/featured', getFeaturedContent);
+
+// // Public banners (only active banners)
+// router.get('/banners', getPublicBanners);
+
+// // Public config (only active sections)
+// router.get('/config', getPublicConfig);
+
+// // ============================================
+// // ADMIN ROUTES - Authentication + Admin role required
+// // ============================================
+
+// // ===== Config & Stats =====
+// router.get('/admin/config', protect, adminOnly, getHomepageConfig);
+// router.get('/admin/config/full', protect, adminOnly, getHomepageConfigCMS);
+// router.get('/admin/stats', protect, adminOnly, getHomepageStats);
+
+// // ===== Section Management =====
+// router.put('/admin/sections/:section', protect, adminOnly, updateSection);
+// router.patch('/admin/sections/:section/toggle', protect, adminOnly, toggleSection);
+// router.put('/admin/sections/reorder', protect, adminOnly, reorderSections);
+
+// // ===== Banner Management (Full CRUD) =====
+
+// // Get all banners (admin view - includes inactive)
+// router.get('/admin/banners', protect, adminOnly, getAllBannersCMS);
+
+// // Get single banner by ID
+// router.get('/admin/banners/:id', protect, adminOnly, getBannerById);
+
+// // Add new banner
+// router.post('/admin/banners', protect, adminOnly, addBanner);
+
+// // Bulk upload banners
+// router.post('/admin/banners/bulk', protect, adminOnly, bulkUploadBanners);
+
+// // Update all banners (batch update)
+// router.put('/admin/banners', protect, adminOnly, updateBanners);
+
+// // Update single banner by ID
+// router.put('/admin/banners/:id', protect, adminOnly, updateBanner);
+
+// // Delete single banner by ID
+// router.delete('/admin/banners/:id', protect, adminOnly, removeBanner);
+
+// // Reorder banners
+// router.post('/admin/banners/reorder', protect, adminOnly, reorderBanners);
+
+// // Toggle banner active status
+// router.patch('/admin/banners/:id/toggle', protect, adminOnly, toggleBannerStatus);
+
+// // ===== Featured Content Management =====
+// router.get('/admin/featured', protect, adminOnly, getFeaturedContentCMS);
+// router.put('/admin/featured', protect, adminOnly, updateFeaturedContent);
+
+// // ===== Quote Settings Management =====
+// router.get('/admin/quote-settings', protect, adminOnly, getQuoteSettings);
+// router.put('/admin/quote-settings', protect, adminOnly, updateQuoteSettings);
+
+// // ============================================
+// // LEGACY ROUTES (for backward compatibility)
+// // Keep these for existing frontend code
+// // ============================================
+
+// // Legacy config endpoint (without /admin prefix)
+// router.get('/config/admin', protect, adminOnly, getHomepageConfig);
+
+// // Legacy banner endpoints (without /admin prefix - will be deprecated)
+// router.get('/banners/admin', protect, adminOnly, getAllBannersCMS);
+// router.post('/banners', protect, adminOnly, addBanner);
+// router.put('/banners', protect, adminOnly, updateBanners);
+// router.put('/banners/:id', protect, adminOnly, updateBanner);
+// router.delete('/banners/:id', protect, adminOnly, removeBanner);
+// router.patch('/banners/:id/toggle', protect, adminOnly, toggleBannerStatus);
+// router.post('/banners/reorder', protect, adminOnly, reorderBanners);
+// router.post('/banners/bulk', protect, adminOnly, bulkUploadBanners);
+
+// // Legacy section endpoints
+// router.put('/sections/:section', protect, adminOnly, updateSection);
+// router.patch('/sections/:section/toggle', protect, adminOnly, toggleSection);
+// router.put('/sections/reorder', protect, adminOnly, reorderSections);
+
+// // Legacy featured content endpoint
+// router.put('/featured', protect, adminOnly, updateFeaturedContent);
+
+// // Legacy quote settings endpoint
+// router.put('/quote-settings', protect, adminOnly, updateQuoteSettings);
+// router.get('/quote-settings', protect, adminOnly, getQuoteSettings);
+
+// export default router;
+
+
+
+
+
+
+
+
+
+
+
 // server/routes/homepage.routes.js
 import express from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
 import {
-  // Public routes (no authentication)
+  // Public routes
   getHomepageData,
   getDailyQuote,
   getFeaturedContent,
   getPublicBanners,
   getPublicConfig,
-  // Admin routes (require authentication)
+  // Admin routes
   getHomepageConfig,
   getHomepageConfigCMS,
   getHomepageStats,
@@ -243,6 +393,13 @@ import {
 } from '../controllers/homepage.controller.js';
 
 const router = express.Router();
+
+// ============================================
+// TEST ROUTE - Verify router is working
+// ============================================
+router.get('/test', (req, res) => {
+  res.json({ success: true, message: 'Homepage router is working!' });
+});
 
 // ============================================
 // PUBLIC ROUTES - No authentication required
@@ -278,32 +435,16 @@ router.patch('/admin/sections/:section/toggle', protect, adminOnly, toggleSectio
 router.put('/admin/sections/reorder', protect, adminOnly, reorderSections);
 
 // ===== Banner Management (Full CRUD) =====
-
-// Get all banners (admin view - includes inactive)
+// IMPORTANT: Specific routes must come BEFORE parameter routes
 router.get('/admin/banners', protect, adminOnly, getAllBannersCMS);
-
-// Get single banner by ID
-router.get('/admin/banners/:id', protect, adminOnly, getBannerById);
-
-// Add new banner
-router.post('/admin/banners', protect, adminOnly, addBanner);
-
-// Bulk upload banners
 router.post('/admin/banners/bulk', protect, adminOnly, bulkUploadBanners);
-
-// Update all banners (batch update)
+router.post('/admin/banners', protect, adminOnly, addBanner);
 router.put('/admin/banners', protect, adminOnly, updateBanners);
-
-// Update single banner by ID
-router.put('/admin/banners/:id', protect, adminOnly, updateBanner);
-
-// Delete single banner by ID
-router.delete('/admin/banners/:id', protect, adminOnly, removeBanner);
-
-// Reorder banners
 router.post('/admin/banners/reorder', protect, adminOnly, reorderBanners);
-
-// Toggle banner active status
+// Parameter routes (with :id) should come AFTER specific routes
+router.get('/admin/banners/:id', protect, adminOnly, getBannerById);
+router.put('/admin/banners/:id', protect, adminOnly, updateBanner);
+router.delete('/admin/banners/:id', protect, adminOnly, removeBanner);
 router.patch('/admin/banners/:id/toggle', protect, adminOnly, toggleBannerStatus);
 
 // ===== Featured Content Management =====
@@ -315,14 +456,28 @@ router.get('/admin/quote-settings', protect, adminOnly, getQuoteSettings);
 router.put('/admin/quote-settings', protect, adminOnly, updateQuoteSettings);
 
 // ============================================
-// LEGACY ROUTES (for backward compatibility)
-// Keep these for existing frontend code
+// DEBUG ROUTE - Check all registered routes
 // ============================================
+router.get('/debug/routes', (req, res) => {
+  const routes = [];
+  router.stack.forEach(layer => {
+    if (layer.route) {
+      const methods = Object.keys(layer.route.methods).join(', ').toUpperCase();
+      routes.push(`${methods} /api/homepage${layer.route.path}`);
+    }
+  });
+  res.json({ 
+    success: true, 
+    totalRoutes: routes.length,
+    routes,
+    message: 'All homepage routes loaded successfully'
+  });
+});
 
-// Legacy config endpoint (without /admin prefix)
+// ============================================
+// LEGACY ROUTES (for backward compatibility)
+// ============================================
 router.get('/config/admin', protect, adminOnly, getHomepageConfig);
-
-// Legacy banner endpoints (without /admin prefix - will be deprecated)
 router.get('/banners/admin', protect, adminOnly, getAllBannersCMS);
 router.post('/banners', protect, adminOnly, addBanner);
 router.put('/banners', protect, adminOnly, updateBanners);
@@ -331,17 +486,11 @@ router.delete('/banners/:id', protect, adminOnly, removeBanner);
 router.patch('/banners/:id/toggle', protect, adminOnly, toggleBannerStatus);
 router.post('/banners/reorder', protect, adminOnly, reorderBanners);
 router.post('/banners/bulk', protect, adminOnly, bulkUploadBanners);
-
-// Legacy section endpoints
 router.put('/sections/:section', protect, adminOnly, updateSection);
 router.patch('/sections/:section/toggle', protect, adminOnly, toggleSection);
 router.put('/sections/reorder', protect, adminOnly, reorderSections);
-
-// Legacy featured content endpoint
 router.put('/featured', protect, adminOnly, updateFeaturedContent);
-
-// Legacy quote settings endpoint
-router.put('/quote-settings', protect, adminOnly, updateQuoteSettings);
 router.get('/quote-settings', protect, adminOnly, getQuoteSettings);
+router.put('/quote-settings', protect, adminOnly, updateQuoteSettings);
 
 export default router;

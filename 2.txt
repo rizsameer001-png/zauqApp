@@ -1,0 +1,2036 @@
+# Zauq Application — Complete Requirements Document
+
+# 1. Project Overview
+
+## Product Vision
+
+Zauq is a premium English,Hindi, Urdu poetry, literature, ghazal, shayari, audiobook, ebook, and cultural learning platform inspired by modern literary ecosystems such as rekhta.org, but with a more immersive AI-powered social experience. Vey Beutifull Homepage design with navbar mega menu and footer. by default english
+Technology -react,vite,nodejs, mongodb, Cludinary(pls ensure pdf can easly downloadable or redable for users), hosting render
+
+The platform should combine:
+
+* Urdu poetry archive
+* Shayari discovery
+* Poet communities
+* AI literary tools
+* Audio/video streaming
+* Mushaira ecosystem
+* Ebook library
+* Urdu learning system
+* Social engagement
+* Creator monetization
+* AI translation/transliteration
+* Advanced Urdu search
+
+The system must support:
+
+* Web Application
+* Android Application
+* iOS Application
+* Progressive Web App (PWA)
+* Smart TV streaming support (future)
+* Admin Panel
+* REST APIs
+* GraphQL APIs
+
+---
+
+# 2. Core Objectives
+
+## Primary Goals
+
+* Build the largest English,Hindi Urdu poetry and literature ecosystem
+* Enable easy Urdu/Hindi/Roman reading
+* Preserve classical literature digitally
+* Create community-driven poetry discovery
+* Enable AI-assisted English,Hindi,Urdu learning
+* Support content creators and narrators
+* Provide premium streaming experience
+* Deliver advanced literary search tools
+
+---
+
+# 3. User Roles
+
+
+## Registered User
+
+* Save favorites
+* Follow poets
+* Create collections
+* Comment
+* Like/share content
+* Join communities
+* Participate in events
+
+## Premium User
+
+* Ad-free experience
+* Offline downloads
+* Full ebook access
+* Exclusive videos/audio
+* AI features
+* Early access releases
+
+## Creator/Poet
+
+* Upload poetry
+* Publish audio/video
+* Manage followers
+* Monetize content
+* Host live events
+
+## Moderator
+
+* Moderate community
+* Manage reports
+* Review submissions
+
+## Content Editor
+
+* Manage literary content
+* Approve translations
+* Review metadata
+
+## Admin
+
+* Full system access
+
+---
+
+# 4. Frontend Requirements
+
+# A. Home Page
+
+## Sections
+
+* Hero slider
+* Trending ghazals
+* Featured poets
+* Daily sher
+* Audio highlights
+* Mushaira videos
+* Urdu word of the day
+* Learning section
+* Popular categories
+* Editor’s picks
+* New arrivals
+* Community posts
+* AI recommendations
+* Festival banners
+* Event promotions
+* Rare collections
+
+## Functionalities
+
+* Infinite scrolling
+* Lazy loading
+* Personalized recommendations
+* Dynamic feed
+* Language switcher
+* Dark/light mode
+* Accessibility support
+* Push notification prompt
+
+---
+
+# B. Authentication System
+
+## Features
+
+* Email signup/login
+* Mobile OTP login
+
+* Multi-device sessions
+* Social onboarding
+
+## Security
+
+* JWT authentication
+* OAuth2
+* Session management
+* Device verification
+* 2FA support
+* CAPTCHA protection(if enabled in admin panel)
+
+---
+
+# C. User Profile System
+
+## Features
+
+* Profile image
+* Bio
+* Interests
+* Favorite poets
+* Reading history
+
+
+## Activity Feed
+
+* Likes
+* Comments
+* Shares
+* Reading activity
+* Saved poetry
+
+---
+
+# D. Poetry Module
+
+## Supported Poetry Types
+
+* Ghazal
+* Nazm
+* Sher
+* Rubai
+* Doha
+* Qita
+* Marsiya
+* Salam
+* Hamd
+* Naat
+* Geet
+* Rekhti
+* Free verse
+* Modern poetry
+
+## Poetry Detail Page
+
+### Display
+
+* Urdu text
+* Hindi transliteration
+* Roman Urdu
+* English translation
+* Line-by-line meaning
+* Word meanings popup
+* Tafseer/explanation
+* Poet info
+* Related poetry
+
+### Features
+
+* Like
+* Bookmark
+* Share
+* Copy text
+* Generate quote image
+* Font controls
+* Theme customization
+* Reading mode
+* Fullscreen mode
+* Auto-scroll
+* AI explanation
+* AI summary
+* AI recitation
+* AI emotional analysis
+
+## Advanced Reading Features
+
+* Nastaliq font rendering
+* RTL optimization
+* Transliteration switching
+* Verse-by-verse playback
+* Word pronunciation
+
+
+---
+
+# E. Poet/Author Module
+
+## Poet Profile
+
+* Name
+* Pen name
+* Biography
+* Timeline
+* Birth/death
+* Literary movement
+* Achievements
+* Quotes
+* Photo gallery
+* Audio/video collection
+
+## Features
+
+* Follow poet
+* Notifications
+* Related poets
+* Popular works
+* Community discussions
+* Verified badge
+
+---
+
+# F. Advanced Search System
+
+## Search Types
+
+* Poetry search
+* Poet search
+* Audio search
+* Video search
+* Ebook search
+* Dictionary search
+* Topic search
+* Event search
+
+## Filters
+
+* Genre
+* Mood
+* Era
+* Language
+* Poet
+* Meter/Bahr
+* Qaafiya
+* Popularity
+* Trending
+
+## Search Technologies
+
+* Elasticsearch/OpenSearch
+* Urdu NLP
+* Semantic search
+* Roman Urdu mapping
+* Fuzzy matching
+* Voice search
+* OCR search
+
+---
+
+# G. Dictionary Module
+
+## Features
+
+* Urdu meanings
+* Hindi meanings
+* English meanings
+* Pronunciation
+* Audio pronunciation
+* Grammar information
+* Synonyms
+* Antonyms
+* Example sentences
+* Word origin
+
+## Smart Features
+
+* AI contextual meanings
+* OCR lookup
+* Tap-to-meaning
+* Voice pronunciation
+
+---
+
+# H. Audio Streaming Module
+
+## Content Types
+
+* Poetry recitations
+* Ghazal singing
+* Audiobooks
+* Podcasts
+* Mushaira recordings
+
+## Player Features
+
+* Background playback
+* Playlist
+* Queue system
+* Sleep timer
+* Playback speed
+* Equalizer
+* Download offline
+* Continue listening
+* Lyrics sync
+
+## Streaming
+
+* HLS streaming
+* Adaptive bitrate
+* DRM protection
+
+---
+
+# I. Video Module
+
+## Content Types
+
+* Mushaira videos
+* Interviews
+* Literary documentaries
+* Learning content
+* Live sessions
+
+## Video Player Features
+
+* Adaptive streaming
+* Subtitles
+* Picture-in-picture
+* Fullscreen
+* Continue watching
+* Watch history
+* Download offline
+* Chromecast/AirPlay support
+
+---
+
+# J. Ebook Module
+
+## Supported Formats
+
+* PDF
+* EPUB
+* MOBI
+
+## Reader Features
+
+* Page flip
+* Highlighting
+* Notes
+* Bookmarks
+* Continue reading
+* Zoom
+* Dark mode
+* Font controls
+* Text search
+* Audio narration sync
+
+## Collections
+
+* Rare books
+* Magazines
+* Literary journals
+* Poetry collections
+
+---
+
+# K. Social & Community Features
+
+## Features
+
+* Follow users
+* User feeds
+* Comments
+* Likes
+* Reposts
+* Stories
+* Poetry status
+* Discussion forums
+* Poetry challenges
+* Community groups
+* Fan clubs
+
+## Gamification
+
+* Points system
+* Achievement badges
+* Leaderboards
+* Reading streaks
+
+---
+
+# L. AI Features
+
+## AI Reader
+
+* AI poetry explanation
+* AI line-by-line meaning
+* AI pronunciation
+* AI transliteration
+* AI translation
+
+## AI Discovery
+
+* Personalized recommendations
+* Mood-based poetry suggestions
+* Semantic discovery
+
+## AI Creator Tools
+
+* AI poetry assistant
+* Meter suggestions
+* Qaafiya suggestions
+* AI rhyming assistant
+* AI poem generation
+
+---
+
+# M. Learning Module
+
+## Features
+
+* Urdu learning lessons
+* Poetry appreciation courses
+* Literary history
+* Interactive quizzes
+* Writing workshops
+* Pronunciation training
+
+## Course Features
+
+* Video lessons
+* Progress tracking
+* Certificates
+* Live classes
+
+---
+
+# N. Event System
+
+## Features
+
+* Live Mushairas
+* Workshops
+* Literary festivals
+* Webinars
+* Ticket booking
+* Live streaming
+* Event reminders
+
+---
+
+# O. Notification System
+
+## Channels
+
+* Push notifications
+* Email
+* SMS
+* WhatsApp
+* In-app alerts
+
+## Notification Types
+
+* New poems
+* New followers
+* Event reminders
+* Recommendations
+* Subscription updates
+
+---
+
+# P. Monetization Features
+
+## Revenue Models
+
+* Premium subscriptions
+* Ads
+* Donations
+* Paid events
+* Creator subscriptions
+* Ebook purchases
+* Merchandise
+
+---
+
+# Q. Mobile App Requirements
+
+## Features
+
+* Offline mode
+* Native audio/video
+* Gesture controls
+* Push notifications
+* Home widgets
+* Deep linking
+* Biometric authentication
+
+---
+
+# 5. Admin Panel Requirements
+
+# A. Admin Dashboard
+
+## Widgets
+
+* Total users
+* Active users
+* DAU/MAU
+* Revenue
+* Trending content
+* Watch time
+* Listening time
+* Ebook downloads
+* Search trends
+* AI usage analytics
+
+## Real-Time Monitoring
+
+* Live users
+* Active streams
+* Server load
+* Error monitoring
+
+---
+
+# B. User Management
+
+## Features
+
+* User listing
+* Search/filter users
+* Suspend/ban users
+* Role management
+* Subscription control
+* User activity tracking
+* Login history
+* Device management
+
+## Creator Management
+
+* Creator verification
+* Monetization settings
+* Revenue sharing
+
+---
+
+# C. Poetry CMS
+
+## Features
+
+* Add/edit/delete poems
+* Bulk upload
+* OCR import
+* AI-assisted tagging
+* Transliteration management
+* Translation workflow
+* Metadata management
+* Version history
+
+## Poetry Metadata
+
+* Bahr
+* Qaafiya
+* Radif
+* Genre
+* Mood
+* Era
+* Themes
+
+## Workflow
+
+* Draft
+* Review
+* Published
+* Scheduled
+* Archived
+
+---
+
+# D. Poet Management
+
+## Features
+
+* Poet profiles
+* Biography editor
+* Timeline editor
+* Verification
+* Media linking
+* Related poet mapping
+
+---
+
+# E. Ebook CMS
+
+## Features
+
+* PDF upload
+* EPUB upload
+* OCR processing
+* Metadata editing
+* DRM settings
+* Watermarking
+* Collection management
+
+---
+
+# F. Audio CMS
+
+## Features
+
+* Audio upload
+* Bulk upload
+* Playlist management
+* Streaming settings
+* Narrator management
+* Audio processing
+* Waveform generation
+
+---
+
+# G. Video CMS
+
+## Features
+
+* Video upload
+* Auto transcoding
+* Subtitle management
+* Thumbnail generation
+* Streaming settings
+* DRM protection
+* YouTube/Vimeo integration
+
+---
+
+# H. Dictionary CMS
+
+## Features
+
+* Add/edit words
+* Pronunciation upload
+* Grammar tagging
+* Synonym management
+* Community suggestion approval
+
+---
+
+# I. Search Management
+
+## Features
+
+* Search indexing
+* Ranking rules
+* Synonym management
+* Query analytics
+* Search failure reports
+* AI semantic tuning
+
+---
+
+# J. Community Moderation
+
+## Features
+
+* Comment moderation
+* Spam filtering
+* Toxicity detection
+* Abuse reports
+* User reports
+* Content removal
+
+---
+
+# K. AI Management Panel
+
+## Features
+
+* AI translation approval
+* AI tagging management
+* Recommendation tuning
+* Prompt management
+* AI moderation settings
+
+---
+
+# L. Event Management
+
+## Features
+
+* Event creation
+* Ticketing
+* Seating management
+* QR tickets
+* Live streaming setup
+* RSVP management
+
+---
+
+# M. Homepage Management
+
+## Features
+
+* Dynamic sections
+* Banner scheduling
+* Featured collections
+* Drag-and-drop layout builder
+
+---
+
+# N. Notification Management
+
+## Features
+
+* Push campaigns
+* Email campaigns
+* SMS campaigns
+* User segmentation
+* Scheduled notifications
+
+---
+
+# O. Advertisement Management
+
+## Features
+
+* Banner ads
+* Native ads
+* Video ads
+* Sponsored content
+* Campaign analytics
+
+---
+
+# P. SEO Management
+
+## Features
+
+* Meta titles
+* Meta descriptions
+* Slug management
+* Canonical URLs
+* Schema markup
+* Sitemap generation
+
+---
+
+# Q. Analytics & Reporting
+
+## Reports
+
+* Revenue reports
+* Content analytics
+* User retention
+* Listening analytics
+* Watch analytics
+* Search trends
+* Subscription analytics
+
+## Export
+
+* CSV
+* Excel
+* PDF
+
+---
+
+# R. Subscription & Billing Management
+
+## Features
+
+* Subscription plans
+* Coupon management
+* Invoices
+* Refunds
+* Payment history
+* Tax management
+
+---
+
+# S. API Management
+
+## Features
+
+* API keys
+* Rate limits
+* Webhooks
+* Usage analytics
+* API logs
+
+---
+
+# T. Security & Audit System
+
+## Features
+
+* Audit logs
+* Admin action tracking
+* Role permissions
+* IP restrictions
+* 2FA enforcement
+* Security alerts
+
+---
+
+# U. Backup & DevOps
+
+## Features
+
+* Automated backups
+* Manual restore
+* CI/CD integration
+* Error tracking
+* Log monitoring
+* CDN monitoring
+
+---
+
+# 6. Technical Requirements
+
+# Frontend Stack
+
+## Web
+
+* React, vite
+* Tailwind CSS
+* Redux/Zustand
+
+## Mobile
+
+* Flutter OR React Native
+
+---
+
+# Backend Stack
+
+## Recommended
+
+* Node.js (NestJS)
+
+
+---
+
+# Database
+
+## Primary Database
+
+* Mongodb
+
+## Search Engine
+
+* Elasticsearch/OpenSearch
+
+## Cache
+
+* Redis
+
+---
+
+# Media Infrastructure
+
+## Storage, Cludinary
+
+* AWS S3
+* Cloudflare R2
+
+## CDN
+
+* Cloudflare CDN
+* AWS CloudFront
+
+## Streaming
+
+* HLS streaming
+* DASH streaming
+
+---
+
+# AI Infrastructure
+
+## Services
+
+* OpenAI APIs
+* HuggingFace
+* Urdu NLP models
+* Speech-to-text
+* Text-to-speech
+
+---
+
+# 7. API Requirements
+
+# Public APIs
+
+* Poetry API
+* Poet API
+* Search API
+* Dictionary API
+* Event API
+
+# Internal APIs
+
+* CMS APIs
+* Analytics APIs
+* Recommendation APIs
+* Moderation APIs
+
+---
+
+# 8. Database Entities
+
+## Core Tables
+
+* Users
+* Roles
+* Poems
+* Poets
+* Genres
+* Tags
+* Books
+* Audio
+* Videos
+* Comments
+* Likes
+* Followers
+* Collections
+* Events
+* Notifications
+* Subscriptions
+* Transactions
+* DictionaryWords
+
+---
+
+# 9. UI/UX Requirements
+
+## Design Goals
+
+* Elegant literary design
+* Premium visual identity
+* Smooth animations
+* Clean typography
+* Urdu-first experience
+
+## Accessibility
+
+* Keyboard navigation
+* Screen reader support
+* Adjustable fonts
+* High contrast mode
+
+---
+
+# 10. Performance Requirements
+
+## Targets
+
+* Page load < 2 seconds
+* API response < 300ms
+* Global CDN delivery
+* 99.9% uptime
+
+---
+
+# 11. Security Requirements
+
+## Features
+
+* HTTPS everywhere
+* Encryption at rest
+* Rate limiting
+* DDoS protection
+* Anti-scraping
+* DRM for premium content
+* Secure payment processing
+
+---
+
+# 12. Scalability Requirements
+
+## Must Support
+
+* Millions of poems
+* Millions of users
+* Heavy concurrent streaming
+* Large-scale search indexing
+
+---
+
+# 13. Future Roadmap Features
+
+## Future AI Features
+
+* AI Mushaira host
+* AI Urdu tutor
+* AI poetry generator
+* AI voice cloning
+* AI live translation
+
+## Future Platform Features
+
+* Smart TV app
+* Wearable integration
+* AR poetry experiences
+* NFT poetry collectibles
+
+---
+
+# 14. Recommended Development Phases
+
+## Phase 1 — MVP
+
+* Authentication
+* Poetry CMS
+* Poet pages
+* Search system
+* Basic mobile app
+
+## Phase 2
+
+* Audio/video streaming
+* Ebook reader
+* Dictionary
+* Premium subscriptions
+
+## Phase 3
+
+* AI features
+* Social features
+* Community tools
+* Events system
+
+## Phase 4
+
+* Creator monetization
+* AI learning system
+* Large-scale personalization
+* Global scaling
+
+---
+
+# 15. Recommended Pages Structure
+
+# Public Pages
+
+* Home
+* Explore
+* Poetry
+* Poets
+* Audio
+* Videos
+* Ebooks
+* Dictionary
+* Learning
+* Events
+* Blog
+* About
+
+# User Pages
+
+* Profile
+* Favorites
+* History
+* Downloads
+* Notifications
+* Subscription
+
+# Creator Pages
+
+* Creator dashboard
+* Revenue
+* Uploads
+* Analytics
+
+# Admin Pages
+
+* Dashboard
+* Users
+* Poetry CMS
+* Audio CMS
+* Video CMS
+* Ebooks
+* Dictionary
+* Search
+* Analytics
+* Notifications
+* Moderation
+* Settings
+
+---
+
+# 16. Recommended Architecture
+
+## Architecture Style
+
+* Microservices architecture
+* Event-driven services
+* API Gateway
+* Queue system
+* CDN-first media delivery
+
+## Infrastructure
+
+* Docker
+* Kubernetes
+* AWS/GCP
+* CI/CD pipelines
+* Monitoring stack
+
+---
+
+# 17. Recommended Third-Party Integrations
+
+## Authentication
+
+* Firebase Auth
+* Auth0
+
+## Payments
+
+* Razorpay
+* Stripe
+* PayPal
+
+## Notifications
+
+* Firebase Cloud Messaging
+* OneSignal
+* Twilio
+
+## Analytics
+
+* Google Analytics
+* Mixpanel
+* Amplitude
+
+## Error Tracking
+
+* Sentry
+* Datadog
+
+---
+
+# 18. Success Metrics
+
+## KPIs
+
+* Daily active users
+* Monthly active users
+* Average reading time
+* Listening hours
+* Subscription conversion
+* Retention rate
+* Community engagement
+* Search success rate
+
+---
+
+
+
+# 20. Additional Advanced Product Requirements
+
+# A. Multi-Language System Requirements
+
+## Default Language
+
+* Frontend default language must be English
+* Users can switch language anytime
+* Remember selected language using cookies/local storage/user profile
+
+## Supported Languages
+
+* English
+* Hindi
+* Urdu (RTL)
+
+## Internationalization Features
+
+* Full i18n architecture
+* Dynamic translation loading
+* RTL/LTR switching
+* Multi-language SEO URLs
+* Multi-language metadata
+* Multi-language slugs
+* Multi-language breadcrumbs
+* Multi-language sitemap generation
+
+## Urdu RTL Requirements
+
+* Complete RTL support
+* Urdu Nastaliq fonts
+* RTL layout mirroring
+* RTL menus/forms
+* RTL typography optimization
+
+---
+
+# B. Suggested Reads System
+
+## Requirement
+
+Every detail page must contain:
+
+* Suggested Reads by Zauq App
+* Similar content grouping
+* AI recommendations
+* Trending related content
+
+## Pages Supporting Suggested Reads
+
+* Poetry detail page
+* Author detail page
+* Blog detail page
+* Book detail page
+* Audio detail page
+* Video detail page
+* Event detail page
+
+## Suggested Content Types
+
+* Similar poems
+* Similar authors
+* Related books
+* Related audio
+* Related videos
+* Related blogs
+* Same genre recommendations
+* Same mood recommendations
+
+## Recommendation Logic
+
+* Same category
+* Same tags
+* Same author
+* Same mood
+* User behavior tracking
+* AI semantic recommendations
+
+---
+
+# C. Advertisement System Requirements
+
+## Ad Support Areas
+
+* Homepage banners
+* Sidebar ads
+* Inline poetry ads
+* Suggested reads ads
+* Video ads
+* Audio ads
+* Blog ads
+* Ebook ads
+* Popup campaigns
+* Sticky footer ads
+
+## Admin Controlled Ads
+
+Admin can:
+
+* Enable/disable ads
+* Schedule campaigns
+* Add Google AdSense
+* Add custom HTML ads
+* Add affiliate banners
+* Add native ads
+* Add sponsored content
+
+## Ad Placement Controls
+
+* Position selection
+* Device targeting
+* Geo targeting
+* Language targeting
+* Frequency capping
+
+---
+
+# D. Home Page Redesign Requirements
+
+## Modern Homepage Layout
+
+* Large hero section
+* Mega menu navigation
+* Trending slider
+* Literary categories
+* Featured authors
+* New releases
+* AI recommendations
+* Editor picks
+* Daily quote section
+* Popular books section
+* Audio/video highlights
+* Community feed
+* Blog highlights
+* Event promotions
+* Premium CTA sections
+
+## Mega Menu Requirements
+
+### Poetry Menu
+
+* Ghazals
+* Nazms
+* Sher
+* Doha
+* Rubai
+* Rekhti
+* Categories
+
+### Authors Menu
+
+* Classical poets
+* Modern poets
+* Trending authors
+* Female poets
+* Regional poets
+
+### Books Menu
+
+* Rare books
+* Journals
+* Magazines
+* Collections
+
+### Media Menu
+
+* Audio
+* Videos
+* Mushaira
+* Podcasts
+
+### Learning Menu
+
+* Urdu learning
+* Courses
+* Literary articles
+* Workshops
+
+---
+
+# E. React 20 Compatibility Requirements
+
+## Frontend Requirements
+
+The platform must support:
+
+* React 20+
+* Next.js latest stable version
+* Server Components
+* Streaming SSR
+* Suspense architecture
+* App Router
+* Edge rendering
+
+## UI Architecture
+
+* Component-driven architecture
+* Atomic design system
+* Shared UI library
+* Theme engine
+* Dynamic layouts
+
+---
+
+# F. Dynamic Sitemap Requirements
+
+## Features
+
+* Automatic sitemap generation
+* Multi-language sitemap
+* Dynamic URL indexing
+* Blog sitemap
+* Poetry sitemap
+* Author sitemap
+* Book sitemap
+* Video sitemap
+* Audio sitemap
+* Image sitemap
+* News sitemap
+
+## SEO Features
+
+* Auto ping Google/Bing
+* Canonical support
+* Structured data generation
+
+---
+
+# G. Blog System Requirements
+
+# Blog Features
+
+## Blog CMS
+
+* Rich blog editor
+* Multi-image upload
+* Drag-drop editor
+* Markdown support
+* Rich text formatting
+* AI writing assistance
+* SEO optimization
+
+## Media Support
+
+* Multiple image galleries
+* YouTube embed support
+* Vimeo support
+* Audio embedding
+* Tweet embedding
+
+## Blog Categories
+
+* Literary articles
+* Urdu learning
+* Poet biographies
+* Event coverage
+* Reviews
+* Interviews
+* Culture
+* History
+
+## Blog Listing Features
+
+* Grid view
+* List view
+* Masonry layout
+* Infinite scroll
+* Category filters
+* Tag filters
+* Search
+
+## Blog Detail Page
+
+* Author info
+* Reading time
+* Share tools
+* Comments
+* Similar blogs
+* Related tags
+* Suggested reads
+* Sticky TOC
+* Image galleries
+
+## Similar Blog Grouping
+
+System should automatically show:
+
+* Related blogs
+* Same category blogs
+* Same tag blogs
+* Same author blogs
+
+---
+
+# H. Advanced Author Management Requirements
+
+## Author Profile Features
+
+Admin can add:
+
+* Multiple author images
+* Cover images
+* Author gallery
+* Author videos
+* Author audios
+* YouTube videos
+* Biography timeline
+* Literary milestones
+* Awards
+* Social profiles
+* Interviews
+* Quotes
+
+## Timeline System
+
+* Birth/death timeline
+* Literary journey
+* Major publications
+* Awards/events
+* Dynamic timeline UI
+
+## Similar Author Grouping
+
+* Similar authors
+* Same era authors
+* Same genre authors
+* AI-based author recommendations
+
+---
+
+# I. Book Management Advanced Requirements
+
+## Book Features
+
+Admin can add:
+
+* Multiple book images
+* Preview pages
+* PDFs
+* EPUB files
+* Audio narration
+* Book trailers
+* YouTube videos
+* Author references
+* Tags/categories
+
+## Book Detail Page
+
+* Book gallery
+* Preview reader
+* Similar books
+* Related books
+* Same author books
+* Audio versions
+* Reviews/ratings
+* Download options
+
+## Similar Book Grouping
+
+Automatic related grouping based on:
+
+* Genre
+* Author
+* Tags
+* Reading behavior
+* AI recommendations
+
+---
+
+# J. Audio Management Advanced Requirements
+
+## Audio Detail Page
+
+* Audio cover gallery
+* Lyrics/transcript
+* Related audios
+* Similar narrations
+* Suggested playlists
+* Download support
+
+## Audio Categories
+
+* Ghazals
+* Podcasts
+* Audiobooks
+* Mushaira recordings
+* Narrations
+
+---
+
+# K. Video Management Advanced Requirements
+
+## Video Features
+
+Admin can add:
+
+* YouTube videos
+* Vimeo videos
+* Self-hosted videos
+* Video playlists
+* Video thumbnails
+* Multiple resolutions
+
+## Video Detail Page
+
+* Similar videos
+* Suggested videos
+* Related authors
+* Related books
+* Playlist recommendations
+
+---
+
+# L. Seed Data & Development Requirements
+
+## Seed System
+
+Project must support:
+
+npm run seed
+
+## Seed Requirements
+
+Seed should automatically create:
+
+### Admin Accounts
+
+* Super Admin
+* Content Admin
+* Moderator
+* Editor
+
+### Demo User Accounts
+
+* Normal users
+* Premium users
+* Author accounts
+
+### Dummy Content
+
+* Poems
+* Authors
+* Books
+* Blogs
+* Audio
+* Videos
+* Categories
+* Tags
+* Comments
+* Notifications
+* Events
+* Advertisements
+
+### Demo Media
+
+* Sample images
+* Sample audio
+* Sample videos
+* Sample PDFs
+
+## Development Utilities
+
+* Database reset script
+* Seeder reset
+* Fake AI content generator
+* Demo multilingual data
+
+---
+
+# M. Advanced Editor Requirements
+
+## Rich Editor Features
+
+Editor should support:
+
+* Rich text formatting
+* Multi-image drag/drop
+* Image resizing
+* Video embedding
+* YouTube embedding
+* Tables
+* Code blocks
+* Urdu typing support
+* RTL support
+* AI writing assistant
+* Auto-save drafts
+* SEO fields
+* Internal linking
+
+## Recommended Editors
+
+* TipTap
+* Lexical
+* CKEditor 5
+* TinyMCE
+
+---
+
+# N. Voice Reading & Reading Time System Requirements
+
+# Voice Reading System
+
+## Features
+
+All readable content should support:
+
+* Voice narration
+* Text-to-speech (TTS)
+* AI narration
+* Human narration uploads
+* Background playback
+* Playback speed control
+* Voice selection
+* Pause/resume
+* Paragraph highlighting while reading
+* Continue listening
+* Offline narration downloads
+
+## Supported Pages
+
+* Poetry detail pages
+* Blog detail pages
+* Book pages
+* Learning articles
+* Dictionary entries
+* Author biographies
+
+## Blog Voice Reading Features
+
+* Full article narration
+* Auto-scroll during playback
+* Highlight currently spoken paragraph
+* Mini floating audio player
+* Podcast mode
+
+## AI Voice Features
+
+* Urdu voice narration
+* Hindi voice narration
+* English voice narration
+* Male/female voice options
+* Emotion-aware narration
+* Natural voice generation
+
+## Text-to-Speech Providers
+
+Recommended support:
+
+* OpenAI TTS
+* ElevenLabs
+* Google Cloud TTS
+* Azure Speech Services
+
+---
+
+# O. Approximate Reading Time System
+
+## Features
+
+Every readable content page should display:
+
+* Approximate reading time
+* Approximate listening time
+* Word count
+* Listening duration
+
+## Supported Pages
+
+* Blogs
+* Poems
+* Books
+* Learning articles
+* Author biographies
+
+## Reading Time Logic
+
+* Calculate based on average reading speed
+* Separate logic for Urdu/Hindi/English
+* Update dynamically after edits
+
+## Example UI
+
+* 3 min read
+* 12 min listen
+* 1,240 words
+
+## Advanced Features
+
+* Personalized reading speed estimation
+* Remaining reading time
+* Reading progress tracking
+* Resume reading position
+
+---
+
+# P. Similar Content Engine
+
+## Requirement
+
+Every detail page should contain:
+
+* Similar content section
+* Suggested reads section
+* Trending recommendations
+* AI recommendations
+
+## Supported Detail Pages
+
+* Poetry details
+* Blog details
+* Author details
+* Audio details
+* Video details
+* Book details
+* Event details
+
+---
+
+# Q. Advanced Multi-Media Content Support Requirements
+
+# Multi-Image Upload Support
+
+## Supported Modules
+
+The following modules must support multiple image uploads:
+
+* Books
+* Authors
+* Blogs
+* Audio
+* Videos
+* Events
+* Poetry collections
+* User galleries
+
+## Gallery Features
+
+* Drag-and-drop upload
+* Image sorting/reordering
+* Featured image selection
+* Automatic compression
+* WebP conversion
+* Responsive image generation
+* Lazy loading
+* Lightbox gallery viewer
+* Masonry/grid gallery layouts
+
+---
+
+# R. PDF & Ebook Reading Requirements
+
+# PDF Support
+
+## Features
+
+* PDF upload
+* Secure PDF streaming
+* PDF preview mode
+* Download controls
+* DRM protection
+* Watermarking
+* Multi-language PDF support
+
+## Reading Features
+
+* Continue reading from last page
+* Remember reading position automatically
+* Resume reading across devices
+* Reading history tracking
+* Reading progress percentage
+* Bookmark pages
+* Notes/highlights
+* Fullscreen mode
+* Zoom controls
+* Night mode
+* Search inside PDF
+
+## Sync Features
+
+* Cloud synced reading progress
+* Sync bookmarks
+* Sync notes
+
+---
+
+# S. Flipbook Reading Experience Requirements
+
+# Flipbook Features
+
+The platform should support immersive Flipbook reading experiences.
+
+## Reader Modes
+
+* Horizontal swipe reading
+* Realistic page flip animation
+* Single page mode
+* Double page mode
+* Mobile swipe navigation
+* Keyboard navigation
+* Auto page turning
+
+## Supported Devices
+
+* Desktop
+* Tablet
+* Mobile
+* Smart TV (future)
+
+## Advanced Reader Features
+
+* Remember last read page
+* Reading progress bar
+* Continue reading popup
+* Smooth page transition
+* Gesture support
+* Pinch-to-zoom
+* Audio narration sync
+
+## Technologies
+
+Recommended support:
+
+* PDF.js
+* React PageFlip
+* Turn.js
+* Custom Canvas/WebGL rendering
+
+---
+
+# T. Multimedia Content Support
+
+# Video Support
+
+## Video Sources
+
+* Self-hosted videos
+* YouTube links
+* Vimeo videos
+* Embedded external videos
+* Live stream recordings
+
+## Video Features
+
+* Adaptive streaming
+* Captions/subtitles
+* Continue watching
+* Watch history
+* Similar videos
+* Playlist support
+* Video chapters
+* Mini player mode
+
+---
+
+# Audio Support
+
+## Audio Sources
+
+* MP3 uploads
+* Audiobooks
+* Podcasts
+* Narrations
+* Streaming audio
+
+## Audio Features
+
+* Continue listening
+* Playlist support
+* Offline downloads
+* Playback speed
+* Sleep timer
+* Background playback
+* Waveform visualization
+
+---
+
+# YouTube Integration Requirements
+
+## Features
+
+Admin should be able to:
+
+* Add YouTube links
+* Create YouTube playlists
+* Embed YouTube videos
+* Import thumbnails automatically
+* Sync metadata
+* Group videos by category
+
+## Supported Modules
+
+* Blogs
+* Authors
+* Books
+* Videos
+* Learning courses
+* Events
+
+## YouTube Detail Features
+
+* Related YouTube videos
+* Suggested content
+* Channel linking
+* Playlist recommendations
+
+---
+
+# U. Complete Media Relationships
+
+## Relationships Supported
+
+* Author → Books
+* Author → Videos
+* Author → Audio
+* Author → Blogs
+* Author → Events
+* Book → Author
+* Book → Audio
+* Book → Videos
+* Blog → Related books
+* Audio → Related poetry
+* Video → Related poetry
+
+---
+
+# 20. Final Product Vision
+
+Zauq should become:
+
+* The largest Urdu literary ecosystem
+* A modern digital Mushaira platform
+* A social literary network
+* An AI-powered Urdu learning system
+* A creator economy for poets and narrators
+* A global cultural preservation platform  .divide this project into 3 phase and provide me roadmap and work flow of each modules-and its functionality how Admin and frontend integrate, its module admin preview full details with frontend preview
