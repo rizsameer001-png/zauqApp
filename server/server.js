@@ -294,6 +294,7 @@ import uploadRoutes from './routes/upload.routes.js';
 import settingsRoutes from './routes/settings.routes.js';
 import publicSettingsRoutes from './routes/publicSettings.routes.js';
 import aiRoutes from './routes/aiRoutes.js';
+import transliterationRoutes from './routes/transliterationRoutes.js';
 
 //dotenv.config();
 
@@ -384,6 +385,7 @@ app.use('/api/upload', uploadRoutes); // Upload routes
 app.use('/api/admin/settings', settingsRoutes);
 app.use('/api/settings', publicSettingsRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/transliteration', transliterationRoutes);
 
 // ============================================
 // Health Checks
