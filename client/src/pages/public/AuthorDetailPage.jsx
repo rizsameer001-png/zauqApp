@@ -2516,11 +2516,899 @@
 
 
 
+// // client/src/pages/public/AuthorDetailPage.jsx
+// import React, { useState } from 'react'
+// import { useParams, Link, useNavigate } from 'react-router-dom'
+// import { useTranslation } from 'react-i18next'
+// import { motion } from 'framer-motion'
+// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+// import { useSelector } from 'react-redux'
+// import toast from 'react-hot-toast'
+// import {
+//   Heart, Share2, BookOpen, Calendar, MapPin, Users,
+//   ChevronLeft, Clock, Play, Grid, List, Loader2,
+//   AlertCircle, UserPlus, UserCheck, Eye, Music, Video,
+//   Quote, Image as ImageIcon, Twitter, Facebook, Instagram,
+//   Youtube, Globe, ExternalLink, BookMarked, Headphones, Download
+// } from 'lucide-react'
+// import authorAPI from '../../api/authorAPI'
+// import userAPI from '../../api/userAPI'
+
+// const AuthorDetailPage = () => {
+//   const { slug } = useParams()
+//   const navigate = useNavigate()
+//   const { t } = useTranslation()
+//   const queryClient = useQueryClient()
+//   const { user } = useSelector(state => state.auth)
+  
+//   const [activeTab, setActiveTab] = useState('works')
+//   const [viewMode, setViewMode] = useState('grid')
+//   const [poemsPage, setPoemsPage] = useState(1)
+//   const [booksPage, setBooksPage] = useState(1)
+
+//   // Fetch author data using slug
+//   const { 
+//     data: authorData, 
+//     isLoading: authorLoading, 
+//     error: authorError 
+//   } = useQuery({
+//     queryKey: ['author', slug],
+//     queryFn: () => authorAPI.getAuthor(slug),
+//     enabled: !!slug,
+//     retry: 1
+//   })
+
+//   const author = authorData?.data || authorData
+
+//   // ============================================
+//   // FETCH AUTHOR CONTENT USING SLUG
+//   // ============================================
+  
+//   const { 
+//     data: poemsResponse, 
+//     isLoading: poemsLoading 
+//   } = useQuery({
+//     queryKey: ['author-poems', slug, poemsPage],
+//     queryFn: () => authorAPI.getAuthorPoems(slug, { page: poemsPage, limit: 12 }),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: booksResponse, 
+//     isLoading: booksLoading 
+//   } = useQuery({
+//     queryKey: ['author-books', slug, booksPage],
+//     queryFn: () => authorAPI.getAuthorBooks(slug, { page: booksPage, limit: 8 }),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: audioResponse, 
+//     isLoading: audioLoading 
+//   } = useQuery({
+//     queryKey: ['author-audio', slug],
+//     queryFn: () => authorAPI.getAuthorAudio(slug, { limit: 6 }),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: videosResponse, 
+//     isLoading: videosLoading 
+//   } = useQuery({
+//     queryKey: ['author-videos', slug],
+//     queryFn: () => authorAPI.getAuthorVideos(slug, { limit: 6 }),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: timelineResponse, 
+//     isLoading: timelineLoading 
+//   } = useQuery({
+//     queryKey: ['author-timeline', slug],
+//     queryFn: () => authorAPI.getAuthorTimeline(slug),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: galleryResponse, 
+//     isLoading: galleryLoading 
+//   } = useQuery({
+//     queryKey: ['author-gallery', slug],
+//     queryFn: () => authorAPI.getAuthorGallery(slug),
+//     enabled: !!slug
+//   })
+
+//   const { 
+//     data: quotesResponse, 
+//     isLoading: quotesLoading 
+//   } = useQuery({
+//     queryKey: ['author-quotes', slug],
+//     queryFn: () => authorAPI.getAuthorQuotes(slug),
+//     enabled: !!slug
+//   })
+
+//   // Extract data from responses
+//   const extractData = (response, defaultValue = []) => {
+//     if (!response) return defaultValue
+//     if (response.data?.data) return response.data.data
+//     if (response.data) return response.data
+//     if (Array.isArray(response)) return response
+//     if (response.data && Array.isArray(response.data)) return response.data
+//     return defaultValue
+//   }
+
+//   const extractPagination = (response) => {
+//     if (!response) return { page: 1, totalPages: 1, total: 0 }
+//     if (response.data?.pagination) return response.data.pagination
+//     if (response.pagination) return response.pagination
+//     return { page: 1, totalPages: 1, total: 0 }
+//   }
+
+//   const poems = extractData(poemsResponse, [])
+//   const poemsPagination = extractPagination(poemsResponse)
+  
+//   const books = extractData(booksResponse, [])
+//   const booksPagination = extractPagination(booksResponse)
+  
+//   const audioItems = extractData(audioResponse, [])
+//   const videos = extractData(videosResponse, [])
+//   const timeline = extractData(timelineResponse, [])
+//   const gallery = extractData(galleryResponse, [])
+//   const quotes = extractData(quotesResponse, [])
+
+//   const socialLinks = author?.socialLinks || {}
+
+//   // Follow mutation
+//   const followMutation = useMutation({
+//     mutationFn: () => userAPI.followAuthor(author?._id),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(['author', slug])
+//       toast.success(`Now following ${author?.name}`)
+//     },
+//     onError: () => toast.error('Failed to follow author')
+//   })
+
+//   const unfollowMutation = useMutation({
+//     mutationFn: () => userAPI.unfollowAuthor(author?._id),
+//     onSuccess: () => {
+//       queryClient.invalidateQueries(['author', slug])
+//       toast.success(`Unfollowed ${author?.name}`)
+//     },
+//     onError: () => toast.error('Failed to unfollow author')
+//   })
+
+//   const isFollowing = user?.following?.includes(author?._id) || false
+
+//   const handleFollowToggle = () => {
+//     if (!user) {
+//       toast.error('Please login to follow authors')
+//       navigate('/login')
+//       return
+//     }
+//     if (isFollowing) {
+//       unfollowMutation.mutate()
+//     } else {
+//       followMutation.mutate()
+//     }
+//   }
+
+//   const handleShare = async () => {
+//     const url = window.location.href
+//     try {
+//       await navigator.clipboard.writeText(url)
+//       toast.success('Link copied to clipboard!')
+//     } catch (err) {
+//       toast.error('Failed to copy link')
+//     }
+//   }
+
+//   const formatDuration = (seconds) => {
+//     if (!seconds) return 'N/A'
+//     const mins = Math.floor(seconds / 60)
+//     const secs = seconds % 60
+//     return `${mins}:${secs.toString().padStart(2, '0')}`
+//   }
+
+//   // ALL TABS - always show, even with 0 count
+//   const tabs = [
+//     { id: 'works', label: 'Poems', icon: BookOpen },
+//     { id: 'books', label: 'Books', icon: BookMarked },
+//     { id: 'audio', label: 'Audio', icon: Headphones },
+//     { id: 'videos', label: 'Videos', icon: Video },
+//     { id: 'timeline', label: 'Timeline', icon: Calendar },
+//     { id: 'gallery', label: 'Gallery', icon: ImageIcon },
+//     { id: 'quotes', label: 'Quotes', icon: Quote }
+//   ]
+
+//   // Loading state
+//   if (authorLoading) {
+//     return (
+//       <div className="min-h-screen pt-20 pb-16 bg-gray-50 flex items-center justify-center">
+//         <div className="text-center">
+//           <Loader2 className="h-12 w-12 animate-spin text-primary-600 mx-auto mb-4" />
+//           <p className="text-gray-500">Loading author...</p>
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   // Error state
+//   if (authorError || !author) {
+//     return (
+//       <div className="min-h-screen pt-20 pb-16 bg-gray-50">
+//         <div className="max-w-4xl mx-auto px-4 text-center">
+//           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+//           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author Not Found</h1>
+//           <p className="text-gray-500 mb-6">The author you are looking for does not exist.</p>
+//           <Link to="/authors" className="btn-primary inline-flex items-center space-x-2">
+//             <ChevronLeft className="h-4 w-4" />
+//             <span>Browse All Authors</span>
+//           </Link>
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   // ============================================
+//   // RENDER FUNCTIONS WITH EMPTY STATES
+//   // ============================================
+
+//   const EmptyState = ({ icon: Icon, title, message }) => (
+//     <div className="text-center py-16 bg-gray-50 rounded-xl">
+//       <Icon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+//       <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
+//       <p className="text-gray-500">{message}</p>
+//     </div>
+//   )
+
+//   const renderWorks = () => {
+//     if (poemsLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (poems.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={BookOpen}
+//           title="No Poems Yet"
+//           message="Poems by this author will appear here once added."
+//         />
+//       )
+//     }
+
+//     return (
+//       <>
+//         <div className="flex justify-between items-center mb-4">
+//           <h3 className="font-semibold text-gray-900">
+//             Poems ({poemsPagination.total || poems.length})
+//           </h3>
+//           <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+//             <button
+//               onClick={() => setViewMode('grid')}
+//               className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <Grid className="h-4 w-4" />
+//             </button>
+//             <button
+//               onClick={() => setViewMode('list')}
+//               className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+//             >
+//               <List className="h-4 w-4" />
+//             </button>
+//           </div>
+//         </div>
+        
+//         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+//           {poems.map((poem) => (
+//             <Link
+//               key={poem._id}
+//               to={`/poem/${poem.slug}`}
+//               className="card p-4 hover:shadow-md transition-all hover:-translate-y-0.5 group"
+//             >
+//               <div className="flex-1">
+//                 <h4 className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+//                   {poem.title}
+//                 </h4>
+//                 {poem.contentUrdu && (
+//                   <p className="urdu-text text-sm text-gray-500 line-clamp-1 mt-1" dir="rtl">
+//                     {poem.contentUrdu.substring(0, 50)}...
+//                   </p>
+//                 )}
+//                 <div className="flex flex-wrap items-center gap-3 mt-2">
+//                   <span className="text-xs text-gray-500 capitalize px-2 py-0.5 bg-gray-100 rounded-full">
+//                     {poem.genre}
+//                   </span>
+//                   <div className="flex items-center gap-2 text-xs text-gray-400">
+//                     <span className="flex items-center gap-1">
+//                       <Eye className="h-3 w-3" />
+//                       {poem.stats?.views?.toLocaleString() || 0}
+//                     </span>
+//                     <span className="flex items-center gap-1">
+//                       <Heart className="h-3 w-3" />
+//                       {poem.stats?.likes?.toLocaleString() || 0}
+//                     </span>
+//                   </div>
+//                 </div>
+//               </div>
+//             </Link>
+//           ))}
+//         </div>
+
+//         {poemsPagination.totalPages > 1 && (
+//           <div className="flex justify-center gap-2 mt-6">
+//             <button
+//               onClick={() => setPoemsPage(p => Math.max(1, p - 1))}
+//               disabled={poemsPage === 1}
+//               className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+//             >
+//               Previous
+//             </button>
+//             <span className="px-3 py-1 text-sm text-gray-600">
+//               {poemsPage} / {poemsPagination.totalPages}
+//             </span>
+//             <button
+//               onClick={() => setPoemsPage(p => Math.min(poemsPagination.totalPages, p + 1))}
+//               disabled={poemsPage === poemsPagination.totalPages}
+//               className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+//             >
+//               Next
+//             </button>
+//           </div>
+//         )}
+//       </>
+//     )
+//   }
+
+//   const renderBooks = () => {
+//     if (booksLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (books.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={BookMarked}
+//           title="No Books Available"
+//           message="Books by this author will appear here once added."
+//         />
+//       )
+//     }
+
+//     return (
+//       <>
+//         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//           {books.map((book) => (
+//             <Link
+//               key={book._id}
+//               to={`/book/${book.slug}`}
+//               className="card p-4 hover:shadow-md transition-all hover:-translate-y-0.5"
+//             >
+//               {book.coverImage && (
+//                 <img 
+//                   src={book.coverImage} 
+//                   alt={book.title}
+//                   className="w-full h-40 object-cover rounded-lg mb-3"
+//                 />
+//               )}
+//               <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
+//               <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+//               <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+//                 <span className="capitalize">{book.type}</span>
+//                 <span className="flex items-center gap-1">
+//                   <Eye className="h-3 w-3" />
+//                   {book.stats?.views?.toLocaleString() || 0}
+//                 </span>
+//                 <span className="flex items-center gap-1">
+//                   <Download className="h-3 w-3" />
+//                   {book.stats?.downloads?.toLocaleString() || 0}
+//                 </span>
+//               </div>
+//             </Link>
+//           ))}
+//         </div>
+
+//         {booksPagination.totalPages > 1 && (
+//           <div className="flex justify-center gap-2 mt-6">
+//             <button
+//               onClick={() => setBooksPage(p => Math.max(1, p - 1))}
+//               disabled={booksPage === 1}
+//               className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+//             >
+//               Previous
+//             </button>
+//             <span className="px-3 py-1 text-sm text-gray-600">
+//               {booksPage} / {booksPagination.totalPages}
+//             </span>
+//             <button
+//               onClick={() => setBooksPage(p => Math.min(booksPagination.totalPages, p + 1))}
+//               disabled={booksPage === booksPagination.totalPages}
+//               className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+//             >
+//               Next
+//             </button>
+//           </div>
+//         )}
+//       </>
+//     )
+//   }
+
+//   const renderAudio = () => {
+//     if (audioLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (audioItems.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={Headphones}
+//           title="No Audio Content"
+//           message="Audio recordings will appear here once added."
+//         />
+//       )
+//     }
+
+//     return (
+//       <div className="space-y-3">
+//         {audioItems.map((audio) => (
+//           <Link
+//             key={audio._id}
+//             to={`/audio/${audio.slug}`}
+//             className="card p-4 hover:shadow-md transition-all flex items-center gap-4"
+//           >
+//             <div className="w-12 h-12 bg-primary-50 rounded-lg flex items-center justify-center">
+//               <Play className="h-6 w-6 text-primary-600" />
+//             </div>
+//             <div className="flex-1">
+//               <h4 className="font-medium text-gray-900">{audio.title}</h4>
+//               <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+//             </div>
+//             <div className="text-sm text-gray-400">
+//               {formatDuration(audio.duration)}
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     )
+//   }
+
+//   const renderVideos = () => {
+//     if (videosLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (videos.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={Video}
+//           title="No Video Content"
+//           message="Videos will appear here once added."
+//         />
+//       )
+//     }
+
+//     return (
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//         {videos.map((video) => (
+//           <Link
+//             key={video._id}
+//             to={`/video/${video.slug}`}
+//             className="card overflow-hidden hover:shadow-md transition-all"
+//           >
+//             <div className="relative h-40 bg-gray-900">
+//               {video.thumbnail ? (
+//                 <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
+//               ) : (
+//                 <div className="absolute inset-0 flex items-center justify-center">
+//                   <Play className="h-12 w-12 text-white/50" />
+//                 </div>
+//               )}
+//             </div>
+//             <div className="p-4">
+//               <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+//               <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+//                 <span className="capitalize">{video.type}</span>
+//                 <span className="flex items-center gap-1">
+//                   <Eye className="h-3 w-3" />
+//                   {video.stats?.views?.toLocaleString() || 0}
+//                 </span>
+//               </div>
+//             </div>
+//           </Link>
+//         ))}
+//       </div>
+//     )
+//   }
+
+//   const renderTimeline = () => {
+//     if (timelineLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (timeline.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={Calendar}
+//           title="No Timeline Events"
+//           message="Important life events will be added to the timeline."
+//         />
+//       )
+//     }
+
+//     return (
+//       <div className="card p-6">
+//         <div className="space-y-6">
+//           {timeline.map((event, index) => (
+//             <div key={index} className="flex items-start space-x-4">
+//               <div className="flex-shrink-0 w-20 text-right">
+//                 <span className="font-bold text-primary-600">{event.year}</span>
+//               </div>
+//               <div className="flex-shrink-0 w-3 h-3 bg-primary-600 rounded-full mt-1.5" />
+//               <div className="flex-1 pb-6 border-l-2 border-gray-200 pl-4 -ml-1.5">
+//                 <p className="text-gray-700 font-medium">{event.event}</p>
+//                 {event.description && (
+//                   <p className="text-sm text-gray-500 mt-1">{event.description}</p>
+//                 )}
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   const renderGallery = () => {
+//     if (galleryLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (gallery.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={ImageIcon}
+//           title="No Gallery Images"
+//           message="Images will appear here once added to the gallery."
+//         />
+//       )
+//     }
+
+//     return (
+//       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+//         {gallery.map((item, index) => (
+//           <div key={index} className="card overflow-hidden hover:shadow-md transition-all cursor-pointer group">
+//             <img 
+//               src={item.url} 
+//               alt={item.caption || `Image ${index + 1}`}
+//               className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+//             />
+//             {item.caption && (
+//               <div className="p-2">
+//                 <p className="text-xs text-gray-500 line-clamp-2">{item.caption}</p>
+//               </div>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     )
+//   }
+
+//   const renderQuotes = () => {
+//     if (quotesLoading) {
+//       return (
+//         <div className="flex justify-center py-12">
+//           <Loader2 className="h-8 w-8 animate-spin text-primary-600" />
+//         </div>
+//       )
+//     }
+
+//     if (quotes.length === 0) {
+//       return (
+//         <EmptyState 
+//           icon={Quote}
+//           title="No Quotes Available"
+//           message="Famous quotes by this author will appear here."
+//         />
+//       )
+//     }
+
+//     return (
+//       <div className="space-y-4">
+//         {quotes.map((quote, index) => (
+//           <div key={index} className="card p-6 border-l-4 border-primary-500">
+//             <p className="text-lg text-gray-700 italic">"{quote.text}"</p>
+//             {quote.source && (
+//               <p className="text-sm text-gray-500 mt-2">— {quote.source}</p>
+//             )}
+//           </div>
+//         ))}
+//       </div>
+//     )
+//   }
+
+//   const renderSocialLinks = () => {
+//     const hasSocialLinks = Object.values(socialLinks).some(v => v)
+    
+//     if (!hasSocialLinks) return null
+
+//     return (
+//       <div className="mt-6 pt-6 border-t border-gray-200">
+//         <h3 className="font-semibold text-gray-900 mb-3">Connect</h3>
+//         <div className="flex flex-wrap gap-3">
+//           {socialLinks.website && (
+//             <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary-600">
+//               <Globe className="h-4 w-4" /> Website
+//             </a>
+//           )}
+//           {socialLinks.twitter && (
+//             <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-500">
+//               <Twitter className="h-4 w-4" /> Twitter
+//             </a>
+//           )}
+//           {socialLinks.facebook && (
+//             <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-700">
+//               <Facebook className="h-4 w-4" /> Facebook
+//             </a>
+//           )}
+//           {socialLinks.instagram && (
+//             <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-pink-600">
+//               <Instagram className="h-4 w-4" /> Instagram
+//             </a>
+//           )}
+//           {socialLinks.youtube && (
+//             <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600">
+//               <Youtube className="h-4 w-4" /> YouTube
+//             </a>
+//           )}
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <div className="min-h-screen pt-20 pb-16 bg-gray-50">
+//       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+//         {/* Back Link */}
+//         <div className="mb-6">
+//           <Link 
+//             to="/authors" 
+//             className="inline-flex items-center space-x-1 text-sm text-gray-500 hover:text-primary-600 transition-colors"
+//           >
+//             <ChevronLeft className="h-4 w-4" />
+//             <span>Back to Authors</span>
+//           </Link>
+//         </div>
+
+//         {/* Cover & Profile */}
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           className="relative mb-8"
+//         >
+//           <div className="h-48 md:h-64 rounded-xl overflow-hidden">
+//             {author.coverImage ? (
+//               <img src={author.coverImage} alt="" className="w-full h-full object-cover" />
+//             ) : (
+//               <div className="w-full h-full bg-gradient-to-r from-primary-600 to-primary-800" />
+//             )}
+//             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+//           </div>
+//           <div className="relative -mt-16 md:-mt-20 px-6 flex flex-col md:flex-row items-end md:items-center space-y-4 md:space-y-0 md:space-x-6">
+//             <img
+//               src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=128`}
+//               alt={author.name}
+//               className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover bg-white"
+//             />
+//             <div className="flex-1 pb-2">
+//               <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+//                 <div>
+//                   <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{author.name}</h1>
+//                   {author.nameUrdu && (
+//                     <p className="urdu-text text-lg text-gray-600" dir="rtl">{author.nameUrdu}</p>
+//                   )}
+//                   <div className="flex flex-wrap gap-2 mt-1">
+//                     {author.era && (
+//                       <span className="px-2 py-0.5 bg-primary-50 text-primary-700 text-xs rounded-full capitalize">
+//                         {author.era} Era
+//                       </span>
+//                     )}
+//                     {author.isVerified && (
+//                       <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">
+//                         ✓ Verified
+//                       </span>
+//                     )}
+//                   </div>
+//                 </div>
+//                 <div className="flex items-center space-x-3 mt-4 md:mt-0">
+//                   <button
+//                     onClick={handleFollowToggle}
+//                     disabled={followMutation.isPending || unfollowMutation.isPending}
+//                     className={`px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+//                       isFollowing
+//                         ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+//                         : 'bg-primary-600 text-white hover:bg-primary-700'
+//                     }`}
+//                   >
+//                     {isFollowing ? (
+//                       <>
+//                         <UserCheck className="h-4 w-4" />
+//                         <span>Following</span>
+//                       </>
+//                     ) : (
+//                       <>
+//                         <UserPlus className="h-4 w-4" />
+//                         <span>Follow</span>
+//                       </>
+//                     )}
+//                   </button>
+//                   <button 
+//                     onClick={handleShare}
+//                     className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+//                   >
+//                     <Share2 className="h-5 w-5 text-gray-600" />
+//                   </button>
+//                 </div>
+//               </div>
+//             </div>
+//           </div>
+//         </motion.div>
+
+//         {/* Stats */}
+//         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+//           {[
+//             { icon: BookOpen, label: 'Poems', value: author.stats?.poemsCount || 0 },
+//             { icon: BookMarked, label: 'Books', value: author.stats?.booksCount || 0 },
+//             { icon: Users, label: 'Followers', value: (author.stats?.followers || 0).toLocaleString() },
+//             { icon: Eye, label: 'Views', value: (author.stats?.views || 0).toLocaleString() },
+//           ].map((stat, index) => (
+//             <div key={index} className="card p-4 text-center">
+//               <stat.icon className="h-6 w-6 text-primary-600 mx-auto mb-2" />
+//               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+//               <p className="text-sm text-gray-500">{stat.label}</p>
+//             </div>
+//           ))}
+//         </div>
+
+//         {/* Bio & Info */}
+//         <div className="grid md:grid-cols-3 gap-6 mb-8">
+//           <div className="md:col-span-2">
+//             <div className="card p-6">
+//               <h2 className="font-semibold text-gray-900 mb-4">Biography</h2>
+//               <p className="text-gray-700 leading-relaxed whitespace-pre-line">{author.bio}</p>
+//               {author.bioUrdu && (
+//                 <p className="urdu-text text-gray-700 leading-relaxed mt-4" dir="rtl">{author.bioUrdu}</p>
+//               )}
+//               <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
+//                 {author.birthDate && (
+//                   <span className="flex items-center space-x-1 text-sm text-gray-500">
+//                     <Calendar className="h-4 w-4" />
+//                     <span>
+//                       {new Date(author.birthDate).getFullYear()} 
+//                       {author.deathDate && ` - ${new Date(author.deathDate).getFullYear()}`}
+//                     </span>
+//                   </span>
+//                 )}
+//                 {author.birthPlace && (
+//                   <span className="flex items-center space-x-1 text-sm text-gray-500">
+//                     <MapPin className="h-4 w-4" />
+//                     <span>{author.birthPlace}</span>
+//                   </span>
+//                 )}
+//               </div>
+//               {renderSocialLinks()}
+//             </div>
+//           </div>
+//           <div>
+//             <div className="card p-6">
+//               <h3 className="font-semibold text-gray-900 mb-4">Genres</h3>
+//               <div className="flex flex-wrap gap-2">
+//                 {author.genres?.map((genre, index) => (
+//                   <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-sm text-gray-700 capitalize">
+//                     {genre}
+//                   </span>
+//                 ))}
+//                 {(!author.genres || author.genres.length === 0) && (
+//                   <p className="text-gray-500 text-sm">No genres listed</p>
+//                 )}
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Tabs - ALL TABS SHOWN, even with 0 content */}
+//         <div className="flex overflow-x-auto scrollbar-hide gap-1 mb-6 border-b border-gray-200">
+//           {tabs.map((tab) => {
+//             const Icon = tab.icon
+//             const counts = {
+//               works: poemsPagination.total || poems.length,
+//               books: booksPagination.total || books.length,
+//               audio: audioItems.length,
+//               videos: videos.length,
+//               timeline: timeline.length,
+//               gallery: gallery.length,
+//               quotes: quotes.length
+//             }
+//             return (
+//               <button
+//                 key={tab.id}
+//                 onClick={() => setActiveTab(tab.id)}
+//                 className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+//                   activeTab === tab.id
+//                     ? 'border-primary-600 text-primary-600'
+//                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+//                 }`}
+//               >
+//                 <Icon className="h-4 w-4" />
+//                 <span>{tab.label}</span>
+//                 <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+//                   {counts[tab.id]}
+//                 </span>
+//               </button>
+//             )
+//           })}
+//         </div>
+
+//         {/* Tab Content */}
+//         <div className="mb-8">
+//           {activeTab === 'works' && renderWorks()}
+//           {activeTab === 'books' && renderBooks()}
+//           {activeTab === 'audio' && renderAudio()}
+//           {activeTab === 'videos' && renderVideos()}
+//           {activeTab === 'timeline' && renderTimeline()}
+//           {activeTab === 'gallery' && renderGallery()}
+//           {activeTab === 'quotes' && renderQuotes()}
+//         </div>
+//       </div>
+//     </div>
+//   )
+// }
+
+// export default AuthorDetailPage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/pages/public/AuthorDetailPage.jsx
 import React, { useState } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSelector } from 'react-redux'
 import toast from 'react-hot-toast'
@@ -2529,7 +3417,10 @@ import {
   ChevronLeft, Clock, Play, Grid, List, Loader2,
   AlertCircle, UserPlus, UserCheck, Eye, Music, Video,
   Quote, Image as ImageIcon, Twitter, Facebook, Instagram,
-  Youtube, Globe, ExternalLink, BookMarked, Headphones, Download
+  Youtube, Globe, ExternalLink, BookMarked, Headphones, Download,
+  Copy, Check, MessageCircle, Linkedin, Mail, X, ChevronDown,
+  Award, Star, TrendingUp, Zap, Sparkles, Crown, FileText, Volume2,
+  InstagramIcon, FacebookIcon, TwitterIcon, LinkedinIcon, Share
 } from 'lucide-react'
 import authorAPI from '../../api/authorAPI'
 import userAPI from '../../api/userAPI'
@@ -2545,6 +3436,8 @@ const AuthorDetailPage = () => {
   const [viewMode, setViewMode] = useState('grid')
   const [poemsPage, setPoemsPage] = useState(1)
   const [booksPage, setBooksPage] = useState(1)
+  const [showShareMenu, setShowShareMenu] = useState(false)
+  const [copiedLink, setCopiedLink] = useState(false)
 
   // Fetch author data using slug
   const { 
@@ -2692,14 +3585,60 @@ const AuthorDetailPage = () => {
     }
   }
 
-  const handleShare = async () => {
-    const url = window.location.href
+  // ============================================
+  // SOCIAL SHARE FUNCTIONALITY
+  // ============================================
+  
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
+  const shareTitle = author ? `Check out ${author.name} on ZauqApp` : 'Check out this author on ZauqApp'
+  const shareText = author?.bio ? author.bio.substring(0, 100) : 'Explore the literary works of this renowned poet and author.'
+
+  const shareLinks = [
+    {
+      name: 'WhatsApp',
+      icon: MessageCircle,
+      color: 'bg-green-500 hover:bg-green-600',
+      url: `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n\n${shareText}\n\n${shareUrl}`)}`
+    },
+    {
+      name: 'Twitter',
+      icon: Twitter,
+      color: 'bg-[#1DA1F2] hover:bg-[#1a8cd8]',
+      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
+    },
+    {
+      name: 'Facebook',
+      icon: Facebook,
+      color: 'bg-[#1877F2] hover:bg-[#1664d9]',
+      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
+    },
+    {
+      name: 'LinkedIn',
+      icon: Linkedin,
+      color: 'bg-[#0077B5] hover:bg-[#006396]',
+      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+    },
+    {
+      name: 'Email',
+      icon: Mail,
+      color: 'bg-gray-600 hover:bg-gray-700',
+      url: `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
+    }
+  ]
+
+  const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(url)
+      await navigator.clipboard.writeText(shareUrl)
+      setCopiedLink(true)
       toast.success('Link copied to clipboard!')
+      setTimeout(() => setCopiedLink(false), 2000)
     } catch (err) {
       toast.error('Failed to copy link')
     }
+  }
+
+  const handleShare = () => {
+    setShowShareMenu(!showShareMenu)
   }
 
   const formatDuration = (seconds) => {
@@ -2723,10 +3662,18 @@ const AuthorDetailPage = () => {
   // Loading state
   if (authorLoading) {
     return (
-      <div className="min-h-screen pt-20 pb-16 bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary-600 mx-auto mb-4" />
-          <p className="text-gray-500">Loading author...</p>
+          <div className="relative">
+            <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-amber-500 rounded-2xl animate-pulse mx-auto mb-6 flex items-center justify-center">
+              <Users className="h-10 w-10 text-white" />
+            </div>
+            <div className="absolute -top-2 -right-2">
+              <Sparkles className="h-6 w-6 text-amber-400 animate-spin" />
+            </div>
+          </div>
+          <p className="text-gray-600 font-medium">Loading author...</p>
+          <p className="text-sm text-gray-400 mt-1">Discovering literary greatness</p>
         </div>
       </div>
     )
@@ -2735,12 +3682,14 @@ const AuthorDetailPage = () => {
   // Error state
   if (authorError || !author) {
     return (
-      <div className="min-h-screen pt-20 pb-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
+        <div className="max-w-4xl mx-auto px-4 pt-32 pb-16 text-center">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-2xl mb-6">
+            <AlertCircle className="h-10 w-10 text-red-500" />
+          </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Author Not Found</h1>
           <p className="text-gray-500 mb-6">The author you are looking for does not exist.</p>
-          <Link to="/authors" className="btn-primary inline-flex items-center space-x-2">
+          <Link to="/authors" className="btn-primary inline-flex items-center gap-2">
             <ChevronLeft className="h-4 w-4" />
             <span>Browse All Authors</span>
           </Link>
@@ -2754,7 +3703,7 @@ const AuthorDetailPage = () => {
   // ============================================
 
   const EmptyState = ({ icon: Icon, title, message }) => (
-    <div className="text-center py-16 bg-gray-50 rounded-xl">
+    <div className="text-center py-16 bg-white rounded-2xl border border-gray-100">
       <Icon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
       <h3 className="text-lg font-medium text-gray-900 mb-2">{title}</h3>
       <p className="text-gray-500">{message}</p>
@@ -2786,16 +3735,16 @@ const AuthorDetailPage = () => {
           <h3 className="font-semibold text-gray-900">
             Poems ({poemsPagination.total || poems.length})
           </h3>
-          <div className="flex border border-gray-300 rounded-lg overflow-hidden">
+          <div className="flex border border-gray-200 rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 ${viewMode === 'grid' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+              className={`p-2 transition-all ${viewMode === 'grid' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >
               <Grid className="h-4 w-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 ${viewMode === 'list' ? 'bg-primary-50 text-primary-600' : 'text-gray-600'}`}
+              className={`p-2 transition-all ${viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
             >
               <List className="h-4 w-4" />
             </button>
@@ -2803,38 +3752,45 @@ const AuthorDetailPage = () => {
         </div>
         
         <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
-          {poems.map((poem) => (
-            <Link
+          {poems.map((poem, index) => (
+            <motion.div
               key={poem._id}
-              to={`/poem/${poem.slug}`}
-              className="card p-4 hover:shadow-md transition-all hover:-translate-y-0.5 group"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.05, 0.3) }}
+              whileHover={{ y: -4 }}
             >
-              <div className="flex-1">
-                <h4 className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
-                  {poem.title}
-                </h4>
-                {poem.contentUrdu && (
-                  <p className="urdu-text text-sm text-gray-500 line-clamp-1 mt-1" dir="rtl">
-                    {poem.contentUrdu.substring(0, 50)}...
-                  </p>
-                )}
-                <div className="flex flex-wrap items-center gap-3 mt-2">
-                  <span className="text-xs text-gray-500 capitalize px-2 py-0.5 bg-gray-100 rounded-full">
-                    {poem.genre}
-                  </span>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {poem.stats?.views?.toLocaleString() || 0}
+              <Link
+                to={`/poem/${poem.slug}`}
+                className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all group"
+              >
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
+                    {poem.title}
+                  </h4>
+                  {poem.contentUrdu && (
+                    <p className="urdu-text text-sm text-gray-500 line-clamp-1 mt-1" dir="rtl">
+                      {poem.contentUrdu.substring(0, 50)}...
+                    </p>
+                  )}
+                  <div className="flex flex-wrap items-center gap-3 mt-2">
+                    <span className="text-xs text-gray-500 capitalize px-2 py-0.5 bg-gray-100 rounded-full">
+                      {poem.genre}
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Heart className="h-3 w-3" />
-                      {poem.stats?.likes?.toLocaleString() || 0}
-                    </span>
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <span className="flex items-center gap-1">
+                        <Eye className="h-3 w-3" />
+                        {poem.stats?.views?.toLocaleString() || 0}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Heart className="h-3 w-3" />
+                        {poem.stats?.likes?.toLocaleString() || 0}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
@@ -2843,7 +3799,7 @@ const AuthorDetailPage = () => {
             <button
               onClick={() => setPoemsPage(p => Math.max(1, p - 1))}
               disabled={poemsPage === 1}
-              className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
             >
               Previous
             </button>
@@ -2853,7 +3809,7 @@ const AuthorDetailPage = () => {
             <button
               onClick={() => setPoemsPage(p => Math.min(poemsPagination.totalPages, p + 1))}
               disabled={poemsPage === poemsPagination.totalPages}
-              className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
             >
               Next
             </button>
@@ -2885,33 +3841,52 @@ const AuthorDetailPage = () => {
     return (
       <>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((book) => (
-            <Link
+          {books.map((book, index) => (
+            <motion.div
               key={book._id}
-              to={`/book/${book.slug}`}
-              className="card p-4 hover:shadow-md transition-all hover:-translate-y-0.5"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(index * 0.05, 0.3) }}
+              whileHover={{ y: -4 }}
             >
-              {book.coverImage && (
-                <img 
-                  src={book.coverImage} 
-                  alt={book.title}
-                  className="w-full h-40 object-cover rounded-lg mb-3"
-                />
-              )}
-              <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
-              <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
-              <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                <span className="capitalize">{book.type}</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  {book.stats?.views?.toLocaleString() || 0}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Download className="h-3 w-3" />
-                  {book.stats?.downloads?.toLocaleString() || 0}
-                </span>
-              </div>
-            </Link>
+              <Link
+                to={`/book/${book.slug}`}
+                className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all group"
+              >
+                {book.coverImage && (
+                  <div className="relative h-48 overflow-hidden">
+                    <img 
+                      src={book.coverImage} 
+                      alt={book.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    {book.isPremium && (
+                      <div className="absolute top-2 right-2">
+                        <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-medium rounded-full">
+                          <Crown className="h-3 w-3" />
+                          Premium
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                <div className="p-4">
+                  <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
+                  <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                    <span className="capitalize">{book.type || 'Ebook'}</span>
+                    <span className="flex items-center gap-1">
+                      <Eye className="h-3 w-3" />
+                      {book.stats?.views?.toLocaleString() || 0}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Download className="h-3 w-3" />
+                      {book.stats?.downloads?.toLocaleString() || 0}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
           ))}
         </div>
 
@@ -2920,7 +3895,7 @@ const AuthorDetailPage = () => {
             <button
               onClick={() => setBooksPage(p => Math.max(1, p - 1))}
               disabled={booksPage === 1}
-              className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
             >
               Previous
             </button>
@@ -2930,7 +3905,7 @@ const AuthorDetailPage = () => {
             <button
               onClick={() => setBooksPage(p => Math.min(booksPagination.totalPages, p + 1))}
               disabled={booksPage === booksPagination.totalPages}
-              className="px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50 disabled:opacity-50"
+              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
             >
               Next
             </button>
@@ -2961,23 +3936,29 @@ const AuthorDetailPage = () => {
 
     return (
       <div className="space-y-3">
-        {audioItems.map((audio) => (
-          <Link
+        {audioItems.map((audio, index) => (
+          <motion.div
             key={audio._id}
-            to={`/audio/${audio.slug}`}
-            className="card p-4 hover:shadow-md transition-all flex items-center gap-4"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
           >
-            <div className="w-12 h-12 bg-primary-50 rounded-lg flex items-center justify-center">
-              <Play className="h-6 w-6 text-primary-600" />
-            </div>
-            <div className="flex-1">
-              <h4 className="font-medium text-gray-900">{audio.title}</h4>
-              <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
-            </div>
-            <div className="text-sm text-gray-400">
-              {formatDuration(audio.duration)}
-            </div>
-          </Link>
+            <Link
+              to={`/audio/${audio.slug}`}
+              className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all flex items-center gap-4 group"
+            >
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-amber-100 rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Play className="h-6 w-6 text-primary-600" />
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium text-gray-900">{audio.title}</h4>
+                <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
+              </div>
+              <div className="text-sm text-gray-400">
+                {formatDuration(audio.duration)}
+              </div>
+            </Link>
+          </motion.div>
         ))}
       </div>
     )
@@ -3004,32 +3985,43 @@ const AuthorDetailPage = () => {
 
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {videos.map((video) => (
-          <Link
+        {videos.map((video, index) => (
+          <motion.div
             key={video._id}
-            to={`/video/${video.slug}`}
-            className="card overflow-hidden hover:shadow-md transition-all"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+            whileHover={{ y: -4 }}
           >
-            <div className="relative h-40 bg-gray-900">
-              {video.thumbnail ? (
-                <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover" />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Play className="h-12 w-12 text-white/50" />
+            <Link
+              to={`/video/${video.slug}`}
+              className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-all group"
+            >
+              <div className="relative h-40 bg-gradient-to-br from-gray-900 to-gray-800">
+                {video.thumbnail ? (
+                  <img src={video.thumbnail} alt={video.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Play className="h-12 w-12 text-white/50" />
+                  </div>
+                )}
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
+                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-white text-xs">
+                  {formatDuration(video.duration)}
                 </div>
-              )}
-            </div>
-            <div className="p-4">
-              <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
-              <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                <span className="capitalize">{video.type}</span>
-                <span className="flex items-center gap-1">
-                  <Eye className="h-3 w-3" />
-                  {video.stats?.views?.toLocaleString() || 0}
-                </span>
               </div>
-            </div>
-          </Link>
+              <div className="p-4">
+                <h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4>
+                <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                  <span className="capitalize">{video.type}</span>
+                  <span className="flex items-center gap-1">
+                    <Eye className="h-3 w-3" />
+                    {video.stats?.views?.toLocaleString() || 0}
+                  </span>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
         ))}
       </div>
     )
@@ -3055,19 +4047,23 @@ const AuthorDetailPage = () => {
     }
 
     return (
-      <div className="card p-6">
+      <div className="bg-white rounded-xl p-6 border border-gray-100">
         <div className="space-y-6">
           {timeline.map((event, index) => (
-            <div key={index} className="flex items-start space-x-4">
-              <div className="flex-shrink-0 w-20 text-right">
-                <span className="font-bold text-primary-600">{event.year}</span>
+            <div key={index} className="relative flex items-start">
+              <div className="flex-shrink-0 w-24">
+                <span className="font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full text-sm">
+                  {event.year}
+                </span>
               </div>
-              <div className="flex-shrink-0 w-3 h-3 bg-primary-600 rounded-full mt-1.5" />
-              <div className="flex-1 pb-6 border-l-2 border-gray-200 pl-4 -ml-1.5">
-                <p className="text-gray-700 font-medium">{event.event}</p>
-                {event.description && (
-                  <p className="text-sm text-gray-500 mt-1">{event.description}</p>
-                )}
+              <div className="flex-shrink-0 w-0.5 bg-gradient-to-b from-primary-500 to-amber-500 h-full absolute left-28 top-0 bottom-0" />
+              <div className="flex-1 ml-8 pb-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-gray-800 font-medium">{event.event}</p>
+                  {event.description && (
+                    <p className="text-sm text-gray-500 mt-1">{event.description}</p>
+                  )}
+                </div>
               </div>
             </div>
           ))}
@@ -3098,18 +4094,28 @@ const AuthorDetailPage = () => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {gallery.map((item, index) => (
-          <div key={index} className="card overflow-hidden hover:shadow-md transition-all cursor-pointer group">
-            <img 
-              src={item.url} 
-              alt={item.caption || `Image ${index + 1}`}
-              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            {item.caption && (
-              <div className="p-2">
-                <p className="text-xs text-gray-500 line-clamp-2">{item.caption}</p>
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+            whileHover={{ scale: 1.05 }}
+            className="group cursor-pointer"
+          >
+            <div className="relative overflow-hidden rounded-xl shadow-sm">
+              <img 
+                src={item.url} 
+                alt={item.caption || `Image ${index + 1}`}
+                className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                {item.caption && (
+                  <p className="text-white text-xs line-clamp-2">{item.caption}</p>
+                )}
               </div>
-            )}
-          </div>
+            </div>
+          </motion.div>
         ))}
       </div>
     )
@@ -3137,12 +4143,19 @@ const AuthorDetailPage = () => {
     return (
       <div className="space-y-4">
         {quotes.map((quote, index) => (
-          <div key={index} className="card p-6 border-l-4 border-primary-500">
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: Math.min(index * 0.05, 0.3) }}
+            className="bg-gradient-to-r from-primary-50 to-amber-50 rounded-xl p-6 border-l-4 border-primary-500"
+          >
+            <Quote className="h-8 w-8 text-primary-400 mb-3 opacity-50" />
             <p className="text-lg text-gray-700 italic">"{quote.text}"</p>
             {quote.source && (
-              <p className="text-sm text-gray-500 mt-2">— {quote.source}</p>
+              <p className="text-sm text-gray-500 mt-3">— {quote.source}</p>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
     )
@@ -3153,157 +4166,270 @@ const AuthorDetailPage = () => {
     
     if (!hasSocialLinks) return null
 
+    const socialIcons = {
+      website: { icon: Globe, color: 'text-gray-600 hover:text-gray-900' },
+      twitter: { icon: Twitter, color: 'text-gray-600 hover:text-[#1DA1F2]' },
+      facebook: { icon: Facebook, color: 'text-gray-600 hover:text-[#1877F2]' },
+      instagram: { icon: Instagram, color: 'text-gray-600 hover:text-[#E4405F]' },
+      youtube: { icon: Youtube, color: 'text-gray-600 hover:text-[#FF0000]' },
+      wikipedia: { icon: ExternalLink, color: 'text-gray-600 hover:text-gray-900' }
+    }
+
     return (
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <h3 className="font-semibold text-gray-900 mb-3">Connect</h3>
+      <div className="mt-6 pt-6 border-t border-gray-100">
+        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <Share2 className="h-4 w-4 text-primary-600" />
+          Connect & Follow
+        </h3>
         <div className="flex flex-wrap gap-3">
-          {socialLinks.website && (
-            <a href={socialLinks.website} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-primary-600">
-              <Globe className="h-4 w-4" /> Website
-            </a>
-          )}
-          {socialLinks.twitter && (
-            <a href={socialLinks.twitter} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-500">
-              <Twitter className="h-4 w-4" /> Twitter
-            </a>
-          )}
-          {socialLinks.facebook && (
-            <a href={socialLinks.facebook} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-700">
-              <Facebook className="h-4 w-4" /> Facebook
-            </a>
-          )}
-          {socialLinks.instagram && (
-            <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-pink-600">
-              <Instagram className="h-4 w-4" /> Instagram
-            </a>
-          )}
-          {socialLinks.youtube && (
-            <a href={socialLinks.youtube} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-sm text-gray-600 hover:text-red-600">
-              <Youtube className="h-4 w-4" /> YouTube
-            </a>
-          )}
+          {Object.entries(socialLinks).map(([platform, url]) => {
+            if (!url) return null
+            const social = socialIcons[platform]
+            if (!social) return null
+            const Icon = social.icon
+            return (
+              <a
+                key={platform}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all ${social.color}`}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="text-sm capitalize">{platform}</span>
+              </a>
+            )
+          })}
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-16 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
+        
         {/* Back Link */}
-        <div className="mb-6">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          className="mb-6"
+        >
           <Link 
             to="/authors" 
-            className="inline-flex items-center space-x-1 text-sm text-gray-500 hover:text-primary-600 transition-colors"
+            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors group"
           >
-            <ChevronLeft className="h-4 w-4" />
+            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             <span>Back to Authors</span>
           </Link>
-        </div>
+        </motion.div>
 
-        {/* Cover & Profile */}
+        {/* Cover Section - RESPONSIVE 3:1 RATIO */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
           className="relative mb-8"
         >
-          <div className="h-48 md:h-64 rounded-xl overflow-hidden">
-            {author.coverImage ? (
-              <img src={author.coverImage} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-r from-primary-600 to-primary-800" />
-            )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-          </div>
-          <div className="relative -mt-16 md:-mt-20 px-6 flex flex-col md:flex-row items-end md:items-center space-y-4 md:space-y-0 md:space-x-6">
-            <img
-              src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=128`}
-              alt={author.name}
-              className="w-32 h-32 rounded-full border-4 border-white shadow-lg object-cover bg-white"
-            />
-            <div className="flex-1 pb-2">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{author.name}</h1>
-                  {author.nameUrdu && (
-                    <p className="urdu-text text-lg text-gray-600" dir="rtl">{author.nameUrdu}</p>
-                  )}
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {author.era && (
-                      <span className="px-2 py-0.5 bg-primary-50 text-primary-700 text-xs rounded-full capitalize">
-                        {author.era} Era
-                      </span>
-                    )}
-                    {author.isVerified && (
-                      <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-xs rounded-full">
-                        ✓ Verified
-                      </span>
-                    )}
+          {/* Cover Image Container - Responsive aspect ratio */}
+          <div className="relative w-full rounded-2xl overflow-hidden shadow-xl">
+            {/* Responsive aspect ratio: 3:1 (width:height) */}
+            <div className="relative" style={{ paddingBottom: '33.33%' }}>
+              {author.coverImage ? (
+                <>
+                  <img 
+                    src={author.coverImage} 
+                    alt={`${author.name} cover`}
+                    className="absolute inset-0 w-full h-full object-cover object-center"
+                  />
+                  {/* Gradient Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                </>
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-700 via-primary-600 to-amber-700">
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full filter blur-3xl animate-pulse" />
+                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-200 rounded-full filter blur-3xl animate-pulse delay-1000" />
                   </div>
                 </div>
-                <div className="flex items-center space-x-3 mt-4 md:mt-0">
-                  <button
-                    onClick={handleFollowToggle}
-                    disabled={followMutation.isPending || unfollowMutation.isPending}
-                    className={`px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                      isFollowing
-                        ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                        : 'bg-primary-600 text-white hover:bg-primary-700'
-                    }`}
-                  >
-                    {isFollowing ? (
-                      <>
-                        <UserCheck className="h-4 w-4" />
-                        <span>Following</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="h-4 w-4" />
-                        <span>Follow</span>
-                      </>
-                    )}
-                  </button>
+              )}
+            </div>
+            
+            {/* Profile Image - Positioned overlapping the cover */}
+            <div className="absolute -bottom-16 left-6 md:left-8">
+              <div className="relative">
+                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+                  <img
+                    src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=144&bold=true`}
+                    alt={author.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                {author.isVerified && (
+                  <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 border-2 border-white">
+                    <Check className="h-3 w-3 text-white" />
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          
+          {/* Author Info - Positioned below cover */}
+          <div className="mt-20 md:mt-24 pl-6 md:pl-8 pr-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
+                  {author.name}
+                </h1>
+                {author.nameUrdu && (
+                  <p className="urdu-text text-lg text-gray-600 mt-1" dir="rtl">
+                    {author.nameUrdu}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {author.era && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-primary-100 to-amber-100 text-primary-700 text-xs font-medium rounded-full">
+                      <Award className="h-3 w-3" />
+                      {author.era} Era
+                    </span>
+                  )}
+                  {author.isVerified && (
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
+                      <Check className="h-3 w-3" />
+                      Verified Author
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleFollowToggle}
+                  disabled={followMutation.isPending || unfollowMutation.isPending}
+                  className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
+                    isFollowing
+                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gradient-to-r from-primary-600 to-amber-500 text-white hover:shadow-lg hover:-translate-y-0.5'
+                  }`}
+                >
+                  {isFollowing ? (
+                    <>
+                      <UserCheck className="h-4 w-4" />
+                      <span>Following</span>
+                    </>
+                  ) : (
+                    <>
+                      <UserPlus className="h-4 w-4" />
+                      <span>Follow</span>
+                    </>
+                  )}
+                </button>
+                
+                {/* Share Button with Menu */}
+                <div className="relative">
                   <button 
                     onClick={handleShare}
-                    className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors"
+                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all hover:shadow-md"
                   >
                     <Share2 className="h-5 w-5 text-gray-600" />
                   </button>
+                  
+                  <AnimatePresence>
+                    {showShareMenu && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                        className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                      >
+                        <div className="p-3 border-b border-gray-100">
+                          <p className="text-sm font-medium text-gray-700">Share this author</p>
+                        </div>
+                        <div className="p-2">
+                          {shareLinks.map((link) => (
+                            <a
+                              key={link.name}
+                              href={link.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => setShowShareMenu(false)}
+                              className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg ${link.color} text-white mb-1 transition-all hover:shadow-md`}
+                            >
+                              <link.icon className="h-4 w-4" />
+                              <span className="text-sm font-medium">{link.name}</span>
+                            </a>
+                          ))}
+                          <button
+                            onClick={copyToClipboard}
+                            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all mt-1"
+                          >
+                            {copiedLink ? (
+                              <>
+                                <Check className="h-4 w-4 text-green-600" />
+                                <span className="text-sm font-medium text-green-600">Copied!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-4 w-4 text-gray-600" />
+                                <span className="text-sm font-medium text-gray-700">Copy Link</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               </div>
             </div>
           </div>
         </motion.div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        {/* Stats Cards - Premium Design */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
           {[
-            { icon: BookOpen, label: 'Poems', value: author.stats?.poemsCount || 0 },
-            { icon: BookMarked, label: 'Books', value: author.stats?.booksCount || 0 },
-            { icon: Users, label: 'Followers', value: (author.stats?.followers || 0).toLocaleString() },
-            { icon: Eye, label: 'Views', value: (author.stats?.views || 0).toLocaleString() },
+            { icon: BookOpen, label: 'Poems', value: author.stats?.poemsCount || 0, color: 'from-blue-500 to-blue-600' },
+            { icon: BookMarked, label: 'Books', value: author.stats?.booksCount || 0, color: 'from-purple-500 to-purple-600' },
+            { icon: Users, label: 'Followers', value: (author.stats?.followers || 0).toLocaleString(), color: 'from-amber-500 to-amber-600' },
+            { icon: Eye, label: 'Views', value: (author.stats?.views || 0).toLocaleString(), color: 'from-green-500 to-green-600' },
           ].map((stat, index) => (
-            <div key={index} className="card p-4 text-center">
-              <stat.icon className="h-6 w-6 text-primary-600 mx-auto mb-2" />
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-              <p className="text-sm text-gray-500">{stat.label}</p>
+            <div key={index} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-all group">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                  <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+                </div>
+                <div className={`w-10 h-10 bg-gradient-to-br ${stat.color} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                  <stat.icon className="h-5 w-5 text-white" />
+                </div>
+              </div>
             </div>
           ))}
-        </div>
+        </motion.div>
 
-        {/* Bio & Info */}
+        {/* Bio & Info Section */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="md:col-span-2">
-            <div className="card p-6">
-              <h2 className="font-semibold text-gray-900 mb-4">Biography</h2>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Quote className="h-5 w-5 text-primary-600" />
+                Biography
+              </h2>
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">{author.bio}</p>
               {author.bioUrdu && (
-                <p className="urdu-text text-gray-700 leading-relaxed mt-4" dir="rtl">{author.bioUrdu}</p>
+                <p className="urdu-text text-gray-700 leading-relaxed mt-4 pt-4 border-t border-gray-100" dir="rtl">
+                  {author.bioUrdu}
+                </p>
               )}
               <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
                 {author.birthDate && (
-                  <span className="flex items-center space-x-1 text-sm text-gray-500">
-                    <Calendar className="h-4 w-4" />
+                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                    <Calendar className="h-4 w-4 text-primary-500" />
                     <span>
                       {new Date(author.birthDate).getFullYear()} 
                       {author.deathDate && ` - ${new Date(author.deathDate).getFullYear()}`}
@@ -3311,8 +4437,8 @@ const AuthorDetailPage = () => {
                   </span>
                 )}
                 {author.birthPlace && (
-                  <span className="flex items-center space-x-1 text-sm text-gray-500">
-                    <MapPin className="h-4 w-4" />
+                  <span className="flex items-center gap-2 text-sm text-gray-500">
+                    <MapPin className="h-4 w-4 text-primary-500" />
                     <span>{author.birthPlace}</span>
                   </span>
                 )}
@@ -3320,12 +4446,16 @@ const AuthorDetailPage = () => {
               {renderSocialLinks()}
             </div>
           </div>
+          
           <div>
-            <div className="card p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Genres</h3>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Star className="h-5 w-5 text-amber-500" />
+                Literary Genres
+              </h3>
               <div className="flex flex-wrap gap-2">
                 {author.genres?.map((genre, index) => (
-                  <span key={index} className="px-2 py-1 bg-gray-100 rounded-full text-sm text-gray-700 capitalize">
+                  <span key={index} className="px-3 py-1.5 bg-gradient-to-r from-primary-50 to-amber-50 rounded-full text-sm text-gray-700 capitalize">
                     {genre}
                   </span>
                 ))}
@@ -3337,7 +4467,7 @@ const AuthorDetailPage = () => {
           </div>
         </div>
 
-        {/* Tabs - ALL TABS SHOWN, even with 0 content */}
+        {/* Tabs - Premium Design */}
         <div className="flex overflow-x-auto scrollbar-hide gap-1 mb-6 border-b border-gray-200">
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -3354,15 +4484,17 @@ const AuthorDetailPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                className={`flex items-center gap-2 px-5 py-3 text-sm font-medium whitespace-nowrap transition-all ${
                   activeTab === tab.id
-                    ? 'border-primary-600 text-primary-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'text-primary-600 border-b-2 border-primary-600 bg-primary-50/30'
+                    : 'text-gray-500 hover:text-gray-700 hover:border-b-2 hover:border-gray-300'
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 <span>{tab.label}</span>
-                <span className="ml-1 text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
+                <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${
+                  activeTab === tab.id ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-600'
+                }`}>
                   {counts[tab.id]}
                 </span>
               </button>
@@ -3371,7 +4503,13 @@ const AuthorDetailPage = () => {
         </div>
 
         {/* Tab Content */}
-        <div className="mb-8">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+          className="mb-8"
+        >
           {activeTab === 'works' && renderWorks()}
           {activeTab === 'books' && renderBooks()}
           {activeTab === 'audio' && renderAudio()}
@@ -3379,7 +4517,7 @@ const AuthorDetailPage = () => {
           {activeTab === 'timeline' && renderTimeline()}
           {activeTab === 'gallery' && renderGallery()}
           {activeTab === 'quotes' && renderQuotes()}
-        </div>
+        </motion.div>
       </div>
     </div>
   )

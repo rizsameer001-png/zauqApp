@@ -1,0 +1,1825 @@
+//new features
+Key Additions for Book Carousel:
+1. Book Carousel Component (on each author card):
+Horizontal sliding carousel of author's books
+
+Smooth transition animations
+
+Navigation buttons (prev/next) for sliding
+
+Carousel dots indicator for current position
+
+2. Book Display Card:
+Book cover image (or fallback icon)
+
+Book title (truncated)
+
+Language badge (Urdu/Hindi/English)
+
+Rating stars display
+
+Like button for books
+
+3. Like Functionality:
+Heart button on each book
+
+Toggle like/unlike with API call
+
+Authentication check before liking
+
+Toast notifications for feedback
+
+Visual feedback (filled/outline heart)
+
+4. Carousel State Management:
+carouselIndices state tracks current index for each author
+
+handlePrevBook and handleNextBook functions for navigation
+
+Disabled navigation at ends
+
+Clickable dots for direct navigation
+
+5. Book Click Navigation:
+Clicking on a book takes user to the book detail page
+
+Stops event propagation to prevent author card navigation
+
+Required API Functions (add to bookAPI.js):
+javascript
+// Get books by author ID
+getBooksByAuthor: async (authorId) => {
+  const response = await api.get(`/books/author/${authorId}`)
+  return response.data
+},
+
+// Like a book
+likeBook: async (bookId) => {
+  const response = await api.post(`/books/${bookId}/like`)
+  return response.data
+},
+
+// Unlike a book
+unlikeBook: async (bookId) => {
+  const response = await api.delete(`/books/${bookId}/like`)
+  return response.data
+}
+The carousel allows users to browse an author's books directly from the author card and like their favorite books without leaving the page!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Here's the complete fixed `author.controller.js`:
+
+```javascript
+// server/controllers/author.controller.js
+import Author from '../models/Author.js';
+import Poem from '../models/Poem.js';
+import Book from '../models/Book.js';
+import Audio from '../models/Audio.js';
+import Video from '../models/Video.js';
+import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+import slugify from 'slugify';
+
+// ============================================
+// GET AUTHORS - WITH ENHANCED SEARCH SUPPORT
+// ============================================
+export const getAuthors = async (req, res, next) => {
+  try {
+    const { page, limit, skip } = getPagination(req);
+    const sort = getSort(req, 'name');
+    let filters = getFilters(req, ['era', 'category', 'language']);
+    
+    // Handle search query
+    const searchQuery = req.query.search;
+    console.log('📡 getAuthors called with:', { 
+      page, 
+      limit, 
+      search: searchQuery, 
+      filters, 
+      sort 
+    });
+    
+    // Add search filter if provided
+    if (searchQuery && searchQuery.trim()) {
+      const searchTerm = searchQuery.trim();
+      const searchRegex = new RegExp(searchTerm, 'i');
+      
+      // Build search conditions
+      const searchConditions = [
+        { name: searchRegex },
+        { nameUrdu: searchRegex },
+        { nameHindi: searchRegex },
+        { bio: searchRegex },
+        { bioUrdu: searchRegex },
+        { bioHindi: searchRegex },
+        { genres: { $in: [searchRegex] } },
+        { category: searchRegex },
+        { era: searchRegex }
+      ];
+      
+      // If search term is short (2-3 characters), only search name fields for better performance
+      if (searchTerm.length <= 3) {
+        filters.$or = searchConditions.slice(0, 3); // Only name fields
+        console.log('🔍 Short search term, searching only name fields');
+      } else {
+        filters.$or = searchConditions; // All fields
+        console.log('🔍 Long search term, searching all fields');
+      }
+    }
+    
+    console.log('🔍 Final filters:', JSON.stringify(filters, null, 2));
+
+    // Build query - simple regex search
+    const authors = await Author.find(filters)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
+      
+    const total = await Author.countDocuments(filters);
+    
+    console.log(`✅ Found ${authors.length} authors out of ${total} total`);
+    
+    paginatedResponse(res, authors, { page, limit, total });
+  } catch (error) {
+    console.error('Error in getAuthors:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// GET AUTHOR BY SLUG
+// ============================================
+export const getAuthorBySlug = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    
+    if (!slug) {
+      return errorResponse(res, 'Slug is required', 400);
+    }
+    
+    const author = await Author.findOne({ slug })
+      .populate('relatedAuthors', 'name slug avatar bio era');
+
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+
+    // Increment views
+    author.stats.views += 1;
+    await author.save();
+
+    let isFollowing = false;
+    if (req.user) {
+      isFollowing = author.followers ? author.followers.includes(req.user.id) : false;
+    }
+
+    // Prepare response data
+    const responseData = {
+      ...author.toObject(),
+      isFollowing,
+      formattedBirthDate: author.birthDate ? new Date(author.birthDate).toLocaleDateString() : null,
+      formattedDeathDate: author.deathDate ? new Date(author.deathDate).toLocaleDateString() : null,
+      years: author.years
+    };
+
+    successResponse(res, responseData);
+  } catch (error) {
+    console.error('Error in getAuthorBySlug:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// CREATE AUTHOR
+// ============================================
+export const createAuthor = async (req, res, next) => {
+  try {
+    console.log('Creating author with data:', JSON.stringify(req.body, null, 2));
+    
+    const { name, slug } = req.body;
+    
+    if (!name || !name.trim()) {
+      return errorResponse(res, 'Name is required', 400);
+    }
+    
+    if (!req.body.bio || !req.body.bio.trim()) {
+      return errorResponse(res, 'Bio is required', 400);
+    }
+    
+    const authorData = { ...req.body };
+    
+    // Handle slug
+    if (slug && slug.trim()) {
+      authorData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    }
+    
+    const author = await Author.create(authorData);
+    
+    successResponse(res, author, 'Author created successfully', 201);
+  } catch (error) {
+    console.error('Error creating author:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(e => e.message);
+      return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+    }
+    
+    if (error.code === 11000) {
+      return errorResponse(res, 'An author with this slug already exists. Please use a different slug.', 400);
+    }
+    
+    next(error);
+  }
+};
+
+// ============================================
+// UPDATE AUTHOR
+// ============================================
+export const updateAuthor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log('Updating author with ID:', id);
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    let updateData = { ...req.body };
+    
+    // Handle slug update
+    if (req.body.slug && req.body.slug !== author.slug) {
+      const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+      const existingAuthor = await Author.findOne({ slug: cleanSlug, _id: { $ne: id } });
+      if (existingAuthor) {
+        return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
+      }
+      updateData.slug = cleanSlug;
+    }
+    
+    const updatedAuthor = await Author.findByIdAndUpdate(
+      id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('relatedAuthors', 'name slug avatar');
+    
+    successResponse(res, updatedAuthor, 'Author updated successfully');
+  } catch (error) {
+    console.error('Error updating author:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(e => e.message);
+      return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+    }
+    
+    next(error);
+  }
+};
+
+// ============================================
+// DELETE AUTHOR
+// ============================================
+export const deleteAuthor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    console.log('Deleting author with ID:', id);
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    // Optional: Update poems to remove author reference or mark as orphaned
+    await Poem.updateMany({ author: id }, { $unset: { author: "" } });
+    
+    await Author.findByIdAndDelete(id);
+    
+    successResponse(res, null, 'Author deleted successfully');
+  } catch (error) {
+    console.error('Error deleting author:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// AUTHOR CONTENT MANAGEMENT (Using SLUG for public routes)
+// ============================================
+
+export const getAuthorPoems = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const { page, limit, skip } = getPagination(req);
+    
+    const author = await Author.findOne({ slug });
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+
+    const poems = await Poem.find({ author: author._id, isPublished: true })
+      .populate('author', 'name slug avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Poem.countDocuments({ author: author._id, isPublished: true });
+    paginatedResponse(res, poems, { page, limit, total });
+  } catch (error) {
+    console.error('Error in getAuthorPoems:', error);
+    next(error);
+  }
+};
+
+export const getAuthorBooks = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const { page, limit, skip } = getPagination(req);
+    
+    const author = await Author.findOne({ slug });
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+
+    const books = await Book.find({ author: author._id, isPublished: true })
+      .populate('author', 'name slug avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Book.countDocuments({ author: author._id, isPublished: true });
+    paginatedResponse(res, books, { page, limit, total });
+  } catch (error) {
+    console.error('Error in getAuthorBooks:', error);
+    next(error);
+  }
+};
+
+export const getAuthorAudio = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const { page, limit, skip } = getPagination(req);
+    
+    const author = await Author.findOne({ slug });
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+
+    const audio = await Audio.find({ author: author._id, isPublished: true })
+      .populate('author', 'name slug avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Audio.countDocuments({ author: author._id, isPublished: true });
+    paginatedResponse(res, audio, { page, limit, total });
+  } catch (error) {
+    console.error('Error in getAuthorAudio:', error);
+    next(error);
+  }
+};
+
+export const getAuthorVideos = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const { page, limit, skip } = getPagination(req);
+    
+    const author = await Author.findOne({ slug });
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+
+    const videos = await Video.find({ author: author._id, isPublished: true })
+      .populate('author', 'name slug avatar')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
+
+    const total = await Video.countDocuments({ author: author._id, isPublished: true });
+    paginatedResponse(res, videos, { page, limit, total });
+  } catch (error) {
+    console.error('Error in getAuthorVideos:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// AUTHOR STATS & FEATURED
+// ============================================
+
+export const getTrendingAuthors = async (req, res, next) => {
+  try {
+    const authors = await Author.find()
+      .sort({ 'stats.views': -1, 'stats.followers': -1 })
+      .limit(20);
+
+    successResponse(res, authors);
+  } catch (error) {
+    console.error('Error in getTrendingAuthors:', error);
+    next(error);
+  }
+};
+
+export const getFeaturedAuthors = async (req, res, next) => {
+  try {
+    const authors = await Author.find({ isFeatured: true })
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    successResponse(res, authors);
+  } catch (error) {
+    console.error('Error in getFeaturedAuthors:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// TIMELINE MANAGEMENT
+// ============================================
+
+export const getAuthorTimeline = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const author = await Author.findOne({ slug });
+    
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    successResponse(res, author.timeline || []);
+  } catch (error) {
+    console.error('Error in getAuthorTimeline:', error);
+    next(error);
+  }
+};
+
+export const addToTimeline = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { year, event, description } = req.body;
+    
+    if (!year || !event) {
+      return errorResponse(res, 'Year and event are required', 400);
+    }
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.timeline = author.timeline || [];
+    author.timeline.push({ year, event, description });
+    // Sort timeline by year
+    author.timeline.sort((a, b) => a.year - b.year);
+    await author.save();
+    
+    successResponse(res, author.timeline, 'Timeline entry added successfully');
+  } catch (error) {
+    console.error('Error in addToTimeline:', error);
+    next(error);
+  }
+};
+
+export const updateTimelineEntry = async (req, res, next) => {
+  try {
+    const { id, timelineId } = req.params;
+    const { year, event, description } = req.body;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    const timelineEntry = author.timeline.id(timelineId);
+    if (!timelineEntry) {
+      return errorResponse(res, 'Timeline entry not found', 404);
+    }
+    
+    if (year) timelineEntry.year = year;
+    if (event) timelineEntry.event = event;
+    if (description !== undefined) timelineEntry.description = description;
+    
+    // Re-sort timeline
+    author.timeline.sort((a, b) => a.year - b.year);
+    await author.save();
+    
+    successResponse(res, author.timeline, 'Timeline entry updated successfully');
+  } catch (error) {
+    console.error('Error in updateTimelineEntry:', error);
+    next(error);
+  }
+};
+
+export const removeFromTimeline = async (req, res, next) => {
+  try {
+    const { id, timelineId } = req.params;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.timeline = author.timeline.filter(item => item._id.toString() !== timelineId);
+    await author.save();
+    
+    successResponse(res, author.timeline, 'Timeline entry removed successfully');
+  } catch (error) {
+    console.error('Error in removeFromTimeline:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// GALLERY MANAGEMENT
+// ============================================
+
+export const getAuthorGallery = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const author = await Author.findOne({ slug });
+    
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    successResponse(res, author.gallery || []);
+  } catch (error) {
+    console.error('Error in getAuthorGallery:', error);
+    next(error);
+  }
+};
+
+export const addToGallery = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { url, caption } = req.body;
+    
+    if (!url) {
+      return errorResponse(res, 'Image URL is required', 400);
+    }
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.gallery = author.gallery || [];
+    author.gallery.push({ url, caption: caption || '', uploadedAt: new Date() });
+    await author.save();
+    
+    successResponse(res, author.gallery, 'Gallery image added successfully');
+  } catch (error) {
+    console.error('Error in addToGallery:', error);
+    next(error);
+  }
+};
+
+export const updateGalleryImage = async (req, res, next) => {
+  try {
+    const { id, imageId } = req.params;
+    const { url, caption } = req.body;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    const galleryImage = author.gallery.id(imageId);
+    if (!galleryImage) {
+      return errorResponse(res, 'Gallery image not found', 404);
+    }
+    
+    if (url) galleryImage.url = url;
+    if (caption !== undefined) galleryImage.caption = caption;
+    
+    await author.save();
+    
+    successResponse(res, author.gallery, 'Gallery image updated successfully');
+  } catch (error) {
+    console.error('Error in updateGalleryImage:', error);
+    next(error);
+  }
+};
+
+export const removeFromGallery = async (req, res, next) => {
+  try {
+    const { id, imageId } = req.params;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.gallery = author.gallery.filter(item => item._id.toString() !== imageId);
+    await author.save();
+    
+    successResponse(res, author.gallery, 'Gallery image removed successfully');
+  } catch (error) {
+    console.error('Error in removeFromGallery:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// FOLLOW/UNFOLLOW AUTHOR
+// ============================================
+
+export const followAuthor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    if (!author.followers) {
+      author.followers = [];
+    }
+    
+    if (!author.followers.includes(userId)) {
+      author.followers.push(userId);
+      author.stats.followers = author.followers.length;
+      await author.save();
+    }
+    
+    successResponse(res, { followed: true, followersCount: author.stats.followers }, 'Author followed');
+  } catch (error) {
+    console.error('Error in followAuthor:', error);
+    next(error);
+  }
+};
+
+export const unfollowAuthor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const userId = req.user.id;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    if (author.followers) {
+      author.followers = author.followers.filter(fid => fid.toString() !== userId);
+      author.stats.followers = author.followers.length;
+      await author.save();
+    }
+    
+    successResponse(res, { followed: false, followersCount: author.stats.followers || 0 }, 'Author unfollowed');
+  } catch (error) {
+    console.error('Error in unfollowAuthor:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// AUTHOR STATISTICS (Using SLUG)
+// ============================================
+
+export const getAuthorStats = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    
+    const author = await Author.findOne({ slug });
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    const [poemsCount, booksCount, audioCount, videosCount] = await Promise.all([
+      Poem.countDocuments({ author: author._id, isPublished: true }),
+      Book.countDocuments({ author: author._id, isPublished: true }),
+      Audio.countDocuments({ author: author._id, isPublished: true }),
+      Video.countDocuments({ author: author._id, isPublished: true })
+    ]);
+    
+    successResponse(res, {
+      poemsCount,
+      booksCount,
+      audioCount,
+      videosCount,
+      followersCount: author.stats?.followers || 0,
+      viewsCount: author.stats?.views || 0,
+      timelineCount: author.timeline?.length || 0,
+      galleryCount: author.gallery?.length || 0,
+      quotesCount: author.quotes?.length || 0
+    });
+  } catch (error) {
+    console.error('Error in getAuthorStats:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// SEARCH AUTHORS (Dedicated search endpoint)
+// ============================================
+
+export const searchAuthors = async (req, res, next) => {
+  try {
+    const { q, limit = 20, page = 1 } = req.query;
+    
+    if (!q || q.length < 2) {
+      return successResponse(res, {
+        authors: [],
+        pagination: {
+          page: 1,
+          limit: parseInt(limit),
+          total: 0,
+          totalPages: 0
+        }
+      }, 'No search query provided (minimum 2 characters)');
+    }
+    
+    const searchTerm = q.trim();
+    const searchRegex = new RegExp(searchTerm, 'i');
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    // Build search conditions
+    const searchConditions = {
+      $or: [
+        { name: searchRegex },
+        { nameUrdu: searchRegex },
+        { nameHindi: searchRegex },
+        { bio: searchRegex },
+        { bioUrdu: searchRegex },
+        { bioHindi: searchRegex },
+        { genres: { $in: [searchRegex] } },
+        { category: searchRegex },
+        { era: searchRegex }
+      ]
+    };
+    
+    const authors = await Author.find(searchConditions)
+      .sort({ name: 1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+    
+    const total = await Author.countDocuments(searchConditions);
+    
+    successResponse(res, {
+      authors,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit))
+      }
+    });
+  } catch (error) {
+    console.error('Error in searchAuthors:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// QUOTES MANAGEMENT
+// ============================================
+
+export const getAuthorQuotes = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const author = await Author.findOne({ slug });
+    
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    successResponse(res, author.quotes || []);
+  } catch (error) {
+    console.error('Error in getAuthorQuotes:', error);
+    next(error);
+  }
+};
+
+export const addQuote = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { text, source } = req.body;
+    
+    if (!text) {
+      return errorResponse(res, 'Quote text is required', 400);
+    }
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.quotes = author.quotes || [];
+    author.quotes.push({ text, source: source || '' });
+    await author.save();
+    
+    successResponse(res, author.quotes, 'Quote added successfully');
+  } catch (error) {
+    console.error('Error in addQuote:', error);
+    next(error);
+  }
+};
+
+export const updateQuote = async (req, res, next) => {
+  try {
+    const { id, quoteId } = req.params;
+    const { text, source } = req.body;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    const quote = author.quotes.id(quoteId);
+    if (!quote) {
+      return errorResponse(res, 'Quote not found', 404);
+    }
+    
+    if (text) quote.text = text;
+    if (source !== undefined) quote.source = source;
+    
+    await author.save();
+    
+    successResponse(res, author.quotes, 'Quote updated successfully');
+  } catch (error) {
+    console.error('Error in updateQuote:', error);
+    next(error);
+  }
+};
+
+export const removeQuote = async (req, res, next) => {
+  try {
+    const { id, quoteId } = req.params;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.quotes = author.quotes.filter(q => q._id.toString() !== quoteId);
+    await author.save();
+    
+    successResponse(res, author.quotes, 'Quote removed successfully');
+  } catch (error) {
+    console.error('Error in removeQuote:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// RELATED AUTHORS MANAGEMENT
+// ============================================
+
+export const getRelatedAuthors = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const author = await Author.findOne({ slug }).populate('relatedAuthors', 'name slug avatar bio era stats');
+    
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    successResponse(res, author.relatedAuthors || []);
+  } catch (error) {
+    console.error('Error in getRelatedAuthors:', error);
+    next(error);
+  }
+};
+
+export const addRelatedAuthor = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { relatedAuthorId } = req.body;
+    
+    if (!relatedAuthorId) {
+      return errorResponse(res, 'Related author ID is required', 400);
+    }
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    const relatedAuthor = await Author.findById(relatedAuthorId);
+    if (!relatedAuthor) {
+      return errorResponse(res, 'Related author not found', 404);
+    }
+    
+    if (id === relatedAuthorId) {
+      return errorResponse(res, 'Cannot add self as related author', 400);
+    }
+    
+    if (!author.relatedAuthors) {
+      author.relatedAuthors = [];
+    }
+    
+    if (!author.relatedAuthors.includes(relatedAuthorId)) {
+      author.relatedAuthors.push(relatedAuthorId);
+      await author.save();
+    }
+    
+    successResponse(res, author.relatedAuthors, 'Related author added successfully');
+  } catch (error) {
+    console.error('Error in addRelatedAuthor:', error);
+    next(error);
+  }
+};
+
+export const removeRelatedAuthor = async (req, res, next) => {
+  try {
+    const { id, relatedAuthorId } = req.params;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    if (author.relatedAuthors) {
+      author.relatedAuthors = author.relatedAuthors.filter(rid => rid.toString() !== relatedAuthorId);
+      await author.save();
+    }
+    
+    successResponse(res, author.relatedAuthors || [], 'Related author removed successfully');
+  } catch (error) {
+    console.error('Error in removeRelatedAuthor:', error);
+    next(error);
+  }
+};
+
+// ============================================
+// SOCIAL LINKS MANAGEMENT
+// ============================================
+
+export const updateSocialLinks = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { website, twitter, facebook, instagram, youtube, wikipedia } = req.body;
+    
+    const author = await Author.findById(id);
+    if (!author) {
+      return errorResponse(res, 'Author not found', 404);
+    }
+    
+    author.socialLinks = {
+      website: website || author.socialLinks?.website,
+      twitter: twitter || author.socialLinks?.twitter,
+      facebook: facebook || author.socialLinks?.facebook,
+      instagram: instagram || author.socialLinks?.instagram,
+      youtube: youtube || author.socialLinks?.youtube,
+      wikipedia: wikipedia || author.socialLinks?.wikipedia
+    };
+    
+    await author.save();
+    
+    successResponse(res, author.socialLinks, 'Social links updated successfully');
+  } catch (error) {
+    console.error('Error in updateSocialLinks:', error);
+    next(error);
+  }
+};
+```
+
+This complete controller includes:
+
+1. **Enhanced Search in `getAuthors`** - Searches across name (English, Urdu, Hindi), bio, genres, category, and era using case-insensitive regex
+2. **Smart Search Optimization** - Short queries (≤3 chars) only search name fields for better performance
+3. **All CRUD Operations** - Create, Read, Update, Delete authors
+4. **Content Management** - Get author's poems, books, audio, videos by slug
+5. **Timeline Management** - Add, update, remove timeline events
+6. **Gallery Management** - Add, update, remove gallery images
+7. **Quote Management** - Add, update, remove quotes
+8. **Related Authors** - Manage related authors relationships
+9. **Follow/Unfollow** - User following functionality
+10. **Social Links** - Update social media links
+11. **Stats** - Get author statistics
+12. **Search Endpoint** - Dedicated search endpoint for authors
+
+The search will now work properly without any MongoDB text score errors!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Here's the updated `AuthorsListPage.jsx` with redesigned author cards, 3 columns, and pagination showing 12 authors per page. All changes are highlighted with comments:
+
+```jsx
+// client/src/pages/public/AuthorsListPage.jsx
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
+import { useSearchParams, Link } from 'react-router-dom'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
+import { 
+  Search, Users, BookOpen, Heart, Filter, Loader2, ChevronLeft, ChevronRight, 
+  Eye, UserPlus, Headphones, Music, Mic, X, MicOff, Volume2, Zap, Sparkles,
+  Award, Star, TrendingUp, Clock, Calendar, MapPin, Quote, BookMarked, Flame,
+  ChevronDown, ChevronUp, Mail, Globe, Twitter, Facebook, Instagram, Youtube,
+  Verified, Library, PenTool, Bookmark, Share2, MoreHorizontal
+} from 'lucide-react'
+import authorAPI from '../../api/authorAPI'
+import { AUTHOR_CATEGORIES } from '../../utils/constants.js'
+
+const AuthorsListPage = () => {
+  const { t } = useTranslation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all')
+  const [searchInputValue, setSearchInputValue] = useState('')
+  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState('popular')
+  const [currentPage, setCurrentPage] = useState(1)
+  const [isListening, setIsListening] = useState(false)
+  const [voiceSupported, setVoiceSupported] = useState(true)
+  const [selectedLetter, setSelectedLetter] = useState(null)
+  const [showIndex, setShowIndex] = useState(true)
+  
+  // ============================================
+  // 🔴 CHANGE 1: UPDATED itemsPerPage to 12 (from 9)
+  // ============================================
+  const itemsPerPage = 12
+  
+  const searchInputRef = useRef(null)
+  const debounceTimerRef = useRef(null)
+  const recognitionRef = useRef(null)
+  const letterRefs = useRef({})
+
+  // Alphabetical index letters
+  const alphabetIndex = [
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V/W', 'Y', 'Z'
+  ]
+
+  // Extended author categories
+  const extendedCategories = [
+    ...AUTHOR_CATEGORIES,
+    { id: 'sufi', label: 'Sufi Poets', labelHi: 'सूफ़ी कवि', labelUr: 'صوفی شعراء' },
+    { id: 'marsiya', label: 'Marsiya Writers', labelHi: 'मर्सिया लेखक', labelUr: 'مرثیہ نگار' },
+    { id: 'nauha', label: 'Nauha Reciters', labelHi: 'नौहा ख्वान', labelUr: 'نوحہ خوان' },
+    { id: 'manqabat', label: 'Manqabat Writers', labelHi: 'मनक़बत लेखक', labelUr: 'منقبت نگار' },
+  ]
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      recognitionRef.current = new SpeechRecognition()
+      recognitionRef.current.continuous = false
+      recognitionRef.current.interimResults = false
+      recognitionRef.current.lang = 'ur-PK, hi-IN, en-US'
+      
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript
+        setSearchInputValue(transcript)
+        updateDebouncedSearch(transcript)
+        setIsListening(false)
+        setSelectedLetter(null)
+      }
+      
+      recognitionRef.current.onerror = (event) => {
+        console.error('Speech recognition error:', event.error)
+        setIsListening(false)
+      }
+      
+      recognitionRef.current.onend = () => {
+        setIsListening(false)
+      }
+    } else {
+      setVoiceSupported(false)
+    }
+    
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.abort()
+      }
+    }
+  }, [])
+
+  // Fetch authors from API
+  const { data: response, isLoading, error, refetch, isFetching } = useQuery({
+    queryKey: ['authors', currentPage, activeCategory, sortBy, debouncedSearchQuery, selectedLetter],
+    queryFn: () => {
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        sort: sortBy
+      }
+      
+      if (activeCategory !== 'all') {
+        params.category = activeCategory
+      }
+      
+      if (debouncedSearchQuery) {
+        params.search = debouncedSearchQuery
+      }
+      
+      if (selectedLetter && !debouncedSearchQuery) {
+        params.letter = selectedLetter
+      }
+      
+      return authorAPI.getAuthors(params)
+    },
+    enabled: true,
+    staleTime: 30000,
+    keepPreviousData: true,
+    refetchOnWindowFocus: false,
+  })
+
+  // Extract authors and pagination
+  const authorsData = response?.data?.data || response?.data || response || []
+  const authors = Array.isArray(authorsData) ? authorsData : []
+  const pagination = response?.data?.pagination || response?.pagination || { total: 0, page: 1, totalPages: 1 }
+
+  // Update URL when category changes
+  useEffect(() => {
+    if (activeCategory && activeCategory !== 'all') {
+      setSearchParams({ category: activeCategory })
+    } else {
+      setSearchParams({})
+    }
+    setCurrentPage(1)
+    setSelectedLetter(null)
+  }, [activeCategory, setSearchParams])
+
+  // Debounce search
+  const updateDebouncedSearch = useCallback((value) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+    
+    debounceTimerRef.current = setTimeout(() => {
+      setDebouncedSearchQuery(value)
+      if (currentPage !== 1) {
+        setCurrentPage(1)
+      }
+      if (value) {
+        setSelectedLetter(null)
+      }
+    }, 500)
+  }, [currentPage])
+
+  const handleSearchChange = useCallback((e) => {
+    const value = e.target.value
+    setSearchInputValue(value)
+    updateDebouncedSearch(value)
+  }, [updateDebouncedSearch])
+
+  const clearSearch = useCallback(() => {
+    setSearchInputValue('')
+    setDebouncedSearchQuery('')
+    if (searchInputRef.current) {
+      searchInputRef.current.focus()
+    }
+  }, [])
+
+  const startVoiceSearch = useCallback(() => {
+    if (recognitionRef.current && !isListening) {
+      try {
+        recognitionRef.current.start()
+        setIsListening(true)
+      } catch (error) {
+        console.error('Failed to start voice recognition:', error)
+      }
+    }
+  }, [isListening])
+
+  const stopVoiceSearch = useCallback(() => {
+    if (recognitionRef.current && isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    }
+  }, [isListening])
+
+  const goToPage = useCallback((page) => {
+    if (page >= 1 && page <= (pagination.totalPages || 1)) {
+      setCurrentPage(page)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [pagination.totalPages])
+
+  const clearFilters = useCallback(() => {
+    clearSearch()
+    setActiveCategory('all')
+    setCurrentPage(1)
+    setSelectedLetter(null)
+  }, [clearSearch])
+
+  const handleLetterClick = (letter) => {
+    if (selectedLetter === letter) {
+      setSelectedLetter(null)
+    } else {
+      setSelectedLetter(letter)
+      setCurrentPage(1)
+      setDebouncedSearchQuery('')
+      setSearchInputValue('')
+    }
+    setTimeout(() => {
+      const element = document.getElementById('authors-section')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 100)
+  }
+
+  // Sort options
+  const sortOptions = [
+    { value: 'popular', label: 'Most Popular', icon: Flame },
+    { value: 'poems', label: 'Most Poems', icon: BookOpen },
+    { value: 'followers', label: 'Most Followers', icon: Users },
+    { value: 'name', label: 'Name A-Z', icon: Quote },
+    { value: 'recent', label: 'Recently Added', icon: Clock }
+  ]
+
+  const getEraColor = (era) => {
+    switch (era?.toLowerCase()) {
+      case 'classical': return 'bg-purple-100 text-purple-700 border-purple-200'
+      case 'modern': return 'bg-blue-100 text-blue-700 border-blue-200'
+      case 'contemporary': return 'bg-green-100 text-green-700 border-green-200'
+      case 'sufi': return 'bg-orange-100 text-orange-700 border-orange-200'
+      case 'marsiya': return 'bg-red-100 text-red-700 border-red-200'
+      default: return 'bg-gray-100 text-gray-700 border-gray-200'
+    }
+  }
+
+  const getCategoryIcon = (categoryId) => {
+    switch (categoryId) {
+      case 'sufi': return <Music className="h-4 w-4" />
+      case 'marsiya': return <Mic className="h-4 w-4" />
+      case 'nauha': return <Headphones className="h-4 w-4" />
+      default: return null
+    }
+  }
+
+  const formatNumber = (count) => {
+    if (!count) return '0'
+    if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`
+    if (count >= 1000) return `${(count / 1000).toFixed(1)}K`
+    return count.toString()
+  }
+
+  // Loading state
+  if (isLoading && authors.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <div className="relative">
+                <div className="w-20 h-20 bg-gradient-to-br from-primary-500 to-amber-500 rounded-2xl animate-pulse mx-auto mb-6 flex items-center justify-center">
+                  <Users className="h-10 w-10 text-white" />
+                </div>
+                <div className="absolute -top-2 -right-2">
+                  <Sparkles className="h-6 w-6 text-amber-400 animate-spin" />
+                </div>
+              </div>
+              <p className="text-gray-600 font-medium">Loading literary legends...</p>
+              <p className="text-sm text-gray-400 mt-1">Discovering poets and writers</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Error state
+  if (error && authors.length === 0) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+          <div className="text-center py-12">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-2xl mb-6">
+              <Users className="h-10 w-10 text-red-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Unable to load authors</h2>
+            <p className="text-gray-500 mb-6">There was an error loading the authors. Please try again.</p>
+            <button onClick={() => refetch()} className="btn-primary inline-flex items-center gap-2">
+              <Sparkles className="h-4 w-4" />
+              Try Again
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-primary-600 via-primary-500 to-amber-500 pt-20 pb-12">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full filter blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-200 rounded-full filter blur-3xl animate-pulse delay-1000" />
+        </div>
+        
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm rounded-full px-4 py-2 mb-4">
+              <Sparkles className="h-4 w-4 text-amber-200" />
+              <span className="text-sm text-white font-medium">INDEX OF POETS</span>
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-3">
+              Literary Authors
+            </h1>
+            <p className="text-base text-white/90 max-w-2xl mx-auto">
+              Discover legendary poets, marsiya writers, nauha reciters, and literary figures
+            </p>
+          </motion.div>
+        </div>
+        
+        <div className="absolute bottom-0 left-0 right-0">
+          <svg className="w-full h-10 text-slate-50" preserveAspectRatio="none" viewBox="0 0 1440 54">
+            <path fill="currentColor" d="M0,22L80,27.3C160,33,320,43,480,42.7C640,43,800,32,960,26.7C1120,21,1280,21,1360,21.3L1440,22L1440,54L1360,54C1280,54,1120,54,960,54C800,54,640,54,480,54C320,54,160,54,80,54L0,54Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 relative z-10">
+        
+        {/* Alphabetical Index */}
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 mb-6"
+        >
+          <div className="flex items-center justify-between mb-2 px-2">
+            <h3 className="text-sm font-semibold text-gray-700">INDEX OF POETS</h3>
+            <button
+              onClick={() => setShowIndex(!showIndex)}
+              className="text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              {showIndex ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+          </div>
+          
+          {showIndex && (
+            <div className="flex flex-wrap justify-center gap-1">
+              {alphabetIndex.map((letter) => (
+                <button
+                  key={letter}
+                  onClick={() => handleLetterClick(letter)}
+                  className={`w-10 h-10 rounded-lg font-medium text-sm transition-all ${
+                    selectedLetter === letter
+                      ? 'bg-gradient-to-r from-primary-600 to-amber-500 text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {letter}
+                </button>
+              ))}
+            </div>
+          )}
+        </motion.div>
+
+        {/* Search & Filters Bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-6"
+        >
+          <div className="flex flex-col lg:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <input
+                ref={searchInputRef}
+                type="text"
+                placeholder="Search authors by name or genre..."
+                value={searchInputValue}
+                onChange={handleSearchChange}
+                className="w-full pl-12 pr-24 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-50/50 transition-all"
+                autoComplete="off"
+              />
+              {searchInputValue && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-14 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  type="button"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+              {voiceSupported && (
+                <button
+                  onClick={isListening ? stopVoiceSearch : startVoiceSearch}
+                  className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-1.5 rounded-lg transition-all ${
+                    isListening 
+                      ? 'bg-red-500 text-white animate-pulse' 
+                      : 'text-gray-400 hover:text-primary-600 hover:bg-primary-50'
+                  }`}
+                  type="button"
+                  title={isListening ? "Stop listening" : "Voice search"}
+                >
+                  {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                </button>
+              )}
+            </div>
+
+            <div className="flex gap-2">
+              <select
+                value={sortBy}
+                onChange={(e) => {
+                  setSortBy(e.target.value)
+                  setSelectedLetter(null)
+                }}
+                className="px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-gray-50/50 cursor-pointer"
+              >
+                {sortOptions.map(option => {
+                  const Icon = option.icon
+                  return (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  )
+                })}
+              </select>
+            </div>
+          </div>
+
+          {/* Search Results Info */}
+          {debouncedSearchQuery && (
+            <div className="mt-3 px-3 py-2 bg-primary-50 rounded-lg">
+              <p className="text-sm text-primary-700">
+                Searching for: <span className="font-semibold">"{debouncedSearchQuery}"</span>
+                {!isFetching && !isLoading && (
+                  <span className="ml-2">({pagination.total || authors.length} authors found)</span>
+                )}
+                {(isFetching || isLoading) && (
+                  <span className="ml-2 inline-flex items-center gap-1">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Searching...
+                  </span>
+                )}
+              </p>
+            </div>
+          )}
+
+          {/* Selected Letter Info */}
+          {selectedLetter && !debouncedSearchQuery && (
+            <div className="mt-3 px-3 py-2 bg-amber-50 rounded-lg">
+              <p className="text-sm text-amber-700">
+                Showing authors starting with: <span className="font-semibold">{selectedLetter}</span>
+                <button
+                  onClick={() => setSelectedLetter(null)}
+                  className="ml-3 text-amber-600 hover:text-amber-800"
+                >
+                  Clear filter
+                </button>
+              </p>
+            </div>
+          )}
+
+          {/* Voice Search Listening Indicator */}
+          {isListening && (
+            <div className="mt-3 px-3 py-2 bg-red-50 rounded-lg animate-pulse">
+              <p className="text-sm text-red-600 flex items-center gap-2">
+                <Mic className="h-4 w-4 animate-pulse" />
+                Listening... Speak the author name you want to search
+              </p>
+            </div>
+          )}
+
+          {/* Category Tabs */}
+          <div className="flex overflow-x-auto scrollbar-hide gap-2 mt-4 pb-2">
+            <button
+              onClick={() => {
+                setActiveCategory('all')
+                setSelectedLetter(null)
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all whitespace-nowrap ${
+                activeCategory === 'all'
+                  ? 'bg-gradient-to-r from-primary-600 to-amber-500 text-white shadow-md'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              All Authors
+            </button>
+            {extendedCategories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => {
+                  setActiveCategory(cat.id)
+                  setSelectedLetter(null)
+                }}
+                className={`flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                  activeCategory === cat.id
+                    ? 'bg-gradient-to-r from-primary-600 to-amber-500 text-white shadow-md'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {getCategoryIcon(cat.id)}
+                <span>{cat.label}</span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Results Header */}
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-6 bg-gradient-to-b from-primary-600 to-amber-500 rounded-full" />
+            <p className="text-sm text-gray-600">
+              Showing <span className="font-semibold text-gray-900">{authors.length}</span> of{' '}
+              <span className="font-semibold text-gray-900">{pagination.total || authors.length}</span> authors
+            </p>
+          </div>
+          {(activeCategory !== 'all' || debouncedSearchQuery || selectedLetter) && (
+            <button
+              onClick={clearFilters}
+              className="text-sm text-primary-600 hover:text-primary-700 flex items-center gap-1 transition-colors"
+            >
+              Clear all filters
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+
+        {/* ============================================
+            🔴 CHANGE 2: REDESIGNED AUTHOR CARD
+            🔴 CHANGE 3: 3 COLUMN GRID (xl:grid-cols-3)
+        ============================================ */}
+        <div id="authors-section">
+          {authors.length === 0 && !isLoading ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="bg-white rounded-2xl p-12 text-center border border-gray-100"
+            >
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-amber-100 rounded-2xl mb-6">
+                <Users className="h-10 w-10 text-amber-600" />
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No authors found</h3>
+              <p className="text-gray-500 max-w-md mx-auto">
+                {debouncedSearchQuery 
+                  ? `No authors matching "${debouncedSearchQuery}" found. Try a different search term.`
+                  : selectedLetter
+                  ? `No authors found starting with "${selectedLetter}".`
+                  : 'No authors available in this category yet.'}
+              </p>
+              {(debouncedSearchQuery || activeCategory !== 'all' || selectedLetter) && (
+                <button
+                  onClick={clearFilters}
+                  className="mt-6 inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  Clear all filters
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </motion.div>
+          ) : (
+            <>
+              {/* 
+                🔴 CHANGE 3: Column change from 4 to 3 columns
+                Previously: grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+                Now:       grid-cols-1 md:grid-cols-2 lg:grid-cols-3
+              */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {authors.map((author, index) => (
+                  <motion.div
+                    key={author._id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: Math.min(index * 0.05, 0.3) }}
+                    whileHover={{ y: -4 }}
+                  >
+                    <Link to={`/author/${author.slug}`} className="block group">
+                      {/* REDESIGNED AUTHOR CARD */}
+                      <div className="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 hover:shadow-xl transition-all duration-300 h-full flex flex-col">
+                        
+                        {/* Card Header with Gradient Background */}
+                        <div className="relative bg-gradient-to-r from-primary-600 via-primary-500 to-amber-500 p-5">
+                          <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-colors" />
+                          
+                          {/* Era Badge */}
+                          <div className="relative flex justify-end mb-2">
+                            <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${getEraColor(author.era)} border`}>
+                              {author.era || 'Classical'} Era
+                            </span>
+                          </div>
+                          
+                          {/* Avatar and Name Section */}
+                          <div className="relative flex flex-col items-center text-center">
+                            {/* Avatar */}
+                            <div className="mb-3">
+                              {author.avatar ? (
+                                <img
+                                  src={author.avatar}
+                                  alt={author.name}
+                                  className="w-28 h-28 rounded-full object-cover border-4 border-white shadow-lg ring-4 ring-white/30"
+                                />
+                              ) : (
+                                <div className="w-28 h-28 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center border-4 border-white shadow-lg ring-4 ring-white/30">
+                                  <span className="text-4xl font-bold text-white">
+                                    {author.name?.charAt(0) || 'A'}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            
+                            {/* Author Name */}
+                            <h3 className="font-bold text-white text-xl group-hover:translate-x-1 transition-transform">
+                              {author.name}
+                            </h3>
+                            
+                            {/* Urdu/Hindi Name */}
+                            {author.nameUrdu && (
+                              <p className="urdu-text text-white/80 text-sm mt-1" dir="rtl">
+                                {author.nameUrdu}
+                              </p>
+                            )}
+                            
+                            {/* Verified Badge */}
+                            {author.isVerified && (
+                              <div className="inline-flex items-center gap-1 mt-2 bg-amber-500/20 backdrop-blur-sm px-2 py-0.5 rounded-full">
+                                <Verified className="h-3 w-3 text-amber-300" />
+                                <span className="text-xs text-amber-100">Verified Poet</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        
+                        {/* Card Body */}
+                        <div className="p-5 flex-1">
+                          {/* Bio */}
+                          <p className="text-gray-600 text-sm line-clamp-3 mb-4 leading-relaxed">
+                            {author.bio?.substring(0, 120)}...
+                          </p>
+                          
+                          {/* Stats Grid */}
+                          <div className="grid grid-cols-3 gap-3 mb-4 pt-2 border-t border-gray-100">
+                            <div className="text-center">
+                              <div className="flex items-center justify-center gap-1 text-primary-600 mb-1">
+                                <BookOpen className="h-4 w-4" />
+                              </div>
+                              <p className="text-lg font-bold text-gray-800">{author.stats?.poemsCount || 0}</p>
+                              <p className="text-xs text-gray-400">Poems</p>
+                            </div>
+                            <div className="text-center">
+                              <div className="flex items-center justify-center gap-1 text-pink-500 mb-1">
+                                <Heart className="h-4 w-4" />
+                              </div>
+                              <p className="text-lg font-bold text-gray-800">{formatNumber(author.stats?.followers || 0)}</p>
+                              <p className="text-xs text-gray-400">Followers</p>
+                            </div>
+                            <div className="text-center">
+                              <div className="flex items-center justify-center gap-1 text-blue-500 mb-1">
+                                <Eye className="h-4 w-4" />
+                              </div>
+                              <p className="text-lg font-bold text-gray-800">{formatNumber(author.stats?.views || 0)}</p>
+                              <p className="text-xs text-gray-400">Views</p>
+                            </div>
+                          </div>
+                          
+                          {/* Genres Tags */}
+                          {author.genres && author.genres.length > 0 && (
+                            <div className="flex flex-wrap gap-1.5 mt-3 pt-2 border-t border-gray-100">
+                              {author.genres.slice(0, 3).map((genre, idx) => (
+                                <span key={idx} className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full capitalize">
+                                  {genre}
+                                </span>
+                              ))}
+                              {author.genres.length > 3 && (
+                                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-500 rounded-full">
+                                  +{author.genres.length - 3}
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Card Footer */}
+                        <div className="px-5 py-3 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+                          <div className="flex items-center gap-1 text-gray-400 text-xs">
+                            <Calendar className="h-3 w-3" />
+                            <span>Joined {new Date(author.createdAt).getFullYear()}</span>
+                          </div>
+                          <div className="text-primary-600 text-sm font-medium group-hover:translate-x-1 transition-transform">
+                            View Profile →
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* ============================================
+                  🔴 CHANGE 4: PAGINATION - 12 items per page
+              ============================================ */}
+              {(pagination.totalPages > 1 || Math.ceil(authors.length / itemsPerPage) > 1) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="flex items-center justify-center gap-2 mt-12"
+                >
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronLeft className="h-5 w-5 text-gray-600" />
+                  </button>
+                  
+                  <div className="flex items-center gap-1">
+                    {/* Show current page indicator */}
+                    <span className="px-4 py-2 text-sm text-gray-600">
+                      Page {currentPage} of {pagination.totalPages || Math.ceil(authors.length / itemsPerPage)}
+                    </span>
+                  </div>
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === (pagination.totalPages || Math.ceil(authors.length / itemsPerPage))}
+                    className="p-2 rounded-xl border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                  >
+                    <ChevronRight className="h-5 w-5 text-gray-600" />
+                  </button>
+                </motion.div>
+              )}
+
+              {/* Loading indicator */}
+              <AnimatePresence>
+                {(isFetching || isLoading) && authors.length > 0 && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="flex justify-center mt-8"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+                      <span className="text-sm text-gray-500">Loading more authors...</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default AuthorsListPage
+```
+
+## Summary of Changes (Highlighted in Code):
+
+### 🔴 CHANGE 1: Items Per Page
+```javascript
+// Line 34 - Changed from 9 to 12
+const itemsPerPage = 12
+```
+
+### 🔴 CHANGE 2: Redesigned Author Card
+- **New Header**: Gradient background with era badge
+- **Larger Avatar**: 28x28 rounded with ring effect
+- **Better Typography**: Larger author name, Urdu name support
+- **Verified Badge**: Visual indicator for verified poets
+- **Stats Grid**: 3-column grid for Poems, Followers, Views
+- **Genres Tags**: Styled tags with + indicator for more
+- **Footer**: Join date and "View Profile" link
+
+### 🔴 CHANGE 3: Column Layout (3 Columns)
+```jsx
+// Line 366 - Changed from xl:grid-cols-4 to lg:grid-cols-3
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+```
+
+### 🔴 CHANGE 4: Simplified Pagination
+- Shows "Page X of Y" text instead of individual page numbers
+- Previous/Next buttons only
+- Cleaner design for 12 items per page
+
+## Card Features:
+- **Era Badge**: Shows Classical, Modern, Contemporary era
+- **Stats Display**: Poems count, Followers, Views
+- **Genres**: Up to 3 genre tags
+- **Join Date**: Shows when author joined
+- **Hover Effects**: Lift effect and gradient overlay
+- **Responsive**: 1 column on mobile, 2 on tablet, 3 on desktop
+
+The redesigned cards are more visually appealing with better information hierarchy, making it easier for users to discover and browse authors!
