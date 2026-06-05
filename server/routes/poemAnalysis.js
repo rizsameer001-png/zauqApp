@@ -265,7 +265,7 @@
 //     let result = { success: false };
     
 //     // Try Hugging Face first if token exists
-//     if (hfToken && hfToken !== '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') {
+//     if (hfToken && hfToken !== 'hf_') {
 //       console.log('🤗 Attempting Hugging Face analysis...');
 //       result = await analyzePoemWithHuggingFace(poemContent, poemTitle, hfToken);
 //     } else {
@@ -351,7 +351,7 @@
 //   res.json({
 //     status: 'ok',
 //     huggingface: {
-//       configured: !!hfToken && hfToken !== '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',
+//       configured: !!hfToken && hfToken !== 'hf_',
 //       tokenPrefix: hfToken ? hfToken.substring(0, 15) + '...' : 'missing'
 //     }
 //   });
@@ -775,7 +775,7 @@ router.get('/health', async (req, res) => {
         status: geminiKey ? 'ready' : 'missing'
       },
       huggingface: {
-        configured: !!hfToken && hfToken !== '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',
+        const isConfigured = Boolean(hfToken) && hfToken.startsWith("hf_");
         modelsFound: WORKING_HF_MODELS.length,
         models: WORKING_HF_MODELS.map(m => ({ name: m.name, size: m.size }))
       },
