@@ -80,28 +80,9 @@
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Premium Glassmorphism Button */
-  .btn-premium {
-    @apply px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl 
-           hover:shadow-lg hover:shadow-amber-500/30 transition-all duration-300
-           focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-glass {
-    @apply px-5 py-2.5 bg-white/5 backdrop-blur-sm text-white/70 font-medium rounded-xl 
-           hover:bg-white/10 hover:text-white border border-white/10 transition-all duration-300;
-  }
-
   .card {
     @apply bg-white rounded-xl shadow-sm border border-gray-100 
            hover:shadow-md transition-shadow duration-300;
-  }
-
-  /* Premium Glass Card */
-  .card-glass {
-    @apply bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 
-           hover:bg-white/10 transition-all duration-300;
   }
 
   .card-hover {
@@ -163,12 +144,6 @@
 
   .badge-info {
     @apply bg-blue-100 text-blue-800;
-  }
-
-  /* Premium Badge */
-  .badge-premium {
-    @apply inline-flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-amber-500/20 to-orange-500/20 
-           text-amber-400 text-xs font-semibold rounded-full border border-amber-500/30;
   }
 }
 
@@ -305,30 +280,6 @@
     opacity: 1;
   }
 
-  /* Premium Audio Player Custom Range */
-  input[type="range"].premium-range {
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 9999px;
-    height: 4px;
-  }
-
-  input[type="range"].premium-range::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    background: #f59e0b;
-    border-radius: 50%;
-    cursor: pointer;
-    box-shadow: 0 0 6px #f59e0b;
-  }
-
-  input[type="range"].premium-range::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-  }
-
   /* Animations */
   @keyframes fadeIn {
     from {
@@ -383,43 +334,6 @@
     }
   }
 
-  /* Premium Animations */
-  @keyframes glow {
-    0%, 100% {
-      box-shadow: 0 0 20px rgba(245, 158, 11, 0.2);
-    }
-    50% {
-      box-shadow: 0 0 40px rgba(245, 158, 11, 0.4);
-    }
-  }
-
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0px);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-
-  @keyframes spin-slow {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
-    }
-    100% {
-      background-position: 1000px 0;
-    }
-  }
-
   .animate-fadeIn {
     animation: fadeIn 0.3s ease-out;
   }
@@ -440,25 +354,6 @@
     animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 
-  .animate-glow {
-    animation: glow 2s ease-in-out infinite;
-  }
-
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-
-  .animate-spin-slow {
-    animation: spin-slow 8s linear infinite;
-  }
-
-  /* Shimmer effect for loading states */
-  .shimmer {
-    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-    background-size: 1000px 100%;
-    animation: shimmer 2s infinite;
-  }
-
   /* Loading skeleton */
   .skeleton {
     @apply bg-gray-200 animate-pulse rounded;
@@ -470,14 +365,6 @@
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  /* Premium Glass effect (thicker blur) */
-  .glass-premium {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* RTL support for modal/dialog */
@@ -514,79 +401,4 @@
       border-radius: 0;
     }
   }
-}
-
-/* Custom styles for premium audio player */
-.premium-player-container {
-  background: linear-gradient(135deg, rgba(31, 41, 55, 0.8) 0%, rgba(17, 24, 39, 0.9) 100%);
-  backdrop-filter: blur(12px);
-}
-
-/* Custom scrollbar for premium design */
-.premium-scroll::-webkit-scrollbar {
-  height: 4px;
-  width: 4px;
-}
-
-.premium-scroll::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.premium-scroll::-webkit-scrollbar-thumb {
-  background: rgba(245, 158, 11, 0.5);
-  border-radius: 4px;
-}
-
-.premium-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(245, 158, 11, 0.8);
-}
-
-/* Modal animation */
-.modal-enter {
-  opacity: 0;
-  transform: scale(0.95);
-}
-
-.modal-enter-active {
-  opacity: 1;
-  transform: scale(1);
-  transition: opacity 300ms, transform 300ms;
-}
-
-.modal-exit {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.modal-exit-active {
-  opacity: 0;
-  transform: scale(0.95);
-  transition: opacity 300ms, transform 300ms;
-}
-
-/* Hover effect for premium cards */
-.premium-card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.premium-card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.3);
-  border-color: rgba(245, 158, 11, 0.3);
-}
-
-/* Gradient text utility */
-.text-gradient {
-  background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.text-gradient-premium {
-  background: linear-gradient(135deg, #f59e0b 0%, #f97316 25%, #ec4899 50%, #8b5cf6 75%, #6366f1 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
