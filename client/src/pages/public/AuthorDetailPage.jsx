@@ -4224,15 +4224,14 @@ const AuthorDetailPage = () => {
           </Link>
         </motion.div>
 
-        {/* Cover Section - RESPONSIVE 3:1 RATIO */}
+        {/* Cover Section - With Author Name Inside */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative mb-8"
+          className="relative mb-16"
         >
-          {/* Cover Image Container - Responsive aspect ratio */}
+          {/* Cover Image Container - 3:1 aspect ratio */}
           <div className="relative w-full rounded-2xl overflow-hidden shadow-xl">
-            {/* Responsive aspect ratio: 3:1 (width:height) */}
             <div className="relative" style={{ paddingBottom: '33.33%' }}>
               {author.coverImage ? (
                 <>
@@ -4241,149 +4240,73 @@ const AuthorDetailPage = () => {
                     alt={`${author.name} cover`}
                     className="absolute inset-0 w-full h-full object-cover object-center"
                   />
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  {/* Dark Gradient Overlay for Text Readability */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 </>
               ) : (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-700 via-primary-600 to-amber-700">
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-800 via-primary-700 to-amber-800">
                   <div className="absolute inset-0 opacity-20">
                     <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full filter blur-3xl animate-pulse" />
                     <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-200 rounded-full filter blur-3xl animate-pulse delay-1000" />
                   </div>
                 </div>
               )}
-            </div>
-            
-            {/* Profile Image - Positioned overlapping the cover */}
-            <div className="absolute -bottom-16 left-6 md:left-8">
-              <div className="relative">
-                <div className="w-28 h-28 md:w-36 md:h-36 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
-                  <img
-                    src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=144&bold=true`}
-                    alt={author.name}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                {author.isVerified && (
-                  <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 border-2 border-white">
-                    <Check className="h-3 w-3 text-white" />
+              
+              {/* Author Name Overlay - Inside Cover Image */}
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-10">
+                <div className="space-y-2">
+                  {/* Roman Name */}
+                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
+                    {author.name}
+                  </h1>
+                  {/* Urdu Name */}
+                  {author.nameUrdu && (
+                    <p className="urdu-text text-xl md:text-2xl text-white/90 drop-shadow-lg" dir="rtl">
+                      {author.nameUrdu}
+                    </p>
+                  )}
+                  {/* Era & Verified Badges */}
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {author.era && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-xs md:text-sm font-medium">
+                        <Award className="h-3.5 w-3.5" />
+                        {author.era} Era
+                      </span>
+                    )}
+                    {author.isVerified && (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/80 backdrop-blur-md rounded-full text-white text-xs md:text-sm font-medium">
+                        <Check className="h-3.5 w-3.5" />
+                        Verified Author
+                      </span>
+                    )}
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
           
-          {/* Author Info - Positioned below cover */}
-          <div className="mt-20 md:mt-24 pl-6 md:pl-8 pr-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900">
-                  {author.name}
-                </h1>
-                {author.nameUrdu && (
-                  <p className="urdu-text text-lg text-gray-600 mt-1" dir="rtl">
-                    {author.nameUrdu}
-                  </p>
-                )}
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {author.era && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-primary-100 to-amber-100 text-primary-700 text-xs font-medium rounded-full">
-                      <Award className="h-3 w-3" />
-                      {author.era} Era
-                    </span>
-                  )}
-                  {author.isVerified && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 text-xs font-medium rounded-full">
-                      <Check className="h-3 w-3" />
-                      Verified Author
-                    </span>
-                  )}
-                </div>
+          {/* Profile Image - Positioned Above Cover (overlapping) */}
+          <div className="absolute -bottom-12 left-6 md:left-8 z-20">
+            <div className="relative">
+              <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
+                <img
+                  src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=128&bold=true`}
+                  alt={author.name}
+                  className="w-full h-full object-cover"
+                />
               </div>
-              
-              {/* Action Buttons */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleFollowToggle}
-                  disabled={followMutation.isPending || unfollowMutation.isPending}
-                  className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
-                    isFollowing
-                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      : 'bg-gradient-to-r from-primary-600 to-amber-500 text-white hover:shadow-lg hover:-translate-y-0.5'
-                  }`}
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserCheck className="h-4 w-4" />
-                      <span>Following</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="h-4 w-4" />
-                      <span>Follow</span>
-                    </>
-                  )}
-                </button>
-                
-                {/* Share Button with Menu */}
-                <div className="relative">
-                  <button 
-                    onClick={handleShare}
-                    className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all hover:shadow-md"
-                  >
-                    <Share2 className="h-5 w-5 text-gray-600" />
-                  </button>
-                  
-                  <AnimatePresence>
-                    {showShareMenu && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                        className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                      >
-                        <div className="p-3 border-b border-gray-100">
-                          <p className="text-sm font-medium text-gray-700">Share this author</p>
-                        </div>
-                        <div className="p-2">
-                          {shareLinks.map((link) => (
-                            <a
-                              key={link.name}
-                              href={link.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              onClick={() => setShowShareMenu(false)}
-                              className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg ${link.color} text-white mb-1 transition-all hover:shadow-md`}
-                            >
-                              <link.icon className="h-4 w-4" />
-                              <span className="text-sm font-medium">{link.name}</span>
-                            </a>
-                          ))}
-                          <button
-                            onClick={copyToClipboard}
-                            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all mt-1"
-                          >
-                            {copiedLink ? (
-                              <>
-                                <Check className="h-4 w-4 text-green-600" />
-                                <span className="text-sm font-medium text-green-600">Copied!</span>
-                              </>
-                            ) : (
-                              <>
-                                <Copy className="h-4 w-4 text-gray-600" />
-                                <span className="text-sm font-medium text-gray-700">Copy Link</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+              {author.isVerified && (
+                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 border-2 border-white">
+                  <Check className="h-3 w-3 text-white" />
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </motion.div>
+
+        {/* Empty spacer to account for overlapping profile image */}
+        <div className="h-12 md:h-16"></div>
 
         {/* Stats Cards - Premium Design */}
         <motion.div
@@ -4411,6 +4334,87 @@ const AuthorDetailPage = () => {
             </div>
           ))}
         </motion.div>
+
+        {/* Action Buttons Row */}
+        <div className="flex justify-end items-center gap-3 mb-8">
+          <button
+            onClick={handleFollowToggle}
+            disabled={followMutation.isPending || unfollowMutation.isPending}
+            className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
+              isFollowing
+                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                : 'bg-gradient-to-r from-primary-600 to-amber-500 text-white hover:shadow-lg hover:-translate-y-0.5'
+            }`}
+          >
+            {isFollowing ? (
+              <>
+                <UserCheck className="h-4 w-4" />
+                <span>Following</span>
+              </>
+            ) : (
+              <>
+                <UserPlus className="h-4 w-4" />
+                <span>Follow</span>
+              </>
+            )}
+          </button>
+          
+          {/* Share Button with Menu */}
+          <div className="relative">
+            <button 
+              onClick={handleShare}
+              className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all hover:shadow-md"
+            >
+              <Share2 className="h-5 w-5 text-gray-600" />
+            </button>
+            
+            <AnimatePresence>
+              {showShareMenu && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                  className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                >
+                  <div className="p-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-gray-700">Share this author</p>
+                  </div>
+                  <div className="p-2">
+                    {shareLinks.map((link) => (
+                      <a
+                        key={link.name}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setShowShareMenu(false)}
+                        className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg ${link.color} text-white mb-1 transition-all hover:shadow-md`}
+                      >
+                        <link.icon className="h-4 w-4" />
+                        <span className="text-sm font-medium">{link.name}</span>
+                      </a>
+                    ))}
+                    <button
+                      onClick={copyToClipboard}
+                      className="flex items-center gap-3 w-full px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all mt-1"
+                    >
+                      {copiedLink ? (
+                        <>
+                          <Check className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium text-green-600">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="h-4 w-4 text-gray-600" />
+                          <span className="text-sm font-medium text-gray-700">Copy Link</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
 
         {/* Bio & Info Section */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">

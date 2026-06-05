@@ -744,6 +744,357 @@
 
 
 
+// // API Endpoints
+// export const API_ENDPOINTS = {
+//   AUTH: {
+//     REGISTER: '/auth/register',
+//     LOGIN: '/auth/login',
+//     GOOGLE: '/auth/google',
+//     LOGOUT: '/auth/logout',
+//     PROFILE: '/auth/profile',
+//     FORGOT_PASSWORD: '/auth/forgot-password',
+//     RESET_PASSWORD: '/auth/reset-password',
+//   },
+//   POEMS: {
+//     BASE: '/poems',
+//     BY_SLUG: (slug) => `/poems/${slug}`,
+//     FEATURED: '/poems/featured',
+//     TRENDING: '/poems/trending',
+//     BY_AUTHOR: (authorId) => `/poems/author/${authorId}`,
+//   },
+//   AUTHORS: {
+//     BASE: '/authors',
+//     BY_SLUG: (slug) => `/authors/${slug}`,
+//     FEATURED: '/authors/featured',
+//     TRENDING: '/authors/trending',
+//   },
+//   BOOKS: {
+//     BASE: '/books',
+//     BY_SLUG: (slug) => `/books/${slug}`,
+//     FEATURED: '/books/featured',
+//     DOWNLOAD: (slug) => `/books/${slug}/download`,
+//     READER: (slug) => `/books/${slug}/reader`,
+//   },
+//   AUDIO: {
+//     BASE: '/audio',
+//     BY_SLUG: (slug) => `/audio/${slug}`,
+//     FEATURED: '/audio/featured',
+//     STREAM: (slug) => `/audio/${slug}/stream`,
+//     TRANSCRIPT: (slug) => `/audio/${slug}/transcript`,
+//     BY_TYPE: (type) => `/audio/type/${type}`,
+//     BY_OCCASION: (occasion) => `/audio/occasion/${occasion}`,
+//   },
+//   VIDEOS: {
+//     BASE: '/videos',
+//     BY_SLUG: (slug) => `/videos/${slug}`,
+//     FEATURED: '/videos/featured',
+//     STREAM: (slug) => `/videos/${slug}/stream`,
+//   },
+//   UPLOAD: {
+//     IMAGE: '/upload/image',
+//     PDF: '/upload/pdf',
+//     EPUB: '/upload/epub',
+//     AUDIO: '/upload/audio',
+//     VIDEO: '/upload/video',
+//   },
+//   SUBSCRIPTIONS: {
+//     BASE: '/subscriptions',
+//     PLANS: '/subscriptions/plans',
+//     CURRENT: '/subscriptions/current',
+//     SUBSCRIBE: '/subscriptions/subscribe',
+//     CANCEL: '/subscriptions/cancel',
+//     BILLING_HISTORY: '/subscriptions/billing-history',
+//     VERIFY_PAYMENT: '/subscriptions/verify-payment',
+//     FEATURES: '/subscriptions/features',
+//   }
+// };
+
+// // Content Types
+// export const CONTENT_TYPES = {
+//   POEM: 'poem',
+//   AUTHOR: 'author',
+//   BOOK: 'book',
+//   AUDIO: 'audio',
+//   VIDEO: 'video',
+// };
+
+// // Subscription Plans
+// export const SUBSCRIPTION_PLANS = {
+//   FREE: {
+//     id: 'free',
+//     name: 'Free',
+//     price: 0,
+//     currency: 'INR',
+//     period: 'month',
+//     description: 'Perfect for getting started',
+//     features: [
+//       'Browse all content',
+//       'Read public poems',
+//       'Basic search',
+//       'Limited downloads (50 poems/day)',
+//       '2 ebooks/month',
+//       '5 audio streams/month'
+//     ],
+//     limits: {
+//       poemsPerDay: 50,
+//       booksPerMonth: 2,
+//       audioPerMonth: 5
+//     },
+//     badge: null,
+//     recommended: false,
+//     color: 'gray'
+//   },
+//   BASIC: {
+//     id: 'basic',
+//     name: 'Basic',
+//     price: 99,
+//     currency: 'INR',
+//     period: 'month',
+//     description: 'Great for regular readers',
+//     features: [
+//       'All free features',
+//       'Unlimited poem reading',
+//       'Download 5 ebooks/month',
+//       'Basic audio streaming',
+//       'Ad-supported experience',
+//       'Email support'
+//     ],
+//     limits: {
+//       ebooksPerMonth: 5,
+//       audiobooksPerMonth: 3
+//     },
+//     badge: 'Popular',
+//     recommended: true,
+//     color: 'blue'
+//   },
+//   PREMIUM: {
+//     id: 'premium',
+//     name: 'Premium',
+//     price: 199,
+//     currency: 'INR',
+//     period: 'month',
+//     description: 'For serious literature enthusiasts',
+//     features: [
+//       'All Basic features',
+//       'Unlimited downloads',
+//       'HD audio streaming',
+//       'Ad-free experience',
+//       'AI-powered explanations',
+//       'Priority support',
+//       'Offline access'
+//     ],
+//     limits: {
+//       unlimited: true
+//     },
+//     badge: 'Best Value',
+//     recommended: true,
+//     color: 'amber'
+//   },
+//   PRO: {
+//     id: 'pro',
+//     name: 'Pro',
+//     price: 499,
+//     currency: 'INR',
+//     period: 'month',
+//     description: 'For creators and power users',
+//     features: [
+//       'All Premium features',
+//       'Creator tools',
+//       'Analytics dashboard',
+//       'Early access to features',
+//       '24/7 priority support',
+//       'API access',
+//       'Content monetization',
+//       'Custom branding'
+//     ],
+//     limits: {
+//       unlimited: true,
+//       creator: true
+//     },
+//     badge: 'Creator',
+//     recommended: false,
+//     color: 'purple'
+//   }
+// };
+
+// // Billing Cycles
+// export const BILLING_CYCLES = {
+//   MONTHLY: 'monthly',
+//   QUARTERLY: 'quarterly',
+//   YEARLY: 'yearly'
+// };
+
+// // Payment Methods
+// export const PAYMENT_METHODS = {
+//   CARD: 'card',
+//   UPI: 'upi',
+//   NETBANKING: 'netbanking',
+//   WALLET: 'wallet',
+//   FREE: 'free'
+// };
+
+// // Subscription Status
+// export const SUBSCRIPTION_STATUS = {
+//   ACTIVE: 'active',
+//   CANCELLED: 'cancelled',
+//   EXPIRED: 'expired',
+//   PENDING: 'pending'
+// };
+
+// // Helper functions for subscriptions
+// export const getPlanById = (planId) => {
+//   return Object.values(SUBSCRIPTION_PLANS).find(plan => plan.id === planId);
+// };
+
+// export const getAllPlans = () => {
+//   return Object.values(SUBSCRIPTION_PLANS);
+// };
+
+// export const getRecommendedPlans = () => {
+//   return Object.values(SUBSCRIPTION_PLANS).filter(plan => plan.recommended);
+// };
+
+// export const getActivePlans = () => {
+//   return Object.values(SUBSCRIPTION_PLANS);
+// };
+
+// export const calculateDiscountedPrice = (plan, billingCycle) => {
+//   const basePrice = plan.price;
+//   if (billingCycle === BILLING_CYCLES.QUARTERLY) {
+//     return {
+//       amount: basePrice * 3,
+//       discount: 10,
+//       totalSavings: Math.round(basePrice * 3 * 0.1)
+//     };
+//   } else if (billingCycle === BILLING_CYCLES.YEARLY) {
+//     return {
+//       amount: basePrice * 12,
+//       discount: 20,
+//       totalSavings: Math.round(basePrice * 12 * 0.2)
+//     };
+//   }
+//   return {
+//     amount: basePrice,
+//     discount: 0,
+//     totalSavings: 0
+//   };
+// };
+
+// // Poetry Genres
+// export const POETRY_GENRES = [
+//   { id: 'ghazal', label: 'Ghazals', labelHi: 'ग़ज़ल', labelUr: 'غزل', icon: '🎵', description: 'Love, romance, and philosophical poetry' },
+//   { id: 'nazm', label: 'Nazms', labelHi: 'नज़्म', labelUr: 'نظم', icon: '📝', description: 'Narrative and descriptive poetry' },
+//   { id: 'sher', label: 'Sher', labelHi: 'शेर', labelUr: 'شعر', icon: '📖', description: 'Two-line couplets' },
+//   { id: 'rubai', label: 'Rubai', labelHi: 'रुबाई', labelUr: 'رباعی', icon: '🔢', description: 'Four-line quatrains' },
+//   { id: 'rekhti', label: 'Rekhti', labelHi: 'रेख़्ती', labelUr: 'ریختی', icon: '💫', description: 'Feminine perspective poetry' },
+//   { id: 'qasida', label: 'Qasida', labelHi: 'क़सीदा', labelUr: 'قصیدہ', icon: '🏆', description: 'Panegyric poetry' },
+//   { id: 'marsiya', label: 'Marsiya', labelHi: 'मर्सिया', labelUr: 'مرثیہ', icon: '💔', description: 'Elegiac poetry' },
+//   { id: 'other', label: 'Other', labelHi: 'अन्य', labelUr: 'دیگر', icon: '📚', description: 'Other forms of poetry' },
+// ];
+
+// // Author Categories
+// export const AUTHOR_CATEGORIES = [
+//   { id: 'classical', label: 'Classical Poets', labelHi: 'शास्त्रीय कवि', labelUr: 'کلاسیکی شعراء', description: 'Pre-20th century poets' },
+//   { id: 'modern', label: 'Modern Poets', labelHi: 'आधुनिक कवि', labelUr: 'جدید شعراء', description: '20th century poets' },
+//   { id: 'contemporary', label: 'Contemporary Poets', labelHi: 'समकालीन कवि', labelUr: 'معاصر شعراء', description: 'Living or recent poets' },
+//   { id: 'female', label: 'Female Poets', labelHi: 'महिला कवि', labelUr: 'خواتین شعراء', description: 'Women poets' },
+//   { id: 'trending', label: 'Trending Poets', labelHi: 'ट्रेंडिंग कवि', labelUr: 'مقبول شعراء', description: 'Most popular authors' },
+//   { id: 'emerging', label: 'Emerging Voices', labelHi: 'उभरती आवाज़ें', labelUr: 'ابھرتی آوازیں', description: 'New and upcoming poets' },
+// ];
+
+// // Book Categories
+// export const BOOK_CATEGORIES = [
+//   { id: 'rare', label: 'Rare Books', labelHi: 'दुर्लभ पुस्तकें', labelUr: 'نایاب کتابیں', description: 'Antique and rare manuscripts' },
+//   { id: 'journal', label: 'Journals', labelHi: 'जर्नल', labelUr: 'جرنل', description: 'Literary journals' },
+//   { id: 'magazine', label: 'Magazines', labelHi: 'पत्रिकाएं', labelUr: 'رسائل', description: 'Literary magazines' },
+//   { id: 'manuscript', label: 'Manuscripts', labelHi: 'हस्तलिखित', labelUr: 'مخطوطات', description: 'Handwritten manuscripts' },
+//   { id: 'poetry_collection', label: 'Poetry Collections', labelHi: 'काव्य संग्रह', labelUr: 'مجموعہ کلام', description: 'Collected poetry works' },
+//   { id: 'prose', label: 'Prose', labelHi: 'गद्य', labelUr: 'نثر', description: 'Literary prose works' },
+// ];
+
+// // Audio Categories
+// export const AUDIO_CATEGORIES = [
+//   { id: 'nauha', label: 'Nauha', icon: '😢', occasion: 'muharram', description: 'Lamentation recitations' },
+//   { id: 'marsiya', label: 'Marsiya', icon: '💔', occasion: 'muharram', description: 'Elegiac poetry' },
+//   { id: 'mushaira', label: 'Mushaira', icon: '🎤', occasion: 'general', description: 'Poetry events' },
+//   { id: 'podcast', label: 'Podcast', icon: '🎙️', occasion: 'general', description: 'Podcasts' },
+//   { id: 'other', label: 'Other', icon: '📀', occasion: 'general', description: 'Other audio content' },
+// ];
+
+// // Occasion Categories
+// export const OCCASION_CATEGORIES = [
+//   { id: 'muharram', label: 'Muharram', icon: '🖤' },
+//   { id: 'ramadan', label: 'Ramadan', icon: '🌙' },
+//   { id: 'eid', label: 'Eid', icon: '🎉' },
+//   { id: 'milad', label: 'Milad', icon: '⭐' },
+//   { id: 'general', label: 'General', icon: '📀' },
+// ];
+
+// // Video Categories
+// export const VIDEO_CATEGORIES = [
+//   { id: 'majlis', label: 'Majlis', icon: '🕌' },
+//   { id: 'nauha', label: 'Nauha', icon: '😢' },
+//   { id: 'mushaira', label: 'Mushaira', icon: '🎤' },
+//   { id: 'other', label: 'Other', icon: '🎥' },
+// ];
+
+// // Languages
+// export const LANGUAGES = [
+//   { code: 'en', label: 'English' },
+//   { code: 'hi', label: 'Hindi' },
+//   { code: 'ur', label: 'Urdu' },
+// ];
+
+// // Roles
+// export const USER_ROLES = {
+//   ADMIN: 'admin',
+//   USER: 'user',
+//   CREATOR: 'creator',
+//   MODERATOR: 'moderator',
+//   SUPERADMIN: 'superadmin'
+// };
+
+// // Export all
+// export default {
+//   API_ENDPOINTS,
+//   CONTENT_TYPES,
+//   SUBSCRIPTION_PLANS,
+//   BILLING_CYCLES,
+//   PAYMENT_METHODS,
+//   SUBSCRIPTION_STATUS,
+//   getPlanById,
+//   getAllPlans,
+//   getRecommendedPlans,
+//   getActivePlans,
+//   calculateDiscountedPrice,
+//   POETRY_GENRES,
+//   AUTHOR_CATEGORIES,
+//   BOOK_CATEGORIES,
+//   AUDIO_CATEGORIES,
+//   OCCASION_CATEGORIES,
+//   VIDEO_CATEGORIES,
+//   LANGUAGES,
+//   USER_ROLES,
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/utils/constants.js
+
 // API Endpoints
 export const API_ENDPOINTS = {
   AUTH: {
@@ -817,6 +1168,57 @@ export const CONTENT_TYPES = {
   AUDIO: 'audio',
   VIDEO: 'video',
 };
+
+// ============================================
+// AUDIO TYPES
+// ============================================
+export const AUDIO_TYPES = [
+  { id: 'nauha', label: 'Nauha', icon: '😢', occasion: 'muharram', description: 'Lamentation recitations commemorating the martyrs of Karbala' },
+  { id: 'marsiya', label: 'Marsiya', icon: '💔', occasion: 'muharram', description: 'Elegiac poetry mourning the martyrs' },
+  { id: 'soz', label: 'Soz', icon: '🔥', occasion: 'muharram', description: 'Poems expressing grief and sorrow' },
+  { id: 'salam', label: 'Salam', icon: '🕊️', occasion: 'muharram', description: 'Salutations to the Ahl al-Bayt' },
+  { id: 'majlis', label: 'Majlis', icon: '🎙️', occasion: 'muharram', description: 'Religious gatherings and sermons' },
+  { id: 'naat', label: 'Naat', icon: '⭐', occasion: 'general', description: 'Poems in praise of Prophet Muhammad (PBUH)' },
+  { id: 'hamd', label: 'Hamd', icon: '🕌', occasion: 'general', description: 'Songs praising Allah' },
+  { id: 'manqabat', label: 'Manqabat', icon: '⚔️', occasion: 'general', description: 'Poems praising Imam Ali (AS)' },
+  { id: 'munajat', label: 'Munajat', icon: '🤲', occasion: 'general', description: 'Supplications and whispered prayers' },
+  { id: 'ghazal', label: 'Ghazal', icon: '💕', occasion: 'general', description: 'Poetic expression of love and mysticism' },
+  { id: 'nazm', label: 'Nazm', icon: '📝', occasion: 'general', description: 'Modern Urdu poems' },
+  { id: 'podcast', label: 'Podcast', icon: '🎙️', occasion: 'general', description: 'Talk shows and discussions' },
+  { id: 'audiobook', label: 'Audiobook', icon: '📚', occasion: 'general', description: 'Audio versions of books' },
+  { id: 'mushaira', label: 'Mushaira', icon: '🎤', occasion: 'general', description: 'Poetry events and gatherings' },
+  { id: 'poem_recitation', label: 'Poem Recitation', icon: '📖', occasion: 'general', description: 'Poetry recitations' },
+  { id: 'lecture', label: 'Lecture', icon: '🎓', occasion: 'general', description: 'Educational lectures' },
+  { id: 'interview', label: 'Interview', icon: '🎙️', occasion: 'general', description: 'Interviews with scholars and poets' },
+  { id: 'other', label: 'Other', icon: '📀', occasion: 'general', description: 'Other audio content' },
+];
+
+// ============================================
+// OCCASION CATEGORIES
+// ============================================
+export const OCCASION_CATEGORIES = [
+  { id: 'muharram', label: 'Muharram', icon: '🖤', description: 'Content for the month of Muharram' },
+  { id: 'ramadan', label: 'Ramadan', icon: '🌙', description: 'Content for the holy month of Ramadan' },
+  { id: 'eid', label: 'Eid', icon: '🎉', description: 'Eid celebrations and special content' },
+  { id: 'milad', label: 'Milad', icon: '⭐', description: 'Birth anniversary celebrations' },
+  { id: 'general', label: 'General', icon: '📀', description: 'General religious content' },
+];
+
+// ============================================
+// OCCASIONS - Alias for backward compatibility
+// ============================================
+export const OCCASIONS = OCCASION_CATEGORIES;
+
+// ============================================
+// SIMPLE OCCASIONS - Simplified version
+// ============================================
+export const SIMPLE_OCCASIONS = [
+  { id: 'muharram', label: 'Muharram', value: 'muharram' },
+  { id: 'ramadan', label: 'Ramadan', value: 'ramadan' },
+  { id: 'eid', label: 'Eid', value: 'eid' },
+  { id: 'milad', label: 'Milad', value: 'milad' },
+  { id: 'general', label: 'General', value: 'general' },
+];
 
 // Subscription Plans
 export const SUBSCRIPTION_PLANS = {
@@ -1012,23 +1414,8 @@ export const BOOK_CATEGORIES = [
   { id: 'prose', label: 'Prose', labelHi: 'गद्य', labelUr: 'نثر', description: 'Literary prose works' },
 ];
 
-// Audio Categories
-export const AUDIO_CATEGORIES = [
-  { id: 'nauha', label: 'Nauha', icon: '😢', occasion: 'muharram', description: 'Lamentation recitations' },
-  { id: 'marsiya', label: 'Marsiya', icon: '💔', occasion: 'muharram', description: 'Elegiac poetry' },
-  { id: 'mushaira', label: 'Mushaira', icon: '🎤', occasion: 'general', description: 'Poetry events' },
-  { id: 'podcast', label: 'Podcast', icon: '🎙️', occasion: 'general', description: 'Podcasts' },
-  { id: 'other', label: 'Other', icon: '📀', occasion: 'general', description: 'Other audio content' },
-];
-
-// Occasion Categories
-export const OCCASION_CATEGORIES = [
-  { id: 'muharram', label: 'Muharram', icon: '🖤' },
-  { id: 'ramadan', label: 'Ramadan', icon: '🌙' },
-  { id: 'eid', label: 'Eid', icon: '🎉' },
-  { id: 'milad', label: 'Milad', icon: '⭐' },
-  { id: 'general', label: 'General', icon: '📀' },
-];
+// Audio Categories (Legacy - use AUDIO_TYPES instead)
+export const AUDIO_CATEGORIES = AUDIO_TYPES;
 
 // Video Categories
 export const VIDEO_CATEGORIES = [
@@ -1039,10 +1426,21 @@ export const VIDEO_CATEGORIES = [
 ];
 
 // Languages
+// export const LANGUAGES = [
+//   { code: 'en', label: 'English', name: 'English' },
+//   { code: 'hi', label: 'Hindi', name: 'हिन्दी' },
+//   { code: 'ur', label: 'Urdu', name: 'اردو' },
+//   { code: 'ar', label: 'Arabic', name: 'العربية' },
+//   { code: 'fa', label: 'Persian', name: 'فارسی' },
+// ];
+
+// ✅ CORRECT - Codes match backend enum exactly
 export const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'hi', label: 'Hindi' },
-  { code: 'ur', label: 'Urdu' },
+  { code: 'urdu', label: 'Urdu (اردو)', name: 'اردو' },
+  { code: 'hindi', label: 'Hindi (हिन्दी)', name: 'हिन्दी' },
+  { code: 'english', label: 'English', name: 'English' },
+  { code: 'arabic', label: 'Arabic (العربية)', name: 'العربية' },
+  { code: 'persian', label: 'Persian (فارسی)', name: 'فارسی' },
 ];
 
 // Roles
@@ -1054,10 +1452,14 @@ export const USER_ROLES = {
   SUPERADMIN: 'superadmin'
 };
 
-// Export all
+// Export all as default
 export default {
   API_ENDPOINTS,
   CONTENT_TYPES,
+  AUDIO_TYPES,
+  OCCASION_CATEGORIES,
+  OCCASIONS, // Added this export
+  SIMPLE_OCCASIONS,
   SUBSCRIPTION_PLANS,
   BILLING_CYCLES,
   PAYMENT_METHODS,
@@ -1071,7 +1473,6 @@ export default {
   AUTHOR_CATEGORIES,
   BOOK_CATEGORIES,
   AUDIO_CATEGORIES,
-  OCCASION_CATEGORIES,
   VIDEO_CATEGORIES,
   LANGUAGES,
   USER_ROLES,

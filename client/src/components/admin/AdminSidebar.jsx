@@ -374,12 +374,12 @@ const AdminSidebar = () => {
 
   const audioMenuItems = [
     { path: '/admin/audio', icon: Headphones, label: 'Audio Dashboard' },
-    // { path: '/admin/audio/analytics', icon: TrendingUp, label: 'Audio Analytics' },
     { path: '/admin/audio/types', icon: FolderTree, label: 'Audio Types' },
-    // { path: '/admin/audio/categories', icon: FolderTree, label: 'Categories' },
-    // { path: '/admin/audio/occasions', icon: Calendar, label: 'Occasions' },
+    { path: '/admin/audio/categories', icon: FolderTree, label: 'Categories' },
+    { path: '/admin/audio/occasions', icon: Calendar, label: 'Occasions' },
     { path: '/admin/audio/playlists', icon: ListMusic, label: 'Playlists' },
     { path: '/admin/audio/bulk-upload', icon: Upload, label: 'Bulk Upload' },
+    { path: '/admin/audio/analytics', icon: TrendingUp, label: 'Audio Analytics' },
     // { path: '/admin/audio/reports', icon: FileText, label: 'Reports' },
   ]
 
