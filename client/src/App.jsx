@@ -2107,6 +2107,10 @@ import VideoDetailPage from './pages/public/VideoDetailPage.jsx'
 import SearchPage from './pages/public/SearchPage.jsx'
 import AboutPage from './pages/public/AboutPage.jsx'
 
+//Blog
+import BlogListPage from './pages/public/BlogListPage';
+import BlogDetailPage from './pages/public/BlogDetailPage';
+
 // Subscription Pages
 import SubscriptionPage from './pages/subscription/SubscriptionPage.jsx'
 import SubscriptionSuccessPage from './pages/subscription/SubscriptionSuccessPage.jsx'
@@ -2156,6 +2160,10 @@ import SettingsPage from './pages/admin/SettingsPage.jsx'
 import NotificationCMSPage from './pages/admin/NotificationCMSPage'
 import CategoriesManagementPage from './pages/admin/CategoriesManagementPage.jsx'
 import AudioOccasionsPage from './pages/admin/AudioOccasionsPage'
+import BlogCMSPage from './pages/admin/BlogCMSPage';
+//import BlogListPage from './pages/admin/BlogListPage';
+import BlogCategoriesPage from './pages/admin/BlogCategoriesPage'
+import BlogCommentsPage from './pages/admin/BlogCommentsPage'
 
 // Audio Player Component
 import AudioPlayerBar from './components/AudioPlayerBar'
@@ -2226,6 +2234,12 @@ const App = () => {
           <Route path="/videos" element={<VideoListPage />} />
           <Route path="/video/:slug" element={<VideoDetailPage />} />
           <Route path="/videos/:id" element={<Navigate to="/videos" replace />} />
+
+
+          {/* Blog Routes - Public */}
+          <Route path="/blog" element={<BlogListPage />} />
+          <Route path="/blog/:slug" element={<BlogDetailPage />} />
+
         </Route>
 
         {/* ============================================
@@ -2341,6 +2355,18 @@ const App = () => {
           <Route path="videos" element={<VideoCMSPage />} />
           <Route path="videos/types" element={<PlaceholderPage title="Video Types Management" />} />
           <Route path="videos/analytics" element={<PlaceholderPage title="Video Analytics" />} />
+
+
+          {/* ============================================
+              BLOG CMS - ADMIN
+          ============================================ */}
+          
+          <Route path="blog" element={<BlogListPage />} />
+          <Route path="blog/new" element={<BlogCMSPage />} />
+          <Route path="blog/edit/:id" element={<BlogCMSPage />} />
+          <Route path="blog" element={<BlogListPage />} />
+          <Route path="blog/categories" element={<BlogCategoriesPage />} />
+          <Route path="blog/comments" element={<BlogCommentsPage />} />
 
           {/* ============================================
               NOTIFICATION CMS - ADMIN

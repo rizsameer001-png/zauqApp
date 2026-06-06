@@ -978,7 +978,453 @@
 
 
 
+// // client/src/api/userAPI.js
+// import api from './apiConfig'
+
+// const userAPI = {
+//   // ============================================
+//   // PROFILE MANAGEMENT
+//   // ============================================
+  
+//   getProfile: () => api.get('/users/profile').then(res => res.data),
+  
+//   updateProfile: (data) => api.put('/users/profile', data).then(res => res.data),
+  
+//   updatePassword: (data) => api.put('/users/password', data).then(res => res.data),
+  
+//   // Avatar upload with multiple fallback methods
+//   uploadAvatar: async (formData) => {
+//     console.log('Uploading avatar...');
+//     for (let pair of formData.entries()) {
+//       console.log('FormData entry:', pair[0], pair[1]);
+//     }
+    
+//     try {
+//       const response = await api.post('/users/avatar', formData, {
+//         headers: { 
+//           'Content-Type': 'multipart/form-data'
+//         },
+//         timeout: 30000,
+//         onUploadProgress: (progressEvent) => {
+//           const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+//           console.log(`Upload progress: ${percentCompleted}%`);
+//         }
+//       });
+      
+//       console.log('Upload response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('Avatar upload error:', error);
+//       console.error('Error response:', error.response?.data);
+//       console.error('Error status:', error.response?.status);
+//       throw error;
+//     }
+//   },
+  
+//   // Alternative method if 'avatar' field doesn't work
+//   uploadAvatarAsImage: async (formData) => {
+//     console.log('Uploading avatar as image...');
+//     for (let pair of formData.entries()) {
+//       console.log('FormData entry:', pair[0], pair[1]);
+//     }
+    
+//     try {
+//       const response = await api.post('/users/avatar/upload', formData, {
+//         headers: { 
+//           'Content-Type': 'multipart/form-data'
+//         },
+//         timeout: 30000
+//       });
+      
+//       console.log('Upload response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('Avatar upload error:', error);
+//       console.error('Error response:', error.response?.data);
+//       throw error;
+//     }
+//   },
+  
+//   // Remove avatar
+//   removeAvatar: () => api.delete('/users/avatar').then(res => res.data),
+  
+//   // ============================================
+//   // FAVORITES MANAGEMENT - ENHANCED
+//   // ============================================
+  
+//   // Get all favorites (optionally filtered by type)
+//   // type can be: 'poems', 'books', 'audio', 'videos', or undefined for all
+//   getFavorites: async (type) => {
+//     try {
+//       const url = type ? `/users/favorites?type=${type}` : '/users/favorites';
+//       console.log('getFavorites URL:', url);
+//       const response = await api.get(url);
+//       console.log('getFavorites raw response:', response);
+//       console.log('getFavorites response.data:', response.data);
+      
+//       // Ensure we return a consistent structure
+//       if (response.data) {
+//         // If the response has success property, return as is
+//         if (response.data.success !== undefined) {
+//           return response.data;
+//         }
+//         // Otherwise wrap it in a success response
+//         return {
+//           success: true,
+//           data: response.data,
+//           message: 'Favorites retrieved successfully'
+//         };
+//       }
+      
+//       return {
+//         success: false,
+//         data: null,
+//         message: 'No data received'
+//       };
+//     } catch (error) {
+//       console.error('getFavorites error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Get favorites with counts
+//   getFavoritesWithCounts: async () => {
+//     const response = await userAPI.getFavorites();
+//     return response;
+//   },
+  
+//   // Add item to favorites
+//   // data should be: { type: 'books', id: 'bookId' }
+//   addToFavorites: async (data) => {
+//     try {
+//       const response = await api.post('/users/favorites', data);
+//       console.log('addToFavorites response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('addToFavorites error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Remove item from favorites
+//   removeFromFavorites: async (type, id) => {
+//     try {
+//       const response = await api.delete(`/users/favorites/${type}/${id}`);
+//       console.log('removeFromFavorites response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('removeFromFavorites error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Toggle favorite (add if not favorited, remove if favorited)
+//   toggleFavorite: async (type, id) => {
+//     try {
+//       // First check if it's already favorited
+//       const checkResult = await userAPI.isFavorited(type, id);
+      
+//       if (checkResult.success && checkResult.data?.isFavorited) {
+//         // Remove from favorites
+//         return await userAPI.removeFromFavorites(type, id);
+//       } else {
+//         // Add to favorites
+//         return await userAPI.addToFavorites({ type, id });
+//       }
+//     } catch (error) {
+//       console.error('Error toggling favorite:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Check if content is favorited
+//   isFavorited: async (type, id) => {
+//     try {
+//       const response = await api.get(`/users/favorites/${type}/${id}/check`);
+//       console.log('isFavorited response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('isFavorited error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Get all favorites counts by type
+//   getFavoritesCount: async () => {
+//     try {
+//       const response = await api.get('/users/favorites/count');
+//       console.log('getFavoritesCount response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('getFavoritesCount error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // Get favorites by specific type with pagination
+//   getFavoritesByType: async (type, page = 1, limit = 20) => {
+//     const response = await userAPI.getFavorites(type);
+//     return response;
+//   },
+  
+//   // Bulk check favorites (for multiple items at once)
+//   bulkCheckFavorites: async (items) => {
+//     // items should be array of { type, id }
+//     try {
+//       const response = await api.post('/users/favorites/bulk-check', { items });
+//       console.log('bulkCheckFavorites response:', response.data);
+//       return response.data;
+//     } catch (error) {
+//       console.error('bulkCheckFavorites error:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // ============================================
+//   // HISTORY MANAGEMENT
+//   // ============================================
+  
+//   getHistory: (type) => api.get(`/users/history${type ? `?type=${type}` : ''}`).then(res => res.data),
+  
+//   clearHistory: () => api.delete('/users/history').then(res => res.data),
+  
+//   removeHistoryItem: (id) => api.delete(`/users/history/${id}`).then(res => res.data),
+  
+//   // ============================================
+//   // DOWNLOADS MANAGEMENT (FULL CRUD)
+//   // ============================================
+  
+//   // Get all downloads (optionally filtered by type)
+//   getDownloads: (type) => api.get(`/users/downloads${type ? `?type=${type}` : ''}`).then(res => res.data),
+  
+//   // Get download by ID
+//   getDownloadById: (id) => api.get(`/users/downloads/${id}`).then(res => res.data),
+  
+//   // Remove a single download
+//   removeDownload: (id) => api.delete(`/users/downloads/${id}`).then(res => res.data),
+  
+//   // Bulk remove downloads
+//   bulkRemoveDownloads: (ids) => api.post('/users/downloads/bulk-delete', { ids }).then(res => res.data),
+  
+//   // Clear all downloads
+//   clearDownloads: () => api.delete('/users/downloads/all').then(res => res.data),
+  
+//   // Download file - gets download URL info
+//   downloadFile: async (contentType, contentId) => {
+//     const response = await api.get(`/users/downloads/${contentType}/${contentId}`);
+//     return response.data;
+//   },
+  
+//   // Check if content is already downloaded
+//   isDownloaded: (contentType, contentId) => api.get(`/users/downloads/${contentType}/${contentId}/check`).then(res => res.data),
+  
+//   // Get download stats
+//   getDownloadStats: () => api.get('/users/downloads/stats').then(res => res.data),
+  
+//   // Helper to trigger actual file download after getting URL
+//   triggerDownload: (downloadUrl, fileName) => {
+//     // Create a temporary anchor element
+//     const link = document.createElement('a');
+//     link.href = downloadUrl;
+//     link.download = fileName || 'download';
+//     link.target = '_blank';
+//     document.body.appendChild(link);
+//     link.click();
+//     document.body.removeChild(link);
+//   },
+  
+//   // Combined method: get download info and trigger download
+//   downloadAndSave: async (contentType, contentId, fileName) => {
+//     try {
+//       const result = await userAPI.downloadFile(contentType, contentId);
+//       if (result.success && result.data?.downloadUrl) {
+//         userAPI.triggerDownload(result.data.downloadUrl, fileName || result.data.title);
+//         return result;
+//       }
+//       throw new Error('No download URL received');
+//     } catch (error) {
+//       console.error('Download failed:', error);
+//       throw error;
+//     }
+//   },
+  
+//   // ============================================
+//   // AUTHOR FOLLOWING
+//   // ============================================
+  
+//   followAuthor: (authorId) => api.post(`/users/follow/${authorId}`).then(res => res.data),
+  
+//   unfollowAuthor: (authorId) => api.delete(`/users/follow/${authorId}`).then(res => res.data),
+  
+//   getFollowingAuthors: () => api.get('/users/following').then(res => res.data),
+  
+//   isFollowingAuthor: (authorId) => api.get(`/users/follow/${authorId}/check`).then(res => res.data),
+  
+//   // ============================================
+//   // NOTIFICATIONS MANAGEMENT
+//   // ============================================
+  
+//   getNotifications: (params) => api.get('/users/notifications', { params }).then(res => res.data),
+  
+//   markNotificationRead: (id) => api.put(`/users/notifications/${id}/read`).then(res => res.data),
+  
+//   markAllNotificationsRead: () => api.put('/users/notifications/read-all').then(res => res.data),
+  
+//   deleteNotification: (id) => api.delete(`/users/notifications/${id}`).then(res => res.data),
+  
+//   deleteAllNotifications: () => api.delete('/users/notifications/all').then(res => res.data),
+  
+//   getNotificationPreferences: () => api.get('/users/notifications/preferences').then(res => res.data),
+  
+//   updateNotificationPreferences: (data) => api.put('/users/notifications/preferences', data).then(res => res.data),
+  
+//   // ============================================
+//   // READING PROGRESS
+//   // ============================================
+  
+//   getReadingProgress: (contentType, contentId) => api.get(`/users/progress/${contentType}/${contentId}`).then(res => res.data),
+  
+//   updateReadingProgress: (data) => api.post('/users/progress', data).then(res => res.data),
+  
+//   getReadingStats: () => api.get('/users/progress/stats').then(res => res.data),
+  
+//   // ============================================
+//   // HELPER METHODS
+//   // ============================================
+  
+//   // Validate image before upload
+//   validateImage: (file) => {
+//     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+//     const maxSize = 2 * 1024 * 1024; // 2MB
+    
+//     if (!allowedTypes.includes(file.type)) {
+//       throw new Error(`Invalid file type. Allowed: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`);
+//     }
+    
+//     if (file.size > maxSize) {
+//       throw new Error(`File too large. Maximum size is 2MB. Your file: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
+//     }
+    
+//     return true;
+//   },
+  
+//   // Create FormData for avatar upload
+//   createAvatarFormData: (file) => {
+//     const formData = new FormData();
+//     formData.append('avatar', file);
+//     // Also append as 'image' for backward compatibility
+//     formData.append('image', file);
+//     return formData;
+//   },
+  
+//   // Create FormData for file upload
+//   createFileFormData: (file, fieldName = 'file') => {
+//     const formData = new FormData();
+//     formData.append(fieldName, file);
+//     return formData;
+//   },
+  
+//   // Format file size for display
+//   formatFileSize: (bytes) => {
+//     if (!bytes) return '0 Bytes';
+//     if (bytes === 0) return '0 Bytes';
+//     const k = 1024;
+//     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+//     const i = Math.floor(Math.log(bytes) / Math.log(k));
+//     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+//   },
+  
+//   // ============================================
+//   // ADDITIONAL HELPER METHODS FOR FAVORITES
+//   // ============================================
+  
+//   // Get favorite icon color based on type
+//   getFavoriteIconColor: (isFavorited) => {
+//     return isFavorited ? '#ef4444' : '#9ca3af';
+//   },
+  
+//   // Format favorite response for UI
+//   formatFavoriteResponse: (response, type, id) => {
+//     if (response && response.success) {
+//       return {
+//         isFavorited: response.data?.isFavorited || response.data?.added || false,
+//         type,
+//         id,
+//         message: response.message || (response.data?.isFavorited ? 'Added to favorites' : 'Removed from favorites')
+//       };
+//     }
+//     return {
+//       isFavorited: false,
+//       type,
+//       id,
+//       message: response?.message || 'Operation failed'
+//     };
+//   },
+  
+//   // Parse favorites data from API response (handles different response structures)
+//   parseFavoritesData: (response) => {
+//     if (!response) return { favorites: [], counts: { poems: 0, books: 0, audio: 0, videos: 0, total: 0 } };
+    
+//     let favorites = [];
+//     let counts = { poems: 0, books: 0, audio: 0, videos: 0, total: 0 };
+    
+//     if (response.success && response.data) {
+//       const data = response.data;
+      
+//       if (Array.isArray(data)) {
+//         favorites = data;
+//       } else if (data.poems || data.books || data.audio || data.videos) {
+//         // Object with type keys
+//         favorites = data;
+//         if (data.counts) {
+//           counts = data.counts;
+//         }
+//       } else if (data.data && Array.isArray(data.data)) {
+//         favorites = data.data;
+//       }
+//     } else if (Array.isArray(response)) {
+//       favorites = response;
+//     } else if (response.data && Array.isArray(response.data)) {
+//       favorites = response.data;
+//     }
+    
+//     return { favorites, counts };
+//   }
+// }
+
+// export default userAPI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/api/userAPI.js
+// LAST UPDATED: 2026-06-06
+// FIXED: Proper JSON payload for favorites with backward compatibility
+
 import api from './apiConfig'
 
 const userAPI = {
@@ -1049,26 +1495,25 @@ const userAPI = {
   removeAvatar: () => api.delete('/users/avatar').then(res => res.data),
   
   // ============================================
-  // FAVORITES MANAGEMENT - ENHANCED
+  // FAVORITES MANAGEMENT - ENHANCED & BACKWARD COMPATIBLE
   // ============================================
   
-  // Get all favorites (optionally filtered by type)
-  // type can be: 'poems', 'books', 'audio', 'videos', or undefined for all
+  // ✅ Get all favorites (optionally filtered by type)
+  // Supports: GET /users/favorites?type=poems (query param)
+  // Also works with: GET /users/favorites (no param for all)
   getFavorites: async (type) => {
     try {
+      // Use query parameters (correct way)
       const url = type ? `/users/favorites?type=${type}` : '/users/favorites';
-      console.log('getFavorites URL:', url);
+      console.log('📚 getFavorites URL:', url);
       const response = await api.get(url);
-      console.log('getFavorites raw response:', response);
-      console.log('getFavorites response.data:', response.data);
+      console.log('📚 getFavorites response:', response.data);
       
       // Ensure we return a consistent structure
       if (response.data) {
-        // If the response has success property, return as is
         if (response.data.success !== undefined) {
           return response.data;
         }
-        // Otherwise wrap it in a success response
         return {
           success: true,
           data: response.data,
@@ -1093,12 +1538,39 @@ const userAPI = {
     return response;
   },
   
-  // Add item to favorites
-  // data should be: { type: 'books', id: 'bookId' }
-  addToFavorites: async (data) => {
+  // ✅ Add item to favorites - BACKWARD COMPATIBLE
+  // Supports BOTH formats:
+  // 1. addToFavorites({ type: 'books', id: 'bookId' }) - old format
+  // 2. addToFavorites({ contentType: 'books', contentId: 'bookId' }) - new format
+  // 3. addToFavorites('books', 'bookId') - direct params
+  addToFavorites: async (typeOrData, id) => {
     try {
-      const response = await api.post('/users/favorites', data);
-      console.log('addToFavorites response:', response.data);
+      let requestData;
+      
+      // Handle different call signatures
+      if (typeof typeOrData === 'object') {
+        // Called as: addToFavorites({ type, id }) or addToFavorites({ contentType, contentId })
+        requestData = typeOrData;
+        
+        // Normalize keys: convert contentType -> type, contentId -> id
+        if (requestData.contentType && !requestData.type) {
+          requestData.type = requestData.contentType;
+          delete requestData.contentType;
+        }
+        if (requestData.contentId && !requestData.id) {
+          requestData.id = requestData.contentId;
+          delete requestData.contentId;
+        }
+      } else if (typeof typeOrData === 'string' && id) {
+        // Called as: addToFavorites('books', 'bookId')
+        requestData = { type: typeOrData, id: id };
+      } else {
+        throw new Error('Invalid parameters. Provide {type, id} or (type, id)');
+      }
+      
+      console.log('❤️ addToFavorites request:', requestData);
+      const response = await api.post('/users/favorites', requestData);
+      console.log('❤️ addToFavorites response:', response.data);
       return response.data;
     } catch (error) {
       console.error('addToFavorites error:', error);
@@ -1106,11 +1578,38 @@ const userAPI = {
     }
   },
   
-  // Remove item from favorites
-  removeFromFavorites: async (type, id) => {
+  // ✅ Remove item from favorites - BACKWARD COMPATIBLE
+  // Supports multiple URL formats:
+  // 1. removeFromFavorites('books', 'bookId') -> DELETE /users/favorites/books/bookId
+  // 2. removeFromFavorites({ type: 'books', id: 'bookId' }) -> DELETE with query params
+  removeFromFavorites: async (typeOrData, id) => {
     try {
-      const response = await api.delete(`/users/favorites/${type}/${id}`);
-      console.log('removeFromFavorites response:', response.data);
+      let type, contentId;
+      
+      // Handle different call signatures
+      if (typeof typeOrData === 'object') {
+        // Called as: removeFromFavorites({ type, id })
+        type = typeOrData.type;
+        contentId = typeOrData.id || typeOrData.contentId;
+      } else if (typeof typeOrData === 'string' && id) {
+        // Called as: removeFromFavorites('books', 'bookId')
+        type = typeOrData;
+        contentId = id;
+      } else {
+        throw new Error('Invalid parameters. Provide {type, id} or (type, id)');
+      }
+      
+      // Normalize type (handle singular/plural)
+      let normalizedType = type;
+      if (type === 'poem') normalizedType = 'poems';
+      if (type === 'book') normalizedType = 'books';
+      if (type === 'video') normalizedType = 'videos';
+      
+      console.log('💔 removeFromFavorites - type:', normalizedType, 'id:', contentId);
+      
+      // Use URL params format: /users/favorites/poems/123
+      const response = await api.delete(`/users/favorites/${normalizedType}/${contentId}`);
+      console.log('💔 removeFromFavorites response:', response.data);
       return response.data;
     } catch (error) {
       console.error('removeFromFavorites error:', error);
@@ -1118,7 +1617,7 @@ const userAPI = {
     }
   },
   
-  // Toggle favorite (add if not favorited, remove if favorited)
+  // ✅ Toggle favorite (add if not favorited, remove if favorited)
   toggleFavorite: async (type, id) => {
     try {
       // First check if it's already favorited
@@ -1129,7 +1628,7 @@ const userAPI = {
         return await userAPI.removeFromFavorites(type, id);
       } else {
         // Add to favorites
-        return await userAPI.addToFavorites({ type, id });
+        return await userAPI.addToFavorites(type, id);
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
@@ -1137,15 +1636,22 @@ const userAPI = {
     }
   },
   
-  // Check if content is favorited
+  // ✅ Check if content is favorited
   isFavorited: async (type, id) => {
     try {
-      const response = await api.get(`/users/favorites/${type}/${id}/check`);
-      console.log('isFavorited response:', response.data);
+      // Normalize type
+      let normalizedType = type;
+      if (type === 'poem') normalizedType = 'poems';
+      if (type === 'book') normalizedType = 'books';
+      if (type === 'video') normalizedType = 'videos';
+      
+      const response = await api.get(`/users/favorites/${normalizedType}/${id}/check`);
+      console.log('🔍 isFavorited response:', response.data);
       return response.data;
     } catch (error) {
       console.error('isFavorited error:', error);
-      throw error;
+      // Return false instead of throwing for better UX
+      return { success: true, data: { isFavorited: false } };
     }
   },
   
@@ -1153,7 +1659,7 @@ const userAPI = {
   getFavoritesCount: async () => {
     try {
       const response = await api.get('/users/favorites/count');
-      console.log('getFavoritesCount response:', response.data);
+      console.log('📊 getFavoritesCount response:', response.data);
       return response.data;
     } catch (error) {
       console.error('getFavoritesCount error:', error);
@@ -1167,12 +1673,12 @@ const userAPI = {
     return response;
   },
   
-  // Bulk check favorites (for multiple items at once)
+  // ✅ Bulk check favorites (for multiple items at once)
   bulkCheckFavorites: async (items) => {
     // items should be array of { type, id }
     try {
       const response = await api.post('/users/favorites/bulk-check', { items });
-      console.log('bulkCheckFavorites response:', response.data);
+      console.log('📦 bulkCheckFavorites response:', response.data);
       return response.data;
     } catch (error) {
       console.error('bulkCheckFavorites error:', error);
@@ -1194,36 +1700,26 @@ const userAPI = {
   // DOWNLOADS MANAGEMENT (FULL CRUD)
   // ============================================
   
-  // Get all downloads (optionally filtered by type)
   getDownloads: (type) => api.get(`/users/downloads${type ? `?type=${type}` : ''}`).then(res => res.data),
   
-  // Get download by ID
   getDownloadById: (id) => api.get(`/users/downloads/${id}`).then(res => res.data),
   
-  // Remove a single download
   removeDownload: (id) => api.delete(`/users/downloads/${id}`).then(res => res.data),
   
-  // Bulk remove downloads
   bulkRemoveDownloads: (ids) => api.post('/users/downloads/bulk-delete', { ids }).then(res => res.data),
   
-  // Clear all downloads
   clearDownloads: () => api.delete('/users/downloads/all').then(res => res.data),
   
-  // Download file - gets download URL info
   downloadFile: async (contentType, contentId) => {
     const response = await api.get(`/users/downloads/${contentType}/${contentId}`);
     return response.data;
   },
   
-  // Check if content is already downloaded
   isDownloaded: (contentType, contentId) => api.get(`/users/downloads/${contentType}/${contentId}/check`).then(res => res.data),
   
-  // Get download stats
   getDownloadStats: () => api.get('/users/downloads/stats').then(res => res.data),
   
-  // Helper to trigger actual file download after getting URL
   triggerDownload: (downloadUrl, fileName) => {
-    // Create a temporary anchor element
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.download = fileName || 'download';
@@ -1233,7 +1729,6 @@ const userAPI = {
     document.body.removeChild(link);
   },
   
-  // Combined method: get download info and trigger download
   downloadAndSave: async (contentType, contentId, fileName) => {
     try {
       const result = await userAPI.downloadFile(contentType, contentId);
@@ -1292,10 +1787,9 @@ const userAPI = {
   // HELPER METHODS
   // ============================================
   
-  // Validate image before upload
   validateImage: (file) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
     
     if (!allowedTypes.includes(file.type)) {
       throw new Error(`Invalid file type. Allowed: ${allowedTypes.map(t => t.split('/')[1]).join(', ')}`);
@@ -1308,23 +1802,19 @@ const userAPI = {
     return true;
   },
   
-  // Create FormData for avatar upload
   createAvatarFormData: (file) => {
     const formData = new FormData();
     formData.append('avatar', file);
-    // Also append as 'image' for backward compatibility
     formData.append('image', file);
     return formData;
   },
   
-  // Create FormData for file upload
   createFileFormData: (file, fieldName = 'file') => {
     const formData = new FormData();
     formData.append(fieldName, file);
     return formData;
   },
   
-  // Format file size for display
   formatFileSize: (bytes) => {
     if (!bytes) return '0 Bytes';
     if (bytes === 0) return '0 Bytes';
@@ -1334,16 +1824,10 @@ const userAPI = {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   },
   
-  // ============================================
-  // ADDITIONAL HELPER METHODS FOR FAVORITES
-  // ============================================
-  
-  // Get favorite icon color based on type
   getFavoriteIconColor: (isFavorited) => {
     return isFavorited ? '#ef4444' : '#9ca3af';
   },
   
-  // Format favorite response for UI
   formatFavoriteResponse: (response, type, id) => {
     if (response && response.success) {
       return {
@@ -1361,7 +1845,6 @@ const userAPI = {
     };
   },
   
-  // Parse favorites data from API response (handles different response structures)
   parseFavoritesData: (response) => {
     if (!response) return { favorites: [], counts: { poems: 0, books: 0, audio: 0, videos: 0, total: 0 } };
     
@@ -1374,7 +1857,6 @@ const userAPI = {
       if (Array.isArray(data)) {
         favorites = data;
       } else if (data.poems || data.books || data.audio || data.videos) {
-        // Object with type keys
         favorites = data;
         if (data.counts) {
           counts = data.counts;
@@ -1393,11 +1875,3 @@ const userAPI = {
 }
 
 export default userAPI
-
-
-
-
-
-
-
-

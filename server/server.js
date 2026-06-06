@@ -536,6 +536,8 @@ import aiRoutes from './routes/aiRoutes.js';
 import transliterationRoutes from './routes/transliterationRoutes.js';
 import playlistRoutes from './routes/playlist.routes.js';
 // import categoryRoutes from './routes/category.routes.js';
+// Blog Routes
+import blogRoutes from './routes/blog.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -592,13 +594,13 @@ app.use(cookieParser());
 // Rate limiting - different limits for different routes
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  max: 300,
   message: { success: false, message: 'Too many requests from this IP' }
 });
 
 const strictLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 50,
+  max: 150,
   message: { success: false, message: 'Too many requests. Please try again later.' }
 });
 
@@ -654,6 +656,7 @@ app.use('/api/ai', aiRoutes);
 app.use('/api/transliteration', transliterationRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/blogs', blogRoutes);
 
 // ============================================
 // Health Checks
