@@ -30,7 +30,20 @@
     "viewAll": "सभी देखें",
     "loading": "लोड हो रहा है...",
     "noResults": "कोई परिणाम नहीं मिला",
-    "error": "कुछ गलत हो गया"
+    "error": "कुछ गलत हो गया",
+    "audio": "ऑडियो",
+    "blog": "ब्लॉग्स",
+    "adminUser": "एडमिन यूज़र",
+    "favorites": "पसंदीदा",
+    "history": "इतिहास",
+    "adminPanel": "एडमिन पैनल",
+     "trendingPoems": "ट्रेंडिंग कविताएँ",
+    "home.trendingPoems": "होम.ट्रेंडिंग कविताएँ",
+     "discoverPoetry": "कविता खोजें",
+     "poetryCollection": "कविता संग्रह",
+     "exploreText": "विभिन्न पीढ़ियों के महान शायरों की ग़ज़लें, नज़्में, शेर और बहुत कुछ खोजें",
+      "audioLibrary": "ऑडियो लाइब्रेरी"
+
   },
   "home": {
     "heroTitle": "शब्दों की सुंदरता की खोज",

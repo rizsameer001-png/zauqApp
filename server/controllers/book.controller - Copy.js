@@ -1,65 +1,15 @@
-// // //server/controllers/book.controller.js
+// //server/controllers/book.controller.js
 
-
-// // server/controllers/book.controller.js
 // import Book from '../models/Book.js';
-// import Author from '../models/Author.js';
-// import User from '../models/User.js';
 // import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
 // import { getPagination, getSort, getFilters } from '../utils/pagination.js';
-// import { convertPdfToImages } from '../utils/pdfConverter.js';
 
-// // ============================================
-// // GET BOOKS - WITH ENHANCED SEARCH SUPPORT
-// // ============================================
 // export const getBooks = async (req, res, next) => {
 //   try {
 //     const { page, limit, skip } = getPagination(req);
 //     const sort = getSort(req);
 //     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
-    
-//     // Handle search query
-//     const searchQuery = req.query.search;
-//     console.log('📡 getBooks called with:', { 
-//       page, 
-//       limit, 
-//       search: searchQuery, 
-//       filters, 
-//       sort 
-//     });
-    
-//     // Only show published books for public, admin can see all
-//     if (!req.user || req.user.role !== 'admin') {
-//       filters.isPublished = true;
-//     }
-    
-//     // ============================================
-//     // ENHANCED SEARCH: Search by title, subtitle, description
-//     // ============================================
-//     if (searchQuery && searchQuery.trim()) {
-//       const searchTerm = searchQuery.trim();
-//       const searchRegex = new RegExp(searchTerm, 'i');
-      
-//       console.log('🔍 Searching for:', searchTerm);
-      
-//       // Build search filter with OR conditions
-//       const searchFilter = {
-//         $or: [
-//           { title: searchRegex },
-//           { subtitle: searchRegex },
-//           { description: searchRegex }
-//         ]
-//       };
-      
-//       // Also search by author name (requires separate handling since author is populated)
-//       // This will search in the author's name if provided in the request
-//       // Note: For full author search, we'd need to aggregate, but this covers basic search
-      
-//       // Merge with existing filters
-//       Object.assign(filters, searchFilter);
-//     }
-    
-//     console.log('🔍 Final filters:', JSON.stringify(filters, null, 2));
+//     filters.isPublished = true;
 
 //     const books = await Book.find(filters)
 //       .populate('author', 'name slug avatar')
@@ -69,9 +19,206 @@
 //       .limit(limit);
 
 //     const total = await Book.countDocuments(filters);
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const getBookBySlug = async (req, res, next) => {
+//   try {
+//     const book = await Book.findOne({ slug: req.params.slug, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .populate('coAuthors', 'name slug avatar')
+//       .populate('category', 'name slug');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     book.stats.views += 1;
+//     await book.save();
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const createBook = async (req, res, next) => {
+//   try {
+//     const book = await Book.create(req.body);
+//     successResponse(res, book, 'Book created', 201);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const updateBook = async (req, res, next) => {
+//   try {
+//     const book = await Book.findByIdAndUpdate(
+//       req.params.id,
+//       req.body,
+//       { new: true, runValidators: true }
+//     );
+//     successResponse(res, book, 'Book updated');
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const deleteBook = async (req, res, next) => {
+//   try {
+//     await Book.findByIdAndDelete(req.params.id);
+//     successResponse(res, null, 'Book deleted');
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const getFeaturedBooks = async (req, res, next) => {
+//   try {
+//     const books = await Book.find({ isFeatured: true, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .limit(10);
+
+//     successResponse(res, books);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const getBookReader = async (req, res, next) => {
+//   try {
+//     const book = await Book.findOne({ slug: req.params.slug, isPublished: true });
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check subscription for premium books
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     successResponse(res, {
+//       pdfUrl: book.pdfUrl,
+//       epubUrl: book.epubUrl,
+//       totalPages: book.totalPages,
+//       previewPages: book.previewPages
+//     });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const getBookPreview = async (req, res, next) => {
+//   try {
+//     const book = await Book.findOne({ slug: req.params.slug, isPublished: true })
+//       .select('title slug coverImage previewPages pdfUrl epubUrl');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const downloadBook = async (req, res, next) => {
+//   try {
+//     const book = await Book.findOne({ slug: req.params.slug, isPublished: true });
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     book.stats.downloads += 1;
+//     await book.save();
+
+//     // Add to user's downloads
+//     await User.findByIdAndUpdate(req.user.id, {
+//       $push: {
+//         downloads: {
+//           contentType: 'book',
+//           contentId: book._id
+//         }
+//       }
+//     });
+
+//     successResponse(res, { downloadUrl: book.pdfUrl || book.epubUrl }, 'Download started');
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+// export const rateBook = async (req, res, next) => {
+//   try {
+//     const book = await Book.findById(req.params.id);
+
+//     // Remove existing rating if any
+//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
+
+//     // Add new rating
+//     book.ratings.push({
+//       user: req.user.id,
+//       rating: req.body.rating,
+//       review: req.body.review
+//     });
+
+//     // Recalculate average
+//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
+//     book.stats.averageRating = total / book.ratings.length;
+//     book.stats.ratings = book.ratings.length;
+
+//     await book.save();
+//     successResponse(res, { averageRating: book.stats.averageRating, totalRatings: book.ratings.length });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+
+// working revert if 
+// //server/controllers/book.controller.js
+// import Book from '../models/Book.js';
+// import Author from '../models/Author.js';
+// import User from '../models/User.js';
+// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+
+// export const getBooks = async (req, res, next) => {
+//   try {
+//     const { page, limit, skip } = getPagination(req);
+//     const sort = getSort(req);
+//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
     
-//     console.log(`✅ Found ${books.length} books out of ${total} total`);
-    
+//     // Only show published books for public, admin can see all
+//     if (!req.user || req.user.role !== 'admin') {
+//       filters.isPublished = true;
+//     }
+
+//     const books = await Book.find(filters)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug')
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
+
+//     const total = await Book.countDocuments(filters);
 //     paginatedResponse(res, books, { page, limit, total });
 //   } catch (error) {
 //     console.error('Error in getBooks:', error);
@@ -79,9 +226,2173 @@
 //   }
 // };
 
+// export const getBookBySlug = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     if (!slug) {
+//       return errorResponse(res, 'Slug is required', 400);
+//     }
+
+//     const book = await Book.findOne({ slug })
+//       .populate('author', 'name slug avatar bio')
+//       .populate('coAuthors', 'name slug avatar')
+//       .populate('category', 'name slug');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check if published or admin
+//     if (!book.isPublished && (!req.user || req.user.role !== 'admin')) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Increment views
+//     book.stats.views += 1;
+//     await book.save();
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookBySlug:', error);
+//     next(error);
+//   }
+// };
+
+// export const createBook = async (req, res, next) => {
+//   try {
+//     console.log('Creating book with data:', JSON.stringify(req.body, null, 2));
+    
+//     const { title, author, slug } = req.body;
+    
+//     // Validate required fields
+//     if (!title || !title.trim()) {
+//       return errorResponse(res, 'Title is required', 400);
+//     }
+//     if (!author) {
+//       return errorResponse(res, 'Author is required', 400);
+//     }
+    
+//     // Validate author exists
+//     const authorExists = await Author.findById(author);
+//     if (!authorExists) {
+//       return errorResponse(res, 'Author not found. Please select a valid author.', 404);
+//     }
+    
+//     // Prepare book data
+//     const bookData = { ...req.body };
+    
+//     // If slug is provided, clean it; otherwise will be auto-generated
+//     if (slug && slug.trim()) {
+//       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     }
+    
+//     const book = await Book.create(bookData);
+    
+//     // Populate author data for response
+//     const populatedBook = await Book.findById(book._id)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, populatedBook, 'Book created successfully', 201);
+//   } catch (error) {
+//     console.error('Error creating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     if (error.code === 11000) {
+//       return errorResponse(res, 'A book with this slug already exists. Please use a different slug.', 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const updateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Updating book with ID:', id);
+//     console.log('Update data:', JSON.stringify(req.body, null, 2));
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // If author is being changed, validate new author
+//     if (req.body.author && req.body.author !== book.author.toString()) {
+//       const authorExists = await Author.findById(req.body.author);
+//       if (!authorExists) {
+//         return errorResponse(res, 'New author not found', 404);
+//       }
+//     }
+    
+//     // Handle slug update if provided
+//     let updateData = { ...req.body };
+//     if (req.body.slug && req.body.slug !== book.slug) {
+//       const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//       const existingBook = await Book.findOne({ slug: cleanSlug, _id: { $ne: id } });
+//       if (existingBook) {
+//         return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
+//       }
+//       updateData.slug = cleanSlug;
+//     }
+    
+//     // If publishing for first time, set publishedAt
+//     if (updateData.isPublished && !book.isPublished) {
+//       updateData.publishedAt = new Date();
+//     }
+    
+//     const updatedBook = await Book.findByIdAndUpdate(
+//       id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     ).populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, updatedBook, 'Book updated successfully');
+//   } catch (error) {
+//     console.error('Error updating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const deleteBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Deleting book with ID:', id);
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     await Book.findByIdAndDelete(id);
+//     successResponse(res, null, 'Book deleted successfully');
+//   } catch (error) {
+//     console.error('Error deleting book:', error);
+//     next(error);
+//   }
+// };
+
+// export const getFeaturedBooks = async (req, res, next) => {
+//   try {
+//     const books = await Book.find({ isFeatured: true, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .limit(10);
+
+//     successResponse(res, books);
+//   } catch (error) {
+//     console.error('Error in getFeaturedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookReader = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check subscription for premium books
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     successResponse(res, {
+//       pdfUrl: book.pdfUrl,
+//       epubUrl: book.epubUrl,
+//       totalPages: book.totalPages,
+//       previewPages: book.previewPages,
+//       title: book.title,
+//       author: book.author
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookReader:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookPreview = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title slug coverImage previewPages pdfUrl epubUrl description author');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookPreview:', error);
+//     next(error);
+//   }
+// };
+
+// export const downloadBook = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     // Increment download count
+//     book.stats.downloads += 1;
+//     await book.save();
+
+//     // Add to user's downloads if user is logged in
+//     if (req.user) {
+//       await User.findByIdAndUpdate(req.user.id, {
+//         $push: {
+//           downloads: {
+//             contentType: 'book',
+//             contentId: book._id,
+//             title: book.title,
+//             downloadedAt: new Date()
+//           }
+//         }
+//       });
+//     }
+
+//     successResponse(res, { 
+//       downloadUrl: book.pdfUrl || book.epubUrl,
+//       title: book.title,
+//       format: book.pdfUrl ? 'PDF' : 'EPUB'
+//     }, 'Download started');
+//   } catch (error) {
+//     console.error('Error in downloadBook:', error);
+//     next(error);
+//   }
+// };
+
+// export const rateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { rating, review } = req.body;
+    
+//     if (!rating || rating < 1 || rating > 5) {
+//       return errorResponse(res, 'Rating must be between 1 and 5', 400);
+//     }
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Remove existing rating if any
+//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
+
+//     // Add new rating
+//     book.ratings.push({
+//       user: req.user.id,
+//       rating: rating,
+//       review: review || ''
+//     });
+
+//     // Recalculate average
+//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
+//     book.stats.averageRating = total / book.ratings.length;
+//     book.stats.ratings = book.ratings.length;
+
+//     await book.save();
+    
+//     successResponse(res, { 
+//       averageRating: book.stats.averageRating, 
+//       totalRatings: book.ratings.length 
+//     }, 'Rating submitted successfully');
+//   } catch (error) {
+//     console.error('Error in rateBook:', error);
+//     next(error);
+//   }
+// };
+
+// // Get books by author slug
+// export const getBooksByAuthor = async (req, res, next) => {
+//   try {
+//     const { authorId } = req.params;
+//     const { page, limit, skip } = getPagination(req);
+    
+//     const author = await Author.findById(authorId);
+//     if (!author) {
+//       return errorResponse(res, 'Author not found', 404);
+//     }
+    
+//     const books = await Book.find({ author: authorId, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+    
+//     const total = await Book.countDocuments({ author: authorId, isPublished: true });
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooksByAuthor:', error);
+//     next(error);
+//   }
+// };
+
+// // Get related books
+// export const getRelatedBooks = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const related = await Book.find({
+//       _id: { $ne: book._id },
+//       $or: [
+//         { author: book.author },
+//         { category: book.category },
+//         { type: book.type },
+//         { genres: { $in: book.genres } }
+//       ],
+//       isPublished: true
+//     })
+//       .populate('author', 'name slug avatar')
+//       .limit(6);
+    
+//     successResponse(res, related);
+//   } catch (error) {
+//     console.error('Error in getRelatedBooks:', error);
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // server/controllers/book.controller.js
+// import Book from '../models/Book.js';
+// import Author from '../models/Author.js';
+// import User from '../models/User.js';
+// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+
+// export const getBooks = async (req, res, next) => {
+//   try {
+//     const { page, limit, skip } = getPagination(req);
+//     const sort = getSort(req);
+//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
+    
+//     // Only show published books for public, admin can see all
+//     if (!req.user || req.user.role !== 'admin') {
+//       filters.isPublished = true;
+//     }
+
+//     const books = await Book.find(filters)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug')
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
+
+//     const total = await Book.countDocuments(filters);
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookBySlug = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     if (!slug) {
+//       return errorResponse(res, 'Slug is required', 400);
+//     }
+
+//     const book = await Book.findOne({ slug })
+//       .populate('author', 'name slug avatar bio')
+//       .populate('coAuthors', 'name slug avatar')
+//       .populate('category', 'name slug');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check if published or admin
+//     if (!book.isPublished && (!req.user || req.user.role !== 'admin')) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Increment views
+//     book.stats.views += 1;
+//     await book.save();
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookBySlug:', error);
+//     next(error);
+//   }
+// };
+
+// export const createBook = async (req, res, next) => {
+//   try {
+//     console.log('Creating book with data:', JSON.stringify(req.body, null, 2));
+    
+//     const { title, author, slug, pageImages } = req.body;
+    
+//     // Validate required fields
+//     if (!title || !title.trim()) {
+//       return errorResponse(res, 'Title is required', 400);
+//     }
+//     if (!author) {
+//       return errorResponse(res, 'Author is required', 400);
+//     }
+    
+//     // Validate author exists
+//     const authorExists = await Author.findById(author);
+//     if (!authorExists) {
+//       return errorResponse(res, 'Author not found. Please select a valid author.', 404);
+//     }
+    
+//     // Prepare book data
+//     const bookData = { ...req.body };
+    
+//     // Handle pageImages - ensure it's an array and set totalPages
+//     if (pageImages && Array.isArray(pageImages) && pageImages.length > 0) {
+//       bookData.pageImages = pageImages;
+//       bookData.totalPages = pageImages.length;
+//     }
+    
+//     // If slug is provided, clean it; otherwise will be auto-generated
+//     if (slug && slug.trim()) {
+//       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     }
+    
+//     const book = await Book.create(bookData);
+    
+//     // Populate author data for response
+//     const populatedBook = await Book.findById(book._id)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, populatedBook, 'Book created successfully', 201);
+//   } catch (error) {
+//     console.error('Error creating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     if (error.code === 11000) {
+//       return errorResponse(res, 'A book with this slug already exists. Please use a different slug.', 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const updateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Updating book with ID:', id);
+//     console.log('Update data:', JSON.stringify(req.body, null, 2));
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // If author is being changed, validate new author
+//     if (req.body.author && req.body.author !== book.author.toString()) {
+//       const authorExists = await Author.findById(req.body.author);
+//       if (!authorExists) {
+//         return errorResponse(res, 'New author not found', 404);
+//       }
+//     }
+    
+//     // Handle slug update if provided
+//     let updateData = { ...req.body };
+//     if (req.body.slug && req.body.slug !== book.slug) {
+//       const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//       const existingBook = await Book.findOne({ slug: cleanSlug, _id: { $ne: id } });
+//       if (existingBook) {
+//         return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
+//       }
+//       updateData.slug = cleanSlug;
+//     }
+    
+//     // Handle pageImages update
+//     if (req.body.pageImages && Array.isArray(req.body.pageImages)) {
+//       updateData.pageImages = req.body.pageImages;
+//       updateData.totalPages = req.body.pageImages.length;
+//     }
+    
+//     // If publishing for first time, set publishedAt
+//     if (updateData.isPublished && !book.isPublished) {
+//       updateData.publishedAt = new Date();
+//     }
+    
+//     const updatedBook = await Book.findByIdAndUpdate(
+//       id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     ).populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, updatedBook, 'Book updated successfully');
+//   } catch (error) {
+//     console.error('Error updating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const deleteBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Deleting book with ID:', id);
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     await Book.findByIdAndDelete(id);
+//     successResponse(res, null, 'Book deleted successfully');
+//   } catch (error) {
+//     console.error('Error deleting book:', error);
+//     next(error);
+//   }
+// };
+
+// export const getFeaturedBooks = async (req, res, next) => {
+//   try {
+//     const books = await Book.find({ isFeatured: true, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .limit(10);
+
+//     successResponse(res, books);
+//   } catch (error) {
+//     console.error('Error in getFeaturedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookReader = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check subscription for premium books
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     successResponse(res, {
+//       pdfUrl: book.pdfUrl,
+//       epubUrl: book.epubUrl,
+//       totalPages: book.totalPages,
+//       previewPages: book.previewPages,
+//       title: book.title,
+//       author: book.author,
+//       pageImages: book.pageImages || []
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookReader:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookPreview = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title slug coverImage previewPages pdfUrl epubUrl description author pageImages totalPages');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookPreview:', error);
+//     next(error);
+//   }
+// };
+
+// export const downloadBook = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     // Increment download count
+//     book.stats.downloads += 1;
+//     await book.save();
+
+//     // Add to user's downloads if user is logged in
+//     if (req.user) {
+//       await User.findByIdAndUpdate(req.user.id, {
+//         $push: {
+//           downloads: {
+//             contentType: 'book',
+//             contentId: book._id,
+//             title: book.title,
+//             downloadedAt: new Date()
+//           }
+//         }
+//       });
+//     }
+
+//     successResponse(res, { 
+//       downloadUrl: book.pdfUrl || book.epubUrl,
+//       title: book.title,
+//       format: book.pdfUrl ? 'PDF' : 'EPUB'
+//     }, 'Download started');
+//   } catch (error) {
+//     console.error('Error in downloadBook:', error);
+//     next(error);
+//   }
+// };
+
+// export const rateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { rating, review } = req.body;
+    
+//     if (!rating || rating < 1 || rating > 5) {
+//       return errorResponse(res, 'Rating must be between 1 and 5', 400);
+//     }
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Remove existing rating if any
+//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
+
+//     // Add new rating
+//     book.ratings.push({
+//       user: req.user.id,
+//       rating: rating,
+//       review: review || ''
+//     });
+
+//     // Recalculate average
+//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
+//     book.stats.averageRating = total / book.ratings.length;
+//     book.stats.ratings = book.ratings.length;
+
+//     await book.save();
+    
+//     successResponse(res, { 
+//       averageRating: book.stats.averageRating, 
+//       totalRatings: book.ratings.length 
+//     }, 'Rating submitted successfully');
+//   } catch (error) {
+//     console.error('Error in rateBook:', error);
+//     next(error);
+//   }
+// };
+
+// // Get books by author slug
+// export const getBooksByAuthor = async (req, res, next) => {
+//   try {
+//     const { authorId } = req.params;
+//     const { page, limit, skip } = getPagination(req);
+    
+//     const author = await Author.findById(authorId);
+//     if (!author) {
+//       return errorResponse(res, 'Author not found', 404);
+//     }
+    
+//     const books = await Book.find({ author: authorId, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+    
+//     const total = await Book.countDocuments({ author: authorId, isPublished: true });
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooksByAuthor:', error);
+//     next(error);
+//   }
+// };
+
+// // Get related books
+// export const getRelatedBooks = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const related = await Book.find({
+//       _id: { $ne: book._id },
+//       $or: [
+//         { author: book.author },
+//         { category: book.category },
+//         { type: book.type },
+//         { genres: { $in: book.genres } }
+//       ],
+//       isPublished: true
+//     })
+//       .populate('author', 'name slug avatar')
+//       .limit(6);
+    
+//     successResponse(res, related);
+//   } catch (error) {
+//     console.error('Error in getRelatedBooks:', error);
+//     next(error);
+//   }
+// };
+
 // // ============================================
-// // GET BOOK BY SLUG
+// // NEW: Get book pages for page-by-page reader
 // // ============================================
+// export const getBookPages = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check if user has access to premium books
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required to read this book', 403);
+//     }
+    
+//     // If no pageImages but PDF exists, we could generate pages (future feature)
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return successResponse(res, {
+//         title: book.title,
+//         pages: [],
+//         totalPages: 0,
+//         message: 'Page images not available. Please download the PDF/EPUB to read.'
+//       });
+//     }
+    
+//     successResponse(res, {
+//       title: book.title,
+//       pages: book.pageImages,
+//       totalPages: book.totalPages || book.pageImages.length
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPages:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // NEW: Get single page image
+// // ============================================
+// export const getBookPage = async (req, res, next) => {
+//   try {
+//     const { slug, pageNumber } = req.params;
+//     const pageNum = parseInt(pageNumber);
+    
+//     if (isNaN(pageNum) || pageNum < 1) {
+//       return errorResponse(res, 'Invalid page number', 400);
+//     }
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check premium access
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+    
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return errorResponse(res, 'No pages available', 404);
+//     }
+    
+//     if (pageNum > book.pageImages.length) {
+//       return errorResponse(res, 'Page not found', 404);
+//     }
+    
+//     successResponse(res, {
+//       page: pageNum,
+//       imageUrl: book.pageImages[pageNum - 1],
+//       totalPages: book.totalPages || book.pageImages.length,
+//       hasNext: pageNum < book.pageImages.length,
+//       hasPrev: pageNum > 1
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPage:', error);
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // server/controllers/book.controller.js
+// import Book from '../models/Book.js';
+// import Author from '../models/Author.js';
+// import User from '../models/User.js';
+// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+
+// export const getBooks = async (req, res, next) => {
+//   try {
+//     const { page, limit, skip } = getPagination(req);
+//     const sort = getSort(req);
+//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
+    
+//     // Only show published books for public, admin can see all
+//     if (!req.user || req.user.role !== 'admin') {
+//       filters.isPublished = true;
+//     }
+
+//     const books = await Book.find(filters)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug')
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
+
+//     const total = await Book.countDocuments(filters);
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookBySlug = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     if (!slug) {
+//       return errorResponse(res, 'Slug is required', 400);
+//     }
+
+//     const book = await Book.findOne({ slug })
+//       .populate('author', 'name slug avatar bio')
+//       .populate('coAuthors', 'name slug avatar')
+//       .populate('category', 'name slug');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check if published or admin
+//     if (!book.isPublished && (!req.user || req.user.role !== 'admin')) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Increment views
+//     book.stats.views += 1;
+//     await book.save();
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookBySlug:', error);
+//     next(error);
+//   }
+// };
+
+// export const createBook = async (req, res, next) => {
+//   try {
+//     console.log('Creating book with data:', JSON.stringify(req.body, null, 2));
+    
+//     const { title, author, slug, pageImages } = req.body;
+    
+//     // Validate required fields
+//     if (!title || !title.trim()) {
+//       return errorResponse(res, 'Title is required', 400);
+//     }
+//     if (!author) {
+//       return errorResponse(res, 'Author is required', 400);
+//     }
+    
+//     // Validate author exists
+//     const authorExists = await Author.findById(author);
+//     if (!authorExists) {
+//       return errorResponse(res, 'Author not found. Please select a valid author.', 404);
+//     }
+    
+//     // Prepare book data
+//     const bookData = { ...req.body };
+    
+//     // Handle pageImages - ensure it's an array and set totalPages
+//     if (pageImages && Array.isArray(pageImages) && pageImages.length > 0) {
+//       bookData.pageImages = pageImages;
+//       bookData.totalPages = pageImages.length;
+//     }
+    
+//     // If slug is provided, clean it; otherwise will be auto-generated
+//     if (slug && slug.trim()) {
+//       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     }
+    
+//     const book = await Book.create(bookData);
+    
+//     // Populate author data for response
+//     const populatedBook = await Book.findById(book._id)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, populatedBook, 'Book created successfully', 201);
+//   } catch (error) {
+//     console.error('Error creating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     if (error.code === 11000) {
+//       return errorResponse(res, 'A book with this slug already exists. Please use a different slug.', 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const updateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Updating book with ID:', id);
+//     console.log('Update data:', JSON.stringify(req.body, null, 2));
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // If author is being changed, validate new author
+//     if (req.body.author && req.body.author !== book.author.toString()) {
+//       const authorExists = await Author.findById(req.body.author);
+//       if (!authorExists) {
+//         return errorResponse(res, 'New author not found', 404);
+//       }
+//     }
+    
+//     // Handle slug update if provided
+//     let updateData = { ...req.body };
+//     if (req.body.slug && req.body.slug !== book.slug) {
+//       const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//       const existingBook = await Book.findOne({ slug: cleanSlug, _id: { $ne: id } });
+//       if (existingBook) {
+//         return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
+//       }
+//       updateData.slug = cleanSlug;
+//     }
+    
+//     // Handle pageImages update
+//     if (req.body.pageImages && Array.isArray(req.body.pageImages)) {
+//       updateData.pageImages = req.body.pageImages;
+//       updateData.totalPages = req.body.pageImages.length;
+//     }
+    
+//     // If publishing for first time, set publishedAt
+//     if (updateData.isPublished && !book.isPublished) {
+//       updateData.publishedAt = new Date();
+//     }
+    
+//     const updatedBook = await Book.findByIdAndUpdate(
+//       id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     ).populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, updatedBook, 'Book updated successfully');
+//   } catch (error) {
+//     console.error('Error updating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const deleteBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Deleting book with ID:', id);
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     await Book.findByIdAndDelete(id);
+//     successResponse(res, null, 'Book deleted successfully');
+//   } catch (error) {
+//     console.error('Error deleting book:', error);
+//     next(error);
+//   }
+// };
+
+// export const getFeaturedBooks = async (req, res, next) => {
+//   try {
+//     const books = await Book.find({ isFeatured: true, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .limit(10);
+
+//     successResponse(res, books);
+//   } catch (error) {
+//     console.error('Error in getFeaturedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookReader = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check subscription for premium books
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     successResponse(res, {
+//       pdfUrl: book.pdfUrl,
+//       epubUrl: book.epubUrl,
+//       totalPages: book.totalPages,
+//       previewPages: book.previewPages,
+//       title: book.title,
+//       author: book.author,
+//       pageImages: book.pageImages || []
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookReader:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookPreview = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title slug coverImage previewPages pdfUrl epubUrl description author pageImages totalPages');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookPreview:', error);
+//     next(error);
+//   }
+// };
+
+// export const downloadBook = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     // Increment download count
+//     book.stats.downloads += 1;
+//     await book.save();
+
+//     // Add to user's downloads if user is logged in
+//     if (req.user) {
+//       await User.findByIdAndUpdate(req.user.id, {
+//         $push: {
+//           downloads: {
+//             contentType: 'book',
+//             contentId: book._id,
+//             title: book.title,
+//             slug: book.slug, // ← ADD SLUG for future reference
+//             downloadedAt: new Date()
+//           }
+//         }
+//       });
+//     }
+
+//     successResponse(res, { 
+//       downloadUrl: book.pdfUrl || book.epubUrl,
+//       title: book.title,
+//       format: book.pdfUrl ? 'PDF' : 'EPUB'
+//     }, 'Download started');
+//   } catch (error) {
+//     console.error('Error in downloadBook:', error);
+//     next(error);
+//   }
+// };
+
+// export const rateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { rating, review } = req.body;
+    
+//     if (!rating || rating < 1 || rating > 5) {
+//       return errorResponse(res, 'Rating must be between 1 and 5', 400);
+//     }
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Remove existing rating if any
+//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
+
+//     // Add new rating
+//     book.ratings.push({
+//       user: req.user.id,
+//       rating: rating,
+//       review: review || ''
+//     });
+
+//     // Recalculate average
+//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
+//     book.stats.averageRating = total / book.ratings.length;
+//     book.stats.ratings = book.ratings.length;
+
+//     await book.save();
+    
+//     successResponse(res, { 
+//       averageRating: book.stats.averageRating, 
+//       totalRatings: book.ratings.length 
+//     }, 'Rating submitted successfully');
+//   } catch (error) {
+//     console.error('Error in rateBook:', error);
+//     next(error);
+//   }
+// };
+
+// // Get books by author slug
+// export const getBooksByAuthor = async (req, res, next) => {
+//   try {
+//     const { authorId } = req.params;
+//     const { page, limit, skip } = getPagination(req);
+    
+//     const author = await Author.findById(authorId);
+//     if (!author) {
+//       return errorResponse(res, 'Author not found', 404);
+//     }
+    
+//     const books = await Book.find({ author: authorId, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+    
+//     const total = await Book.countDocuments({ author: authorId, isPublished: true });
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooksByAuthor:', error);
+//     next(error);
+//   }
+// };
+
+// // Get related books
+// export const getRelatedBooks = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const related = await Book.find({
+//       _id: { $ne: book._id },
+//       $or: [
+//         { author: book.author },
+//         { category: book.category },
+//         { type: book.type },
+//         { genres: { $in: book.genres } }
+//       ],
+//       isPublished: true
+//     })
+//       .populate('author', 'name slug avatar')
+//       .limit(6);
+    
+//     successResponse(res, related);
+//   } catch (error) {
+//     console.error('Error in getRelatedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // BOOK PAGES FOR PAGE-BY-PAGE READER
+// // ============================================
+// export const getBookPages = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check if user has access to premium books
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required to read this book', 403);
+//     }
+    
+//     // If no pageImages but PDF exists, we could generate pages (future feature)
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return successResponse(res, {
+//         title: book.title,
+//         pages: [],
+//         totalPages: 0,
+//         message: 'Page images not available. Please download the PDF/EPUB to read.'
+//       });
+//     }
+    
+//     successResponse(res, {
+//       title: book.title,
+//       pages: book.pageImages,
+//       totalPages: book.totalPages || book.pageImages.length
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPages:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET SINGLE PAGE IMAGE
+// // ============================================
+// export const getBookPage = async (req, res, next) => {
+//   try {
+//     const { slug, pageNumber } = req.params;
+//     const pageNum = parseInt(pageNumber);
+    
+//     if (isNaN(pageNum) || pageNum < 1) {
+//       return errorResponse(res, 'Invalid page number', 400);
+//     }
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check premium access
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+    
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return errorResponse(res, 'No pages available', 404);
+//     }
+    
+//     if (pageNum > book.pageImages.length) {
+//       return errorResponse(res, 'Page not found', 404);
+//     }
+    
+//     successResponse(res, {
+//       page: pageNum,
+//       imageUrl: book.pageImages[pageNum - 1],
+//       totalPages: book.totalPages || book.pageImages.length,
+//       hasNext: pageNum < book.pageImages.length,
+//       hasPrev: pageNum > 1
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPage:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // FIX: LIKE / UNLIKE BOOK ENDPOINT
+// // ============================================
+// export const likeBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Initialize likes array if it doesn't exist
+//     if (!book.likes) {
+//       book.likes = [];
+//     }
+    
+//     const alreadyLiked = book.likes.some(uid => uid.toString() === userId);
+    
+//     if (alreadyLiked) {
+//       // Unlike: remove user from likes array
+//       book.likes = book.likes.filter(uid => uid.toString() !== userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         liked: false, 
+//         likesCount: book.likes.length 
+//       }, 'Book unliked');
+//     } else {
+//       // Like: add user to likes array
+//       book.likes.push(userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         liked: true, 
+//         likesCount: book.likes.length 
+//       }, 'Book liked');
+//     }
+//   } catch (error) {
+//     console.error('Error in likeBook:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // FIX: BOOKMARK / REMOVE BOOKMARK ENDPOINT
+// // ============================================
+// export const bookmarkBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Initialize bookmarks array if it doesn't exist
+//     if (!book.bookmarks) {
+//       book.bookmarks = [];
+//     }
+    
+//     const alreadyBookmarked = book.bookmarks.some(uid => uid.toString() === userId);
+    
+//     if (alreadyBookmarked) {
+//       // Remove bookmark
+//       book.bookmarks = book.bookmarks.filter(uid => uid.toString() !== userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         bookmarked: false, 
+//         bookmarksCount: book.bookmarks.length 
+//       }, 'Bookmark removed');
+//     } else {
+//       // Add bookmark
+//       book.bookmarks.push(userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         bookmarked: true, 
+//         bookmarksCount: book.bookmarks.length 
+//       }, 'Book saved');
+//     }
+//   } catch (error) {
+//     console.error('Error in bookmarkBook:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET BOOK LIKE STATUS (Optional helper)
+// // ============================================
+// export const getBookLikeStatus = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id).select('likes');
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const isLiked = book.likes ? book.likes.some(uid => uid.toString() === userId) : false;
+//     const likesCount = book.likes ? book.likes.length : 0;
+    
+//     successResponse(res, { isLiked, likesCount });
+//   } catch (error) {
+//     console.error('Error in getBookLikeStatus:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET BOOK BOOKMARK STATUS (Optional helper)
+// // ============================================
+// export const getBookBookmarkStatus = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id).select('bookmarks');
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const isBookmarked = book.bookmarks ? book.bookmarks.some(uid => uid.toString() === userId) : false;
+//     const bookmarksCount = book.bookmarks ? book.bookmarks.length : 0;
+    
+//     successResponse(res, { isBookmarked, bookmarksCount });
+//   } catch (error) {
+//     console.error('Error in getBookBookmarkStatus:', error);
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+
+
+
+
+
+// // server/controllers/book.controller.js
+// import Book from '../models/Book.js';
+// import Author from '../models/Author.js';
+// import User from '../models/User.js';
+// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+
+// export const getBooks = async (req, res, next) => {
+//   try {
+//     const { page, limit, skip } = getPagination(req);
+//     const sort = getSort(req);
+//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
+    
+//     // Only show published books for public, admin can see all
+//     if (!req.user || req.user.role !== 'admin') {
+//       filters.isPublished = true;
+//     }
+
+//     const books = await Book.find(filters)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug')
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
+
+//     const total = await Book.countDocuments(filters);
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookBySlug = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     if (!slug) {
+//       return errorResponse(res, 'Slug is required', 400);
+//     }
+
+//     const book = await Book.findOne({ slug })
+//       .populate('author', 'name slug avatar bio')
+//       .populate('coAuthors', 'name slug avatar')
+//       .populate('category', 'name slug');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check if published or admin
+//     if (!book.isPublished && (!req.user || req.user.role !== 'admin')) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Increment views
+//     book.stats.views += 1;
+//     await book.save();
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookBySlug:', error);
+//     next(error);
+//   }
+// };
+
+// export const createBook = async (req, res, next) => {
+//   try {
+//     console.log('Creating book with data:', JSON.stringify(req.body, null, 2));
+    
+//     const { title, author, slug, pageImages, totalPages } = req.body;
+    
+//     // Validate required fields
+//     if (!title || !title.trim()) {
+//       return errorResponse(res, 'Title is required', 400);
+//     }
+//     if (!author) {
+//       return errorResponse(res, 'Author is required', 400);
+//     }
+    
+//     // Validate author exists
+//     const authorExists = await Author.findById(author);
+//     if (!authorExists) {
+//       return errorResponse(res, 'Author not found. Please select a valid author.', 404);
+//     }
+    
+//     // Prepare book data
+//     const bookData = { ...req.body };
+    
+//     // Handle pageImages - ensure it's an array and set totalPages
+//     if (pageImages && Array.isArray(pageImages) && pageImages.length > 0) {
+//       bookData.pageImages = pageImages;
+//       bookData.totalPages = pageImages.length;
+//     } 
+//     // FIX: If totalPages is provided from PDF extraction, use it
+//     else if (totalPages && parseInt(totalPages) > 0) {
+//       bookData.totalPages = parseInt(totalPages);
+//     }
+    
+//     // If slug is provided, clean it; otherwise will be auto-generated
+//     if (slug && slug.trim()) {
+//       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//     }
+    
+//     const book = await Book.create(bookData);
+    
+//     // Populate author data for response
+//     const populatedBook = await Book.findById(book._id)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, populatedBook, 'Book created successfully', 201);
+//   } catch (error) {
+//     console.error('Error creating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     if (error.code === 11000) {
+//       return errorResponse(res, 'A book with this slug already exists. Please use a different slug.', 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const updateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Updating book with ID:', id);
+//     console.log('Update data:', JSON.stringify(req.body, null, 2));
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // If author is being changed, validate new author
+//     if (req.body.author && req.body.author !== book.author.toString()) {
+//       const authorExists = await Author.findById(req.body.author);
+//       if (!authorExists) {
+//         return errorResponse(res, 'New author not found', 404);
+//       }
+//     }
+    
+//     // Handle slug update if provided
+//     let updateData = { ...req.body };
+//     if (req.body.slug && req.body.slug !== book.slug) {
+//       const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+//       const existingBook = await Book.findOne({ slug: cleanSlug, _id: { $ne: id } });
+//       if (existingBook) {
+//         return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
+//       }
+//       updateData.slug = cleanSlug;
+//     }
+    
+//     // Handle pageImages update
+//     if (req.body.pageImages && Array.isArray(req.body.pageImages)) {
+//       updateData.pageImages = req.body.pageImages;
+//       updateData.totalPages = req.body.pageImages.length;
+//     }
+//     // FIX: If totalPages is provided from PDF extraction and no pageImages, use it
+//     else if (req.body.totalPages && !req.body.pageImages) {
+//       updateData.totalPages = parseInt(req.body.totalPages);
+//     }
+    
+//     // If publishing for first time, set publishedAt
+//     if (updateData.isPublished && !book.isPublished) {
+//       updateData.publishedAt = new Date();
+//     }
+    
+//     const updatedBook = await Book.findByIdAndUpdate(
+//       id,
+//       updateData,
+//       { new: true, runValidators: true }
+//     ).populate('author', 'name slug avatar')
+//       .populate('category', 'name slug');
+    
+//     successResponse(res, updatedBook, 'Book updated successfully');
+//   } catch (error) {
+//     console.error('Error updating book:', error);
+    
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(e => e.message);
+//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
+//     }
+    
+//     next(error);
+//   }
+// };
+
+// export const deleteBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     console.log('Deleting book with ID:', id);
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     await Book.findByIdAndDelete(id);
+//     successResponse(res, null, 'Book deleted successfully');
+//   } catch (error) {
+//     console.error('Error deleting book:', error);
+//     next(error);
+//   }
+// };
+
+// export const getFeaturedBooks = async (req, res, next) => {
+//   try {
+//     const books = await Book.find({ isFeatured: true, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .limit(10);
+
+//     successResponse(res, books);
+//   } catch (error) {
+//     console.error('Error in getFeaturedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookReader = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Check subscription for premium books
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     successResponse(res, {
+//       pdfUrl: book.pdfUrl,
+//       epubUrl: book.epubUrl,
+//       totalPages: book.totalPages,
+//       previewPages: book.previewPages,
+//       title: book.title,
+//       author: book.author,
+//       pageImages: book.pageImages || []
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookReader:', error);
+//     next(error);
+//   }
+// };
+
+// export const getBookPreview = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title slug coverImage previewPages pdfUrl epubUrl description author pageImages totalPages');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     successResponse(res, book);
+//   } catch (error) {
+//     console.error('Error in getBookPreview:', error);
+//     next(error);
+//   }
+// };
+
+// export const downloadBook = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+
+//     // Increment download count
+//     book.stats.downloads += 1;
+//     await book.save();
+
+//     // Add to user's downloads if user is logged in
+//     if (req.user) {
+//       await User.findByIdAndUpdate(req.user.id, {
+//         $push: {
+//           downloads: {
+//             contentType: 'book',
+//             contentId: book._id,
+//             title: book.title,
+//             slug: book.slug,
+//             downloadedAt: new Date()
+//           }
+//         }
+//       });
+//     }
+
+//     successResponse(res, { 
+//       downloadUrl: book.pdfUrl || book.epubUrl,
+//       title: book.title,
+//       format: book.pdfUrl ? 'PDF' : 'EPUB'
+//     }, 'Download started');
+//   } catch (error) {
+//     console.error('Error in downloadBook:', error);
+//     next(error);
+//   }
+// };
+
+// export const rateBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const { rating, review } = req.body;
+    
+//     if (!rating || rating < 1 || rating > 5) {
+//       return errorResponse(res, 'Rating must be between 1 and 5', 400);
+//     }
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+
+//     // Remove existing rating if any
+//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
+
+//     // Add new rating
+//     book.ratings.push({
+//       user: req.user.id,
+//       rating: rating,
+//       review: review || ''
+//     });
+
+//     // Recalculate average
+//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
+//     book.stats.averageRating = total / book.ratings.length;
+//     book.stats.ratings = book.ratings.length;
+
+//     await book.save();
+    
+//     successResponse(res, { 
+//       averageRating: book.stats.averageRating, 
+//       totalRatings: book.ratings.length 
+//     }, 'Rating submitted successfully');
+//   } catch (error) {
+//     console.error('Error in rateBook:', error);
+//     next(error);
+//   }
+// };
+
+// // Get books by author slug
+// export const getBooksByAuthor = async (req, res, next) => {
+//   try {
+//     const { authorId } = req.params;
+//     const { page, limit, skip } = getPagination(req);
+    
+//     const author = await Author.findById(authorId);
+//     if (!author) {
+//       return errorResponse(res, 'Author not found', 404);
+//     }
+    
+//     const books = await Book.find({ author: authorId, isPublished: true })
+//       .populate('author', 'name slug avatar')
+//       .sort({ createdAt: -1 })
+//       .skip(skip)
+//       .limit(limit);
+    
+//     const total = await Book.countDocuments({ author: authorId, isPublished: true });
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooksByAuthor:', error);
+//     next(error);
+//   }
+// };
+
+// // Get related books
+// export const getRelatedBooks = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug });
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const related = await Book.find({
+//       _id: { $ne: book._id },
+//       $or: [
+//         { author: book.author },
+//         { category: book.category },
+//         { type: book.type },
+//         { genres: { $in: book.genres } }
+//       ],
+//       isPublished: true
+//     })
+//       .populate('author', 'name slug avatar')
+//       .limit(6);
+    
+//     successResponse(res, related);
+//   } catch (error) {
+//     console.error('Error in getRelatedBooks:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // BOOK PAGES FOR PAGE-BY-PAGE READER
+// // ============================================
+// export const getBookPages = async (req, res, next) => {
+//   try {
+//     const { slug } = req.params;
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('title pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check if user has access to premium books
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required to read this book', 403);
+//     }
+    
+//     // If no pageImages but PDF exists, we could generate pages (future feature)
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return successResponse(res, {
+//         title: book.title,
+//         pages: [],
+//         totalPages: book.totalPages || 0,
+//         message: 'Page images not available. Please download the PDF/EPUB to read.'
+//       });
+//     }
+    
+//     successResponse(res, {
+//       title: book.title,
+//       pages: book.pageImages,
+//       totalPages: book.totalPages || book.pageImages.length
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPages:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET SINGLE PAGE IMAGE
+// // ============================================
+// export const getBookPage = async (req, res, next) => {
+//   try {
+//     const { slug, pageNumber } = req.params;
+//     const pageNum = parseInt(pageNumber);
+    
+//     if (isNaN(pageNum) || pageNum < 1) {
+//       return errorResponse(res, 'Invalid page number', 400);
+//     }
+    
+//     const book = await Book.findOne({ slug, isPublished: true })
+//       .select('pageImages totalPages isPremium');
+
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Check premium access
+//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
+//       return errorResponse(res, 'Premium subscription required', 403);
+//     }
+    
+//     if (!book.pageImages || book.pageImages.length === 0) {
+//       return errorResponse(res, 'No pages available', 404);
+//     }
+    
+//     if (pageNum > book.pageImages.length) {
+//       return errorResponse(res, 'Page not found', 404);
+//     }
+    
+//     successResponse(res, {
+//       page: pageNum,
+//       imageUrl: book.pageImages[pageNum - 1],
+//       totalPages: book.totalPages || book.pageImages.length,
+//       hasNext: pageNum < book.pageImages.length,
+//       hasPrev: pageNum > 1
+//     });
+//   } catch (error) {
+//     console.error('Error in getBookPage:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // LIKE / UNLIKE BOOK ENDPOINT
+// // ============================================
+// export const likeBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Initialize likes array if it doesn't exist
+//     if (!book.likes) {
+//       book.likes = [];
+//     }
+    
+//     const alreadyLiked = book.likes.some(uid => uid.toString() === userId);
+    
+//     if (alreadyLiked) {
+//       // Unlike: remove user from likes array
+//       book.likes = book.likes.filter(uid => uid.toString() !== userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         liked: false, 
+//         likesCount: book.likes.length 
+//       }, 'Book unliked');
+//     } else {
+//       // Like: add user to likes array
+//       book.likes.push(userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         liked: true, 
+//         likesCount: book.likes.length 
+//       }, 'Book liked');
+//     }
+//   } catch (error) {
+//     console.error('Error in likeBook:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // BOOKMARK / REMOVE BOOKMARK ENDPOINT
+// // ============================================
+// export const bookmarkBook = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id);
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     // Initialize bookmarks array if it doesn't exist
+//     if (!book.bookmarks) {
+//       book.bookmarks = [];
+//     }
+    
+//     const alreadyBookmarked = book.bookmarks.some(uid => uid.toString() === userId);
+    
+//     if (alreadyBookmarked) {
+//       // Remove bookmark
+//       book.bookmarks = book.bookmarks.filter(uid => uid.toString() !== userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         bookmarked: false, 
+//         bookmarksCount: book.bookmarks.length 
+//       }, 'Bookmark removed');
+//     } else {
+//       // Add bookmark
+//       book.bookmarks.push(userId);
+//       await book.save();
+//       return successResponse(res, { 
+//         bookmarked: true, 
+//         bookmarksCount: book.bookmarks.length 
+//       }, 'Book saved');
+//     }
+//   } catch (error) {
+//     console.error('Error in bookmarkBook:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET BOOK LIKE STATUS (Optional helper)
+// // ============================================
+// export const getBookLikeStatus = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id).select('likes');
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const isLiked = book.likes ? book.likes.some(uid => uid.toString() === userId) : false;
+//     const likesCount = book.likes ? book.likes.length : 0;
+    
+//     successResponse(res, { isLiked, likesCount });
+//   } catch (error) {
+//     console.error('Error in getBookLikeStatus:', error);
+//     next(error);
+//   }
+// };
+
+// // ============================================
+// // GET BOOK BOOKMARK STATUS (Optional helper)
+// // ============================================
+// export const getBookBookmarkStatus = async (req, res, next) => {
+//   try {
+//     const { id } = req.params;
+//     const userId = req.user.id;
+    
+//     const book = await Book.findById(id).select('bookmarks');
+//     if (!book) {
+//       return errorResponse(res, 'Book not found', 404);
+//     }
+    
+//     const isBookmarked = book.bookmarks ? book.bookmarks.some(uid => uid.toString() === userId) : false;
+//     const bookmarksCount = book.bookmarks ? book.bookmarks.length : 0;
+    
+//     successResponse(res, { isBookmarked, bookmarksCount });
+//   } catch (error) {
+//     console.error('Error in getBookBookmarkStatus:', error);
+//     next(error);
+//   }
+// };
+
+
+
+
+
+
+
+// //working code revert
+// // server/controllers/book.controller.js
+// import Book from '../models/Book.js';
+// import Author from '../models/Author.js';
+// import User from '../models/User.js';
+// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
+// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
+// import { convertPdfToImages } from '../utils/pdfConverter.js';
+
+// export const getBooks = async (req, res, next) => {
+//   try {
+//     const { page, limit, skip } = getPagination(req);
+//     const sort = getSort(req);
+//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
+    
+//     // Only show published books for public, admin can see all
+//     if (!req.user || req.user.role !== 'admin') {
+//       filters.isPublished = true;
+//     }
+
+//     const books = await Book.find(filters)
+//       .populate('author', 'name slug avatar')
+//       .populate('category', 'name slug')
+//       .sort(sort)
+//       .skip(skip)
+//       .limit(limit);
+
+//     const total = await Book.countDocuments(filters);
+//     paginatedResponse(res, books, { page, limit, total });
+//   } catch (error) {
+//     console.error('Error in getBooks:', error);
+//     next(error);
+//   }
+// };
+
 // export const getBookBySlug = async (req, res, next) => {
 //   try {
 //     const { slug } = req.params;
@@ -116,7 +2427,7 @@
 // };
 
 // // ============================================
-// // CREATE BOOK WITH PDF TO IMAGE CONVERSION
+// // UPDATED: CREATE BOOK WITH PDF TO IMAGE CONVERSION
 // // ============================================
 // export const createBook = async (req, res, next) => {
 //   try {
@@ -195,7 +2506,7 @@
 // };
 
 // // ============================================
-// // UPDATE BOOK WITH PDF TO IMAGE CONVERSION
+// // UPDATED: UPDATE BOOK WITH PDF TO IMAGE CONVERSION
 // // ============================================
 // export const updateBook = async (req, res, next) => {
 //   try {
@@ -277,9 +2588,6 @@
 //   }
 // };
 
-// // ============================================
-// // DELETE BOOK
-// // ============================================
 // export const deleteBook = async (req, res, next) => {
 //   try {
 //     const { id } = req.params;
@@ -298,9 +2606,6 @@
 //   }
 // };
 
-// // ============================================
-// // GET FEATURED BOOKS
-// // ============================================
 // export const getFeaturedBooks = async (req, res, next) => {
 //   try {
 //     const books = await Book.find({ isFeatured: true, isPublished: true })
@@ -315,9 +2620,6 @@
 //   }
 // };
 
-// // ============================================
-// // GET BOOK READER
-// // ============================================
 // export const getBookReader = async (req, res, next) => {
 //   try {
 //     const { slug } = req.params;
@@ -347,9 +2649,6 @@
 //   }
 // };
 
-// // ============================================
-// // GET BOOK PREVIEW
-// // ============================================
 // export const getBookPreview = async (req, res, next) => {
 //   try {
 //     const { slug } = req.params;
@@ -368,9 +2667,6 @@
 //   }
 // };
 
-// // ============================================
-// // DOWNLOAD BOOK
-// // ============================================
 // export const downloadBook = async (req, res, next) => {
 //   try {
 //     const { slug } = req.params;
@@ -414,9 +2710,6 @@
 //   }
 // };
 
-// // ============================================
-// // RATE BOOK
-// // ============================================
 // export const rateBook = async (req, res, next) => {
 //   try {
 //     const { id } = req.params;
@@ -458,9 +2751,7 @@
 //   }
 // };
 
-// // ============================================
-// // GET BOOKS BY AUTHOR
-// // ============================================
+// // Get books by author slug
 // export const getBooksByAuthor = async (req, res, next) => {
 //   try {
 //     const { authorId } = req.params;
@@ -485,9 +2776,7 @@
 //   }
 // };
 
-// // ============================================
-// // GET RELATED BOOKS
-// // ============================================
+// // Get related books
 // export const getRelatedBooks = async (req, res, next) => {
 //   try {
 //     const { slug } = req.params;
@@ -733,869 +3022,6 @@
 //     next(error);
 //   }
 // };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // server/controllers/book.controller.js
-// import Book from '../models/Book.js';
-// import Author from '../models/Author.js';
-// import User from '../models/User.js';
-// import { successResponse, errorResponse, paginatedResponse } from '../utils/response.js';
-// import { getPagination, getSort, getFilters } from '../utils/pagination.js';
-// import { convertPdfToImages } from '../utils/pdfConverter.js';
-
-// // ============================================
-// // HELPER: Convert author slug to ID (backward compatible)
-// // ============================================
-// const resolveAuthorId = async (authorInput) => {
-//   if (!authorInput) return null;
-  
-//   // If it's already a valid ObjectId (24 hex chars)
-//   const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(authorInput);
-//   if (isValidObjectId) {
-//     const author = await Author.findById(authorInput);
-//     return author ? author._id : null;
-//   }
-  
-//   // Otherwise treat as slug and find by slug
-//   const author = await Author.findOne({ slug: authorInput });
-//   return author ? author._id : null;
-// };
-
-// // ============================================
-// // GET BOOKS - WITH ENHANCED SEARCH SUPPORT
-// // ============================================
-// export const getBooks = async (req, res, next) => {
-//   try {
-//     const { page, limit, skip } = getPagination(req);
-//     const sort = getSort(req);
-//     const filters = getFilters(req, ['type', 'language', 'genre', 'author', 'isFree', 'isPremium']);
-    
-//     // Handle search query
-//     const searchQuery = req.query.search;
-//     console.log('📡 getBooks called with:', { 
-//       page, 
-//       limit, 
-//       search: searchQuery, 
-//       filters, 
-//       sort 
-//     });
-    
-//     // Only show published books for public, admin can see all
-//     if (!req.user || req.user.role !== 'admin') {
-//       filters.isPublished = true;
-//     }
-    
-//     // Enhanced search: Search by title, subtitle, description
-//     if (searchQuery && searchQuery.trim()) {
-//       const searchTerm = searchQuery.trim();
-//       const searchRegex = new RegExp(searchTerm, 'i');
-      
-//       console.log('🔍 Searching for:', searchTerm);
-      
-//       const searchFilter = {
-//         $or: [
-//           { title: searchRegex },
-//           { subtitle: searchRegex },
-//           { description: searchRegex }
-//         ]
-//       };
-      
-//       Object.assign(filters, searchFilter);
-//     }
-    
-//     console.log('🔍 Final filters:', JSON.stringify(filters, null, 2));
-
-//     const books = await Book.find(filters)
-//       .populate('author', 'name slug avatar')
-//       .populate('category', 'name slug')
-//       .sort(sort)
-//       .skip(skip)
-//       .limit(limit);
-
-//     const total = await Book.countDocuments(filters);
-    
-//     console.log(`✅ Found ${books.length} books out of ${total} total`);
-    
-//     paginatedResponse(res, books, { page, limit, total });
-//   } catch (error) {
-//     console.error('Error in getBooks:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOK BY SLUG
-// // ============================================
-// export const getBookBySlug = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     if (!slug) {
-//       return errorResponse(res, 'Slug is required', 400);
-//     }
-
-//     const book = await Book.findOne({ slug })
-//       .populate('author', 'name slug avatar bio')
-//       .populate('coAuthors', 'name slug avatar')
-//       .populate('category', 'name slug');
-
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     // Check if published or admin
-//     if (!book.isPublished && (!req.user || req.user.role !== 'admin')) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     // Increment views
-//     book.stats.views += 1;
-//     await book.save();
-
-//     successResponse(res, book);
-//   } catch (error) {
-//     console.error('Error in getBookBySlug:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // CREATE BOOK - SUPPORTS BOTH AUTHOR ID AND SLUG
-// // FIX: Properly saves totalPages
-// // ============================================
-// export const createBook = async (req, res, next) => {
-//   try {
-//     console.log('Creating book with data:', JSON.stringify(req.body, null, 2));
-    
-//     const { title, author, slug, pageImages, totalPages, pdfUrl } = req.body;
-    
-//     // Validate required fields
-//     if (!title || !title.trim()) {
-//       return errorResponse(res, 'Title is required', 400);
-//     }
-//     if (!author) {
-//       return errorResponse(res, 'Author is required', 400);
-//     }
-    
-//     // ============================================
-//     // FIX 1: Convert author slug to ID if needed (backward compatible)
-//     // ============================================
-//     const authorId = await resolveAuthorId(author);
-//     if (!authorId) {
-//       return errorResponse(res, `Author not found with identifier: ${author}`, 404);
-//     }
-    
-//     // Prepare book data
-//     const bookData = { ...req.body };
-//     bookData.author = authorId; // Always use ObjectId
-    
-//     // ============================================
-//     // FIX 2: Handle totalPages properly
-//     // ============================================
-//     // Priority: pageImages length > provided totalPages > pdfUrl extraction
-    
-//     // Handle pageImages - if PDF provided but no pageImages, convert PDF to images
-//     if (pdfUrl && (!pageImages || pageImages.length === 0)) {
-//       console.log('🔄 Converting PDF to images...');
-//       const tempSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-//       const conversionResult = await convertPdfToImages(pdfUrl, null, tempSlug);
-      
-//       if (conversionResult.pageImages && conversionResult.pageImages.length > 0) {
-//         bookData.pageImages = conversionResult.pageImages;
-//         bookData.totalPages = conversionResult.totalPages;
-//         console.log(`✅ Converted ${conversionResult.totalPages} pages to images`);
-//       } else if (totalPages && parseInt(totalPages) > 0) {
-//         bookData.totalPages = parseInt(totalPages);
-//       }
-//     } 
-//     // Handle pageImages directly - this sets totalPages automatically
-//     else if (pageImages && Array.isArray(pageImages) && pageImages.length > 0) {
-//       bookData.pageImages = pageImages;
-//       bookData.totalPages = pageImages.length; // Auto-set from images
-//       console.log(`📖 Using ${pageImages.length} page images, totalPages set to ${pageImages.length}`);
-//     } 
-//     // Use provided totalPages
-//     else if (totalPages !== undefined && totalPages !== null && totalPages !== '') {
-//       bookData.totalPages = parseInt(totalPages);
-//       console.log(`📄 Using provided totalPages: ${bookData.totalPages}`);
-//     }
-    
-//     // Ensure totalPages is a number or null
-//     if (bookData.totalPages === undefined || bookData.totalPages === '') {
-//       delete bookData.totalPages;
-//     } else if (typeof bookData.totalPages === 'string') {
-//       bookData.totalPages = parseInt(bookData.totalPages);
-//     }
-    
-//     // If slug is provided, clean it; otherwise will be auto-generated
-//     if (slug && slug.trim()) {
-//       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
-//     }
-    
-//     console.log('📊 Final book data before save:', {
-//       title: bookData.title,
-//       author: bookData.author,
-//       totalPages: bookData.totalPages,
-//       pageImagesCount: bookData.pageImages?.length || 0,
-//       pdfUrl: bookData.pdfUrl ? 'present' : 'absent'
-//     });
-    
-//     const book = await Book.create(bookData);
-    
-//     // Populate author data for response
-//     const populatedBook = await Book.findById(book._id)
-//       .populate('author', 'name slug avatar')
-//       .populate('category', 'name slug');
-    
-//     console.log(`✅ Book created with ID: ${book._id}, totalPages: ${book.totalPages}`);
-    
-//     successResponse(res, populatedBook, 'Book created successfully', 201);
-//   } catch (error) {
-//     console.error('Error creating book:', error);
-    
-//     if (error.name === 'ValidationError') {
-//       const errors = Object.values(error.errors).map(e => e.message);
-//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
-//     }
-    
-//     if (error.code === 11000) {
-//       return errorResponse(res, 'A book with this slug already exists. Please use a different slug.', 400);
-//     }
-    
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // UPDATE BOOK - SUPPORTS BOTH AUTHOR ID AND SLUG
-// // ============================================
-// export const updateBook = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     console.log('Updating book with ID:', id);
-//     console.log('Update data:', JSON.stringify(req.body, null, 2));
-    
-//     const book = await Book.findById(id);
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     // ============================================
-//     // FIX: Convert author slug to ID if needed
-//     // ============================================
-//     let updateData = { ...req.body };
-    
-//     if (req.body.author && req.body.author !== book.author.toString()) {
-//       const authorId = await resolveAuthorId(req.body.author);
-//       if (!authorId) {
-//         return errorResponse(res, `Author not found with identifier: ${req.body.author}`, 404);
-//       }
-//       updateData.author = authorId;
-//     }
-    
-//     // ============================================
-//     // FIX: Handle totalPages properly on update
-//     // ============================================
-//     // Handle slug update if provided
-//     let newSlug = book.slug;
-    
-//     if (req.body.slug && req.body.slug !== book.slug) {
-//       const cleanSlug = req.body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-//       const existingBook = await Book.findOne({ slug: cleanSlug, _id: { $ne: id } });
-//       if (existingBook) {
-//         return errorResponse(res, 'Slug already exists. Please use a different slug.', 400);
-//       }
-//       updateData.slug = cleanSlug;
-//       newSlug = cleanSlug;
-//     }
-    
-//     // Handle PDF conversion if new PDF is uploaded and no pageImages
-//     if (req.body.pdfUrl && req.body.pdfUrl !== book.pdfUrl && 
-//         (!req.body.pageImages || req.body.pageImages.length === 0)) {
-//       console.log('🔄 New PDF detected, converting to images...');
-//       const conversionResult = await convertPdfToImages(req.body.pdfUrl, id, newSlug);
-      
-//       if (conversionResult.pageImages && conversionResult.pageImages.length > 0) {
-//         updateData.pageImages = conversionResult.pageImages;
-//         updateData.totalPages = conversionResult.totalPages;
-//         console.log(`✅ Converted ${conversionResult.totalPages} pages to images`);
-//       }
-//     }
-//     // Handle pageImages update - auto-set totalPages
-//     else if (req.body.pageImages && Array.isArray(req.body.pageImages)) {
-//       updateData.pageImages = req.body.pageImages;
-//       updateData.totalPages = req.body.pageImages.length;
-//       console.log(`📖 Updated page images, totalPages set to ${req.body.pageImages.length}`);
-//     }
-//     // Use provided totalPages
-//     else if (req.body.totalPages !== undefined && req.body.totalPages !== null && req.body.totalPages !== '') {
-//       updateData.totalPages = parseInt(req.body.totalPages);
-//       console.log(`📄 Using provided totalPages: ${updateData.totalPages}`);
-//     }
-    
-//     // If publishing for first time, set publishedAt
-//     if (updateData.isPublished && !book.isPublished) {
-//       updateData.publishedAt = new Date();
-//     }
-    
-//     console.log('📊 Final update data:', {
-//       totalPages: updateData.totalPages,
-//       pageImagesCount: updateData.pageImages?.length || 0
-//     });
-    
-//     const updatedBook = await Book.findByIdAndUpdate(
-//       id,
-//       updateData,
-//       { new: true, runValidators: true }
-//     ).populate('author', 'name slug avatar')
-//       .populate('category', 'name slug');
-    
-//     successResponse(res, updatedBook, 'Book updated successfully');
-//   } catch (error) {
-//     console.error('Error updating book:', error);
-    
-//     if (error.name === 'ValidationError') {
-//       const errors = Object.values(error.errors).map(e => e.message);
-//       return errorResponse(res, `Validation failed: ${errors.join(', ')}`, 400);
-//     }
-    
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // DELETE BOOK
-// // ============================================
-// export const deleteBook = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     console.log('Deleting book with ID:', id);
-    
-//     const book = await Book.findById(id);
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     await Book.findByIdAndDelete(id);
-//     successResponse(res, null, 'Book deleted successfully');
-//   } catch (error) {
-//     console.error('Error deleting book:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET FEATURED BOOKS
-// // ============================================
-// export const getFeaturedBooks = async (req, res, next) => {
-//   try {
-//     const books = await Book.find({ isFeatured: true, isPublished: true })
-//       .populate('author', 'name slug avatar')
-//       .sort({ createdAt: -1 })
-//       .limit(10);
-
-//     successResponse(res, books);
-//   } catch (error) {
-//     console.error('Error in getFeaturedBooks:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOK READER
-// // ============================================
-// export const getBookReader = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     const book = await Book.findOne({ slug, isPublished: true });
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     // Check subscription for premium books
-//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
-//       return errorResponse(res, 'Premium subscription required', 403);
-//     }
-
-//     successResponse(res, {
-//       pdfUrl: book.pdfUrl,
-//       epubUrl: book.epubUrl,
-//       totalPages: book.totalPages,
-//       previewPages: book.previewPages,
-//       title: book.title,
-//       author: book.author,
-//       pageImages: book.pageImages || []
-//     });
-//   } catch (error) {
-//     console.error('Error in getBookReader:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOK PREVIEW
-// // ============================================
-// export const getBookPreview = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     const book = await Book.findOne({ slug, isPublished: true })
-//       .select('title slug coverImage previewPages pdfUrl epubUrl description author pageImages totalPages');
-
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     successResponse(res, book);
-//   } catch (error) {
-//     console.error('Error in getBookPreview:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // DOWNLOAD BOOK
-// // ============================================
-// export const downloadBook = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     const book = await Book.findOne({ slug, isPublished: true });
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     if (book.isPremium && req.user?.subscription?.plan === 'free') {
-//       return errorResponse(res, 'Premium subscription required', 403);
-//     }
-
-//     // Increment download count
-//     book.stats.downloads += 1;
-//     await book.save();
-
-//     // Add to user's downloads if user is logged in
-//     if (req.user) {
-//       await User.findByIdAndUpdate(req.user.id, {
-//         $push: {
-//           downloads: {
-//             contentType: 'book',
-//             contentId: book._id,
-//             title: book.title,
-//             slug: book.slug,
-//             downloadedAt: new Date()
-//           }
-//         }
-//       });
-//     }
-
-//     successResponse(res, { 
-//       downloadUrl: book.pdfUrl || book.epubUrl,
-//       title: book.title,
-//       format: book.pdfUrl ? 'PDF' : 'EPUB'
-//     }, 'Download started');
-//   } catch (error) {
-//     console.error('Error in downloadBook:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // RATE BOOK
-// // ============================================
-// export const rateBook = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const { rating, review } = req.body;
-    
-//     if (!rating || rating < 1 || rating > 5) {
-//       return errorResponse(res, 'Rating must be between 1 and 5', 400);
-//     }
-    
-//     const book = await Book.findById(id);
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-
-//     // Remove existing rating if any
-//     book.ratings = book.ratings.filter(r => r.user.toString() !== req.user.id);
-
-//     // Add new rating
-//     book.ratings.push({
-//       user: req.user.id,
-//       rating: rating,
-//       review: review || ''
-//     });
-
-//     // Recalculate average
-//     const total = book.ratings.reduce((sum, r) => sum + r.rating, 0);
-//     book.stats.averageRating = total / book.ratings.length;
-//     book.stats.ratings = book.ratings.length;
-
-//     await book.save();
-    
-//     successResponse(res, { 
-//       averageRating: book.stats.averageRating, 
-//       totalRatings: book.ratings.length 
-//     }, 'Rating submitted successfully');
-//   } catch (error) {
-//     console.error('Error in rateBook:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOKS BY AUTHOR
-// // ============================================
-// export const getBooksByAuthor = async (req, res, next) => {
-//   try {
-//     const { authorId } = req.params;
-//     const { page, limit, skip } = getPagination(req);
-    
-//     // Support both ID and slug for author
-//     const author = await Author.findOne({ 
-//       $or: [
-//         { _id: authorId },
-//         { slug: authorId }
-//       ]
-//     });
-    
-//     if (!author) {
-//       return errorResponse(res, 'Author not found', 404);
-//     }
-    
-//     const books = await Book.find({ author: author._id, isPublished: true })
-//       .populate('author', 'name slug avatar')
-//       .sort({ createdAt: -1 })
-//       .skip(skip)
-//       .limit(limit);
-    
-//     const total = await Book.countDocuments({ author: author._id, isPublished: true });
-//     paginatedResponse(res, books, { page, limit, total });
-//   } catch (error) {
-//     console.error('Error in getBooksByAuthor:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET RELATED BOOKS
-// // ============================================
-// export const getRelatedBooks = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     const book = await Book.findOne({ slug });
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     const related = await Book.find({
-//       _id: { $ne: book._id },
-//       $or: [
-//         { author: book.author },
-//         { category: book.category },
-//         { type: book.type },
-//         { genres: { $in: book.genres } }
-//       ],
-//       isPublished: true
-//     })
-//       .populate('author', 'name slug avatar')
-//       .limit(6);
-    
-//     successResponse(res, related);
-//   } catch (error) {
-//     console.error('Error in getRelatedBooks:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // BOOK PAGES FOR PAGE-BY-PAGE READER
-// // ============================================
-// export const getBookPages = async (req, res, next) => {
-//   try {
-//     const { slug } = req.params;
-    
-//     const book = await Book.findOne({ slug, isPublished: true })
-//       .select('title pageImages totalPages isPremium');
-
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     // Check if user has access to premium books
-//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
-//       return errorResponse(res, 'Premium subscription required to read this book', 403);
-//     }
-    
-//     // If no pageImages but PDF exists, we could generate pages (future feature)
-//     if (!book.pageImages || book.pageImages.length === 0) {
-//       return successResponse(res, {
-//         title: book.title,
-//         pages: [],
-//         totalPages: book.totalPages || 0,
-//         message: 'Page images not available. Please download the PDF/EPUB to read.'
-//       });
-//     }
-    
-//     successResponse(res, {
-//       title: book.title,
-//       pages: book.pageImages,
-//       totalPages: book.totalPages || book.pageImages.length
-//     });
-//   } catch (error) {
-//     console.error('Error in getBookPages:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET SINGLE PAGE IMAGE
-// // ============================================
-// export const getBookPage = async (req, res, next) => {
-//   try {
-//     const { slug, pageNumber } = req.params;
-//     const pageNum = parseInt(pageNumber);
-    
-//     if (isNaN(pageNum) || pageNum < 1) {
-//       return errorResponse(res, 'Invalid page number', 400);
-//     }
-    
-//     const book = await Book.findOne({ slug, isPublished: true })
-//       .select('pageImages totalPages isPremium');
-
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     // Check premium access
-//     if (book.isPremium && (!req.user || req.user.subscription?.plan === 'free')) {
-//       return errorResponse(res, 'Premium subscription required', 403);
-//     }
-    
-//     if (!book.pageImages || book.pageImages.length === 0) {
-//       return errorResponse(res, 'No pages available', 404);
-//     }
-    
-//     if (pageNum > book.pageImages.length) {
-//       return errorResponse(res, 'Page not found', 404);
-//     }
-    
-//     successResponse(res, {
-//       page: pageNum,
-//       imageUrl: book.pageImages[pageNum - 1],
-//       totalPages: book.totalPages || book.pageImages.length,
-//       hasNext: pageNum < book.pageImages.length,
-//       hasPrev: pageNum > 1
-//     });
-//   } catch (error) {
-//     console.error('Error in getBookPage:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // LIKE / UNLIKE BOOK ENDPOINT
-// // ============================================
-// export const likeBook = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-    
-//     const book = await Book.findById(id);
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     // Initialize likes array if it doesn't exist
-//     if (!book.likes) {
-//       book.likes = [];
-//     }
-    
-//     const alreadyLiked = book.likes.some(uid => uid.toString() === userId);
-    
-//     if (alreadyLiked) {
-//       // Unlike: remove user from likes array
-//       book.likes = book.likes.filter(uid => uid.toString() !== userId);
-//       await book.save();
-//       return successResponse(res, { 
-//         liked: false, 
-//         likesCount: book.likes.length 
-//       }, 'Book unliked');
-//     } else {
-//       // Like: add user to likes array
-//       book.likes.push(userId);
-//       await book.save();
-//       return successResponse(res, { 
-//         liked: true, 
-//         likesCount: book.likes.length 
-//       }, 'Book liked');
-//     }
-//   } catch (error) {
-//     console.error('Error in likeBook:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // BOOKMARK / REMOVE BOOKMARK ENDPOINT
-// // ============================================
-// export const bookmarkBook = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-    
-//     const book = await Book.findById(id);
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     // Initialize bookmarks array if it doesn't exist
-//     if (!book.bookmarks) {
-//       book.bookmarks = [];
-//     }
-    
-//     const alreadyBookmarked = book.bookmarks.some(uid => uid.toString() === userId);
-    
-//     if (alreadyBookmarked) {
-//       // Remove bookmark
-//       book.bookmarks = book.bookmarks.filter(uid => uid.toString() !== userId);
-//       await book.save();
-//       return successResponse(res, { 
-//         bookmarked: false, 
-//         bookmarksCount: book.bookmarks.length 
-//       }, 'Bookmark removed');
-//     } else {
-//       // Add bookmark
-//       book.bookmarks.push(userId);
-//       await book.save();
-//       return successResponse(res, { 
-//         bookmarked: true, 
-//         bookmarksCount: book.bookmarks.length 
-//       }, 'Book saved');
-//     }
-//   } catch (error) {
-//     console.error('Error in bookmarkBook:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOK LIKE STATUS (Optional helper)
-// // ============================================
-// export const getBookLikeStatus = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-    
-//     const book = await Book.findById(id).select('likes');
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     const isLiked = book.likes ? book.likes.some(uid => uid.toString() === userId) : false;
-//     const likesCount = book.likes ? book.likes.length : 0;
-    
-//     successResponse(res, { isLiked, likesCount });
-//   } catch (error) {
-//     console.error('Error in getBookLikeStatus:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // GET BOOK BOOKMARK STATUS (Optional helper)
-// // ============================================
-// export const getBookBookmarkStatus = async (req, res, next) => {
-//   try {
-//     const { id } = req.params;
-//     const userId = req.user.id;
-    
-//     const book = await Book.findById(id).select('bookmarks');
-//     if (!book) {
-//       return errorResponse(res, 'Book not found', 404);
-//     }
-    
-//     const isBookmarked = book.bookmarks ? book.bookmarks.some(uid => uid.toString() === userId) : false;
-//     const bookmarksCount = book.bookmarks ? book.bookmarks.length : 0;
-    
-//     successResponse(res, { isBookmarked, bookmarksCount });
-//   } catch (error) {
-//     console.error('Error in getBookBookmarkStatus:', error);
-//     next(error);
-//   }
-// };
-
-// // ============================================
-// // BULK UPLOAD BOOKS (Utility function)
-// // ============================================
-// export const bulkCreateBooks = async (req, res, next) => {
-//   try {
-//     const booksData = req.body;
-    
-//     if (!Array.isArray(booksData)) {
-//       return errorResponse(res, 'Expected array of books', 400);
-//     }
-    
-//     let successCount = 0;
-//     let errorCount = 0;
-//     const errors = [];
-    
-//     for (const bookData of booksData) {
-//       try {
-//         // Resolve author ID if slug provided
-//         if (bookData.author) {
-//           const authorId = await resolveAuthorId(bookData.author);
-//           if (!authorId) {
-//             errors.push({ title: bookData.title, error: `Author not found: ${bookData.author}` });
-//             errorCount++;
-//             continue;
-//           }
-//           bookData.author = authorId;
-//         }
-        
-//         // Handle totalPages
-//         if (bookData.pageImages && bookData.pageImages.length > 0) {
-//           bookData.totalPages = bookData.pageImages.length;
-//         } else if (bookData.totalPages) {
-//           bookData.totalPages = parseInt(bookData.totalPages);
-//         }
-        
-//         await Book.create(bookData);
-//         successCount++;
-//       } catch (err) {
-//         errorCount++;
-//         errors.push({ title: bookData.title, error: err.message });
-//       }
-//     }
-    
-//     successResponse(res, {
-//       successCount,
-//       errorCount,
-//       errors: errors.slice(0, 10) // Return first 10 errors
-//     }, `Bulk upload complete: ${successCount} succeeded, ${errorCount} failed`);
-//   } catch (error) {
-//     console.error('Error in bulkCreateBooks:', error);
-//     next(error);
-//   }
-// };
-
 
 
 
@@ -1624,95 +3050,6 @@ import { getPagination, getSort, getFilters } from '../utils/pagination.js';
 import { convertPdfToImages } from '../utils/pdfConverter.js';
 
 // ============================================
-// HELPER: Convert author slug to ID (backward compatible)
-// ============================================
-const resolveAuthorId = async (authorInput) => {
-  if (!authorInput) return null;
-  
-  // If it's already a valid ObjectId (24 hex chars)
-  const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(authorInput);
-  if (isValidObjectId) {
-    const author = await Author.findById(authorInput);
-    return author ? author._id : null;
-  }
-  
-  // Otherwise treat as slug and find by slug
-  const author = await Author.findOne({ slug: authorInput });
-  return author ? author._id : null;
-};
-
-// ============================================
-// HELPER: Clean book data for export
-// ============================================
-const cleanBookForExport = (book, includeSensitive = false) => {
-  const exportObj = {
-    // Basic Info
-    title: book.title,
-    slug: book.slug,
-    subtitle: book.subtitle || '',
-    description: book.description || '',
-    
-    // Author Info
-    author: book.author?.slug || book.author,
-    coAuthors: book.coAuthors?.map(a => a?.slug || a) || [],
-    
-    // Categorization
-    category: book.category?.slug || book.category || null,
-    genres: book.genres || [],
-    type: book.type,
-    language: book.language,
-    
-    // Media URLs
-    coverImage: book.coverImage || '',
-    pageImages: book.pageImages || [],
-    pdfUrl: book.pdfUrl || '',
-    epubUrl: book.epubUrl || '',
-    
-    // Book Details
-    totalPages: book.totalPages || null,
-    previewPages: book.previewPages || null,
-    publisher: book.publisher || '',
-    publishYear: book.publishYear || null,
-    isbn: book.isbn || '',
-    
-    // Pricing & Access
-    price: book.price || { amount: 0, currency: 'INR' },
-    isFree: book.isFree || false,
-    isPremium: book.isPremium || false,
-    watermarkText: book.watermarkText || '',
-    
-    // Status Flags
-    isPublished: book.isPublished || false,
-    isFeatured: book.isFeatured || false,
-    
-    // SEO
-    metaTitle: book.metaTitle || '',
-    metaDescription: book.metaDescription || '',
-    metaKeywords: book.metaKeywords || [],
-    
-    // Stats (optional for export)
-    stats: includeSensitive ? book.stats : {
-      views: book.stats?.views || 0,
-      downloads: book.stats?.downloads || 0
-    },
-    
-    // Timestamps
-    createdAt: book.createdAt,
-    updatedAt: book.updatedAt,
-    publishedAt: book.publishedAt || null
-  };
-  
-  // Remove undefined values
-  Object.keys(exportObj).forEach(key => {
-    if (exportObj[key] === undefined || exportObj[key] === null) {
-      delete exportObj[key];
-    }
-  });
-  
-  return exportObj;
-};
-
-// ============================================
 // GET BOOKS - WITH ENHANCED SEARCH SUPPORT
 // ============================================
 export const getBooks = async (req, res, next) => {
@@ -1736,13 +3073,16 @@ export const getBooks = async (req, res, next) => {
       filters.isPublished = true;
     }
     
-    // Enhanced search: Search by title, subtitle, description
+    // ============================================
+    // ENHANCED SEARCH: Search by title, subtitle, description
+    // ============================================
     if (searchQuery && searchQuery.trim()) {
       const searchTerm = searchQuery.trim();
       const searchRegex = new RegExp(searchTerm, 'i');
       
       console.log('🔍 Searching for:', searchTerm);
       
+      // Build search filter with OR conditions
       const searchFilter = {
         $or: [
           { title: searchRegex },
@@ -1751,6 +3091,11 @@ export const getBooks = async (req, res, next) => {
         ]
       };
       
+      // Also search by author name (requires separate handling since author is populated)
+      // This will search in the author's name if provided in the request
+      // Note: For full author search, we'd need to aggregate, but this covers basic search
+      
+      // Merge with existing filters
       Object.assign(filters, searchFilter);
     }
     
@@ -1811,8 +3156,7 @@ export const getBookBySlug = async (req, res, next) => {
 };
 
 // ============================================
-// CREATE BOOK - SUPPORTS BOTH AUTHOR ID AND SLUG
-// FIX: Properly saves totalPages
+// CREATE BOOK WITH PDF TO IMAGE CONVERSION
 // ============================================
 export const createBook = async (req, res, next) => {
   try {
@@ -1828,22 +3172,14 @@ export const createBook = async (req, res, next) => {
       return errorResponse(res, 'Author is required', 400);
     }
     
-    // ============================================
-    // FIX 1: Convert author slug to ID if needed (backward compatible)
-    // ============================================
-    const authorId = await resolveAuthorId(author);
-    if (!authorId) {
-      return errorResponse(res, `Author not found with identifier: ${author}`, 404);
+    // Validate author exists
+    const authorExists = await Author.findById(author);
+    if (!authorExists) {
+      return errorResponse(res, 'Author not found. Please select a valid author.', 404);
     }
     
     // Prepare book data
     const bookData = { ...req.body };
-    bookData.author = authorId; // Always use ObjectId
-    
-    // ============================================
-    // FIX 2: Handle totalPages properly
-    // ============================================
-    // Priority: pageImages length > provided totalPages > pdfUrl extraction
     
     // Handle pageImages - if PDF provided but no pageImages, convert PDF to images
     if (pdfUrl && (!pageImages || pageImages.length === 0)) {
@@ -1859,23 +3195,14 @@ export const createBook = async (req, res, next) => {
         bookData.totalPages = parseInt(totalPages);
       }
     } 
-    // Handle pageImages directly - this sets totalPages automatically
+    // Handle pageImages directly
     else if (pageImages && Array.isArray(pageImages) && pageImages.length > 0) {
       bookData.pageImages = pageImages;
-      bookData.totalPages = pageImages.length; // Auto-set from images
-      console.log(`📖 Using ${pageImages.length} page images, totalPages set to ${pageImages.length}`);
+      bookData.totalPages = pageImages.length;
     } 
     // Use provided totalPages
-    else if (totalPages !== undefined && totalPages !== null && totalPages !== '') {
+    else if (totalPages && parseInt(totalPages) > 0) {
       bookData.totalPages = parseInt(totalPages);
-      console.log(`📄 Using provided totalPages: ${bookData.totalPages}`);
-    }
-    
-    // Ensure totalPages is a number or null
-    if (bookData.totalPages === undefined || bookData.totalPages === '') {
-      delete bookData.totalPages;
-    } else if (typeof bookData.totalPages === 'string') {
-      bookData.totalPages = parseInt(bookData.totalPages);
     }
     
     // If slug is provided, clean it; otherwise will be auto-generated
@@ -1883,22 +3210,12 @@ export const createBook = async (req, res, next) => {
       bookData.slug = slug.trim().toLowerCase().replace(/[^a-z0-9-]/g, '-');
     }
     
-    console.log('📊 Final book data before save:', {
-      title: bookData.title,
-      author: bookData.author,
-      totalPages: bookData.totalPages,
-      pageImagesCount: bookData.pageImages?.length || 0,
-      pdfUrl: bookData.pdfUrl ? 'present' : 'absent'
-    });
-    
     const book = await Book.create(bookData);
     
     // Populate author data for response
     const populatedBook = await Book.findById(book._id)
       .populate('author', 'name slug avatar')
       .populate('category', 'name slug');
-    
-    console.log(`✅ Book created with ID: ${book._id}, totalPages: ${book.totalPages}`);
     
     successResponse(res, populatedBook, 'Book created successfully', 201);
   } catch (error) {
@@ -1918,7 +3235,7 @@ export const createBook = async (req, res, next) => {
 };
 
 // ============================================
-// UPDATE BOOK - SUPPORTS BOTH AUTHOR ID AND SLUG
+// UPDATE BOOK WITH PDF TO IMAGE CONVERSION
 // ============================================
 export const updateBook = async (req, res, next) => {
   try {
@@ -1931,23 +3248,16 @@ export const updateBook = async (req, res, next) => {
       return errorResponse(res, 'Book not found', 404);
     }
     
-    // ============================================
-    // FIX: Convert author slug to ID if needed
-    // ============================================
-    let updateData = { ...req.body };
-    
+    // If author is being changed, validate new author
     if (req.body.author && req.body.author !== book.author.toString()) {
-      const authorId = await resolveAuthorId(req.body.author);
-      if (!authorId) {
-        return errorResponse(res, `Author not found with identifier: ${req.body.author}`, 404);
+      const authorExists = await Author.findById(req.body.author);
+      if (!authorExists) {
+        return errorResponse(res, 'New author not found', 404);
       }
-      updateData.author = authorId;
     }
     
-    // ============================================
-    // FIX: Handle totalPages properly on update
-    // ============================================
     // Handle slug update if provided
+    let updateData = { ...req.body };
     let newSlug = book.slug;
     
     if (req.body.slug && req.body.slug !== book.slug) {
@@ -1972,27 +3282,20 @@ export const updateBook = async (req, res, next) => {
         console.log(`✅ Converted ${conversionResult.totalPages} pages to images`);
       }
     }
-    // Handle pageImages update - auto-set totalPages
+    // Handle pageImages update
     else if (req.body.pageImages && Array.isArray(req.body.pageImages)) {
       updateData.pageImages = req.body.pageImages;
       updateData.totalPages = req.body.pageImages.length;
-      console.log(`📖 Updated page images, totalPages set to ${req.body.pageImages.length}`);
     }
     // Use provided totalPages
-    else if (req.body.totalPages !== undefined && req.body.totalPages !== null && req.body.totalPages !== '') {
+    else if (req.body.totalPages && !req.body.pageImages) {
       updateData.totalPages = parseInt(req.body.totalPages);
-      console.log(`📄 Using provided totalPages: ${updateData.totalPages}`);
     }
     
     // If publishing for first time, set publishedAt
     if (updateData.isPublished && !book.isPublished) {
       updateData.publishedAt = new Date();
     }
-    
-    console.log('📊 Final update data:', {
-      totalPages: updateData.totalPages,
-      pageImagesCount: updateData.pageImages?.length || 0
-    });
     
     const updatedBook = await Book.findByIdAndUpdate(
       id,
@@ -2196,32 +3499,25 @@ export const rateBook = async (req, res, next) => {
 };
 
 // ============================================
-// GET BOOKS BY AUTHOR (supports both ID and slug)
+// GET BOOKS BY AUTHOR
 // ============================================
 export const getBooksByAuthor = async (req, res, next) => {
   try {
     const { authorId } = req.params;
     const { page, limit, skip } = getPagination(req);
     
-    // Support both ID and slug for author
-    const author = await Author.findOne({ 
-      $or: [
-        { _id: authorId },
-        { slug: authorId }
-      ]
-    });
-    
+    const author = await Author.findById(authorId);
     if (!author) {
       return errorResponse(res, 'Author not found', 404);
     }
     
-    const books = await Book.find({ author: author._id, isPublished: true })
+    const books = await Book.find({ author: authorId, isPublished: true })
       .populate('author', 'name slug avatar')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
     
-    const total = await Book.countDocuments({ author: author._id, isPublished: true });
+    const total = await Book.countDocuments({ author: authorId, isPublished: true });
     paginatedResponse(res, books, { page, limit, total });
   } catch (error) {
     console.error('Error in getBooksByAuthor:', error);
@@ -2474,226 +3770,6 @@ export const getBookBookmarkStatus = async (req, res, next) => {
     successResponse(res, { isBookmarked, bookmarksCount });
   } catch (error) {
     console.error('Error in getBookBookmarkStatus:', error);
-    next(error);
-  }
-};
-
-// ============================================
-// EXPORT BOOKS TO JSON (Backup)
-// ============================================
-export const exportBooks = async (req, res, next) => {
-  try {
-    const { format = 'json', includeUnpublished = 'false', includeStats = 'false' } = req.query;
-    
-    // Check if user is admin
-    if (!req.user || req.user.role !== 'admin') {
-      return errorResponse(res, 'Admin access required for export', 403);
-    }
-    
-    // Build filters
-    const filters = {};
-    if (includeUnpublished !== 'true') {
-      filters.isPublished = true;
-    }
-    
-    // Fetch all books with populated data
-    const books = await Book.find(filters)
-      .populate('author', 'name slug email bio')
-      .populate('coAuthors', 'name slug')
-      .populate('category', 'name slug')
-      .sort({ createdAt: -1 });
-    
-    // Clean data for export
-    const exportData = books.map(book => 
-      cleanBookForExport(book, includeStats === 'true')
-    );
-    
-    const exportSummary = {
-      exportedAt: new Date().toISOString(),
-      totalExported: exportData.length,
-      filters: {
-        includeUnpublished: includeUnpublished === 'true',
-        includeStats: includeStats === 'true'
-      },
-      books: exportData
-    };
-    
-    if (format === 'csv') {
-      // Convert to CSV
-      const flattenObject = (obj, prefix = '') => {
-        const result = {};
-        for (const key in obj) {
-          if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-            Object.assign(result, flattenObject(obj[key], `${prefix}${key}_`));
-          } else if (Array.isArray(obj[key])) {
-            result[`${prefix}${key}`] = JSON.stringify(obj[key]);
-          } else {
-            result[`${prefix}${key}`] = obj[key];
-          }
-        }
-        return result;
-      };
-      
-      const csvData = exportData.map(book => flattenObject(book));
-      const headers = [...new Set(csvData.flatMap(obj => Object.keys(obj)))];
-      
-      let csv = headers.join(',') + '\n';
-      csvData.forEach(row => {
-        csv += headers.map(header => {
-          const value = row[header] || '';
-          return `"${String(value).replace(/"/g, '""')}"`;
-        }).join(',') + '\n';
-      });
-      
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', `attachment; filename=books_export_${Date.now()}.csv`);
-      return res.send(csv);
-    }
-    
-    // Default: JSON format
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename=books_export_${Date.now()}.json`);
-    successResponse(res, exportSummary, 'Books exported successfully');
-    
-  } catch (error) {
-    console.error('Error in exportBooks:', error);
-    next(error);
-  }
-};
-
-// ============================================
-// EXPORT SINGLE BOOK BY ID
-// ============================================
-export const exportSingleBook = async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const { includeStats = 'false' } = req.query;
-    
-    // Check if user is admin
-    if (!req.user || req.user.role !== 'admin') {
-      return errorResponse(res, 'Admin access required for export', 403);
-    }
-    
-    const book = await Book.findById(id)
-      .populate('author', 'name slug email bio')
-      .populate('coAuthors', 'name slug')
-      .populate('category', 'name slug');
-    
-    if (!book) {
-      return errorResponse(res, 'Book not found', 404);
-    }
-    
-    const exportData = cleanBookForExport(book, includeStats === 'true');
-    
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Content-Disposition', `attachment; filename=book_${book.slug}_${Date.now()}.json`);
-    successResponse(res, exportData, 'Book exported successfully');
-    
-  } catch (error) {
-    console.error('Error in exportSingleBook:', error);
-    next(error);
-  }
-};
-
-// ============================================
-// BULK UPLOAD BOOKS (Import)
-// ============================================
-export const bulkCreateBooks = async (req, res, next) => {
-  try {
-    const booksData = req.body;
-    
-    if (!Array.isArray(booksData)) {
-      return errorResponse(res, 'Expected array of books', 400);
-    }
-    
-    // Check if user is admin
-    if (!req.user || req.user.role !== 'admin') {
-      return errorResponse(res, 'Admin access required for bulk upload', 403);
-    }
-    
-    let successCount = 0;
-    let errorCount = 0;
-    const errors = [];
-    const createdBooks = [];
-    
-    for (const bookData of booksData) {
-      try {
-        // Resolve author ID if slug provided
-        if (bookData.author) {
-          const authorId = await resolveAuthorId(bookData.author);
-          if (!authorId) {
-            errors.push({ title: bookData.title || 'Unknown', error: `Author not found: ${bookData.author}` });
-            errorCount++;
-            continue;
-          }
-          bookData.author = authorId;
-        }
-        
-        // Handle co-authors
-        if (bookData.coAuthors && Array.isArray(bookData.coAuthors)) {
-          const resolvedCoAuthors = [];
-          for (const coAuthor of bookData.coAuthors) {
-            const coAuthorId = await resolveAuthorId(coAuthor);
-            if (coAuthorId) {
-              resolvedCoAuthors.push(coAuthorId);
-            }
-          }
-          bookData.coAuthors = resolvedCoAuthors;
-        }
-        
-        // Handle category slug to ID if needed
-        if (bookData.category) {
-          const Category = await import('../models/Category.js').then(m => m.default);
-          const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(bookData.category);
-          if (!isValidObjectId) {
-            const category = await Category.findOne({ slug: bookData.category });
-            if (category) {
-              bookData.category = category._id;
-            }
-          }
-        }
-        
-        // Handle totalPages
-        if (bookData.pageImages && bookData.pageImages.length > 0) {
-          bookData.totalPages = bookData.pageImages.length;
-        } else if (bookData.totalPages) {
-          bookData.totalPages = parseInt(bookData.totalPages);
-        }
-        
-        // Generate slug if not provided
-        if (!bookData.slug && bookData.title) {
-          bookData.slug = bookData.title
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
-        }
-        
-        const book = await Book.create(bookData);
-        createdBooks.push(book);
-        successCount++;
-        
-      } catch (err) {
-        errorCount++;
-        errors.push({ 
-          title: bookData.title || 'Unknown', 
-          error: err.message,
-          slug: bookData.slug
-        });
-        console.error(`Failed to create book: ${bookData.title}`, err.message);
-      }
-    }
-    
-    console.log(`✅ Bulk upload complete: ${successCount} succeeded, ${errorCount} failed`);
-    
-    successResponse(res, {
-      successCount,
-      errorCount,
-      errors: errors.slice(0, 20), // Return first 20 errors
-      createdBooks: createdBooks.map(b => ({ id: b._id, title: b.title, slug: b.slug }))
-    }, `Bulk upload complete: ${successCount} succeeded, ${errorCount} failed`);
-    
-  } catch (error) {
-    console.error('Error in bulkCreateBooks:', error);
     next(error);
   }
 };

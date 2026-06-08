@@ -30,7 +30,14 @@
     "viewAll": "سب دیکھیں",
     "loading": "لوڈ ہو رہا ہے...",
     "noResults": "کوئی نتائج نہیں ملے",
-    "error": "کچھ غلط ہو گیا"
+    "error": "کچھ غلط ہو گیا",
+     "audio": "آڈیو",
+    "blog": "بلاگز",
+    "adminUser": "ایڈمن یوزر",
+    "favorites": "پسندیدہ",
+    "history": "تاریخ",
+    "adminPanel": "ایڈمن پینل",
+    "home.trendingPoems": "مقبول نظمیں"
   },
   "home": {
     "heroTitle": "الفاظ کی خوبصورتی دریافت کریں",
