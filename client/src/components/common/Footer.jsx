@@ -505,6 +505,287 @@
 
 
 
+// // client/src/components/layout/Footer.jsx
+// import React, { useState, useEffect } from 'react'
+// import { Link } from 'react-router-dom'
+// import { useTranslation } from 'react-i18next'
+// import { 
+//   BookOpen, Mail, Phone, MapPin, Facebook, Twitter, Instagram, Youtube, 
+//   Linkedin, Github, Globe, Heart, Sparkles, ArrowUp, Shield, FileText,
+//   Info, HelpCircle, Cookie, Award, Users
+// } from 'lucide-react'
+// import settingsAPI from '../../api/settingsAPI.js'
+
+// // Helper function to clean URLs
+// const cleanUrl = (url) => {
+//   if (!url) return '';
+//   return url.replace(/\s+/g, '').trim();
+// }
+
+// const Footer = () => {
+//   const { t } = useTranslation()
+//   const [showScrollTop, setShowScrollTop] = useState(false)
+//   const [logoError, setLogoError] = useState(false)
+  
+//   // Site settings (same as navbar)
+//   const [siteSettings, setSiteSettings] = useState({
+//     siteName: 'ZauqApp',
+//     siteDescription: 'AI Powered Urdu Literary Ecosystem',
+//     siteLogo: '',
+//     siteFavicon: '',
+//     theme: 'light',
+//     primaryColor: '#8B4513',
+//     secondaryColor: '#DAA520',
+//     fontFamily: 'Inter'
+//   })
+  
+//   const [loading, setLoading] = useState(true)
+
+//   // Fetch site settings - SAME TECHNIQUE AS NAVBAR
+//   useEffect(() => {
+//     const fetchSettings = async () => {
+//       try {
+//         console.log('🔵 Footer fetching site settings...')
+//         const response = await settingsAPI.getPublicSettings()
+//         console.log('🔵 Footer API response:', response)
+        
+//         // Same structure as navbar - response.data contains the settings
+//         const settingsData = response?.data || response
+        
+//         if (settingsData) {
+//           const cleanedLogoUrl = cleanUrl(settingsData.siteLogo)
+//           console.log('🔵 Footer cleaned logo URL:', cleanedLogoUrl)
+          
+//           setSiteSettings({
+//             siteName: settingsData.siteName || 'ZauqApp',
+//             siteDescription: settingsData.siteDescription || 'AI Powered Urdu Literary Ecosystem',
+//             siteLogo: cleanedLogoUrl,
+//             siteFavicon: cleanUrl(settingsData.siteFavicon),
+//             theme: settingsData.theme || 'light',
+//             primaryColor: settingsData.primaryColor || '#8B4513',
+//             secondaryColor: settingsData.secondaryColor || '#DAA520',
+//             fontFamily: settingsData.fontFamily || 'Inter'
+//           })
+//         }
+//       } catch (error) {
+//         console.error('Error fetching settings:', error)
+//       } finally {
+//         setLoading(false)
+//       }
+//     }
+    
+//     fetchSettings()
+//   }, [])
+
+//   // Scroll to top button visibility
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       setShowScrollTop(window.scrollY > 300)
+//     }
+//     window.addEventListener('scroll', handleScroll)
+//     return () => window.removeEventListener('scroll', handleScroll)
+//   }, [])
+
+//   const scrollToTop = () => {
+//     window.scrollTo({ top: 0, behavior: 'smooth' })
+//   }
+
+//   // Logo render function - SAME AS NAVBAR
+//   const renderLogo = () => {
+//     console.log('🎨 Footer renderLogo - siteLogo:', siteSettings.siteLogo)
+    
+//     if (siteSettings.siteLogo && siteSettings.siteLogo.trim() !== '' && !logoError) {
+//       return (
+//         <div className="relative group">
+//           <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
+//           <img 
+//             src={siteSettings.siteLogo}
+//             alt={siteSettings.siteName}
+//             className="relative h-10 w-auto object-contain cursor-pointer"
+//             onError={() => {
+//               console.error('❌ Footer logo failed to load')
+//               setLogoError(true)
+//             }}
+//             onLoad={() => console.log('✅ Footer logo loaded successfully')}
+//           />
+//         </div>
+//       )
+//     }
+    
+//     // Fallback icon
+//     return (
+//       <div className="relative group">
+//         <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
+//         <div className="relative bg-gradient-to-br from-amber-500 to-rose-500 rounded-xl p-2">
+//           <BookOpen className="h-5 w-5 text-white" />
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   // Footer sections
+//   const footerSections = [
+//     { title: 'Quick Links', links: [
+//       { label: 'Home', path: '/' },
+//       { label: 'Explore', path: '/explore' },
+//       { label: 'Poetry', path: '/poetry' },
+//       { label: 'Authors', path: '/authors' }
+//     ]},
+//     { title: 'Resources', links: [
+//       { label: 'Books', path: '/books' },
+//       { label: 'Audio', path: '/audio' },
+//       { label: 'Videos', path: '/videos' },
+//       { label: 'Blog', path: '/blog' }
+//     ]},
+//     { title: 'Support', links: [
+//       { label: 'About Us', path: '/about-us' },
+//       { label: 'Contact', path: '/contact' },
+//       { label: 'Privacy Policy', path: '/privacy-policy' },
+//       { label: 'Terms of Service', path: '/terms-of-service' }
+//     ]}
+//   ]
+
+//   const socialLinks = [
+//     { icon: Facebook, url: 'https://facebook.com', color: 'hover:text-blue-600' },
+//     { icon: Twitter, url: 'https://twitter.com', color: 'hover:text-sky-500' },
+//     { icon: Instagram, url: 'https://instagram.com', color: 'hover:text-pink-600' },
+//     { icon: Youtube, url: 'https://youtube.com', color: 'hover:text-red-600' },
+//     { icon: Linkedin, url: 'https://linkedin.com', color: 'hover:text-blue-700' },
+//     { icon: Github, url: 'https://github.com', color: 'hover:text-gray-600' }
+//   ]
+
+//   if (loading) {
+//     return (
+//       <footer className="bg-gray-900 text-gray-300">
+//         <div className="max-w-7xl mx-auto px-4 py-8 text-center">
+//           <div className="animate-pulse">Loading...</div>
+//         </div>
+//       </footer>
+//     )
+//   }
+
+//   return (
+//     <>
+//       <footer className="bg-gray-900 text-gray-300">
+//         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+          
+//           {/* Main Footer Grid */}
+//           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+            
+//             {/* Brand Section */}
+//             <div className="lg:col-span-2">
+//               <Link to="/" className="flex items-center gap-3 mb-4">
+//                 {renderLogo()}
+//                 <span className="text-xl font-bold text-white">
+//                   {siteSettings.siteName}
+//                 </span>
+//               </Link>
+              
+//               <p className="text-sm text-gray-400 mb-4 leading-relaxed max-w-md">
+//                 {siteSettings.siteDescription}
+//               </p>
+              
+//               {/* Contact Info */}
+//               <div className="space-y-2 text-sm text-gray-400">
+//                 <div className="flex items-center gap-2">
+//                   <Mail className="h-4 w-4" />
+//                   <a href="mailto:contact@zauqapp.com" className="hover:text-primary-400">contact@zauqapp.com</a>
+//                 </div>
+//                 <div className="flex items-center gap-2">
+//                   <MapPin className="h-4 w-4" />
+//                   <span>New Delhi, India</span>
+//                 </div>
+//               </div>
+              
+//               {/* Social Links */}
+//               <div className="flex gap-3 mt-4">
+//                 {socialLinks.map((social, idx) => {
+//                   const Icon = social.icon
+//                   return (
+//                     <a
+//                       key={idx}
+//                       href={social.url}
+//                       target="_blank"
+//                       rel="noopener noreferrer"
+//                       className={`p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all ${social.color}`}
+//                     >
+//                       <Icon className="h-4 w-4" />
+//                     </a>
+//                   )
+//                 })}
+//               </div>
+//             </div>
+
+//             {/* Footer Sections */}
+//             {footerSections.map((section, idx) => (
+//               <div key={idx}>
+//                 <h3 className="text-white font-semibold text-base mb-4">{section.title}</h3>
+//                 <ul className="space-y-2">
+//                   {section.links.map((link, linkIdx) => (
+//                     <li key={linkIdx}>
+//                       <Link 
+//                         to={link.path} 
+//                         className="text-sm text-gray-400 hover:text-primary-400 transition-colors"
+//                       >
+//                         {link.label}
+//                       </Link>
+//                     </li>
+//                   ))}
+//                 </ul>
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* Bottom Bar */}
+//           <div className="mt-8 pt-6 border-t border-gray-800">
+//             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
+//               <div className="flex items-center gap-2">
+//                 <span>&copy; {new Date().getFullYear()} {siteSettings.siteName}</span>
+//                 <span>•</span>
+//                 <span className="flex items-center gap-1">
+//                   Made with <Heart className="h-3 w-3 text-red-500 animate-pulse" /> in India
+//                 </span>
+//               </div>
+//               <div className="flex items-center gap-2">
+//                 <Sparkles className="h-3 w-3 text-primary-500" />
+//                 <span>AI-Powered Literary Platform</span>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       </footer>
+
+//       {/* Scroll to Top Button */}
+//       {showScrollTop && (
+//         <button
+//           onClick={scrollToTop}
+//           className="fixed bottom-6 right-6 z-50 p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 hover:scale-110 transition-all duration-300"
+//         >
+//           <ArrowUp className="h-5 w-5" />
+//         </button>
+//       )}
+//     </>
+//   )
+// }
+
+// export default Footer
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/components/layout/Footer.jsx
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
@@ -590,7 +871,7 @@ const Footer = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  // Logo render function - SAME AS NAVBAR
+  // Logo render function - with hidden SEO text
   const renderLogo = () => {
     console.log('🎨 Footer renderLogo - siteLogo:', siteSettings.siteLogo)
     
@@ -601,7 +882,7 @@ const Footer = () => {
           <img 
             src={siteSettings.siteLogo}
             alt={siteSettings.siteName}
-            className="relative h-10 w-auto object-contain cursor-pointer"
+            className="relative h-12 w-auto object-contain cursor-pointer"
             onError={() => {
               console.error('❌ Footer logo failed to load')
               setLogoError(true)
@@ -612,12 +893,12 @@ const Footer = () => {
       )
     }
     
-    // Fallback icon
+    // Fallback icon with hidden text for SEO
     return (
       <div className="relative group">
         <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
         <div className="relative bg-gradient-to-br from-amber-500 to-rose-500 rounded-xl p-2">
-          <BookOpen className="h-5 w-5 text-white" />
+          <BookOpen className="h-6 w-6 text-white" />
         </div>
       </div>
     )
@@ -672,13 +953,12 @@ const Footer = () => {
           {/* Main Footer Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
             
-            {/* Brand Section */}
+            {/* Brand Section - Logo Only Visually, but Text for SEO */}
             <div className="lg:col-span-2">
-              <Link to="/" className="flex items-center gap-3 mb-4">
+              <Link to="/" className="block mb-4">
                 {renderLogo()}
-                <span className="text-xl font-bold text-white">
-                  {siteSettings.siteName}
-                </span>
+                {/* SEO: Hidden site name for search engines */}
+                <span className="sr-only">{siteSettings.siteName}</span>
               </Link>
               
               <p className="text-sm text-gray-400 mb-4 leading-relaxed max-w-md">
@@ -710,6 +990,7 @@ const Footer = () => {
                       className={`p-2 bg-gray-800 rounded-lg hover:bg-gray-700 transition-all ${social.color}`}
                     >
                       <Icon className="h-4 w-4" />
+                      <span className="sr-only">{social.icon.name}</span>
                     </a>
                   )
                 })}
@@ -740,6 +1021,7 @@ const Footer = () => {
           <div className="mt-8 pt-6 border-t border-gray-800">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-gray-500">
               <div className="flex items-center gap-2">
+                {/* SEO: Site name is visible here for search engines */}
                 <span>&copy; {new Date().getFullYear()} {siteSettings.siteName}</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -760,8 +1042,10 @@ const Footer = () => {
         <button
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 z-50 p-3 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 hover:scale-110 transition-all duration-300"
+          aria-label="Scroll to top"
         >
           <ArrowUp className="h-5 w-5" />
+          <span className="sr-only">Scroll to top</span>
         </button>
       )}
     </>
