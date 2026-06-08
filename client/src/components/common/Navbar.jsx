@@ -10131,7 +10131,7 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-14 lg:h-16">
           
           {/* Logo Section */}
-          <Link 
+{/*          <Link 
             to="/" 
             className="flex items-center space-x-3 group cursor-pointer"
           >
@@ -10149,7 +10149,21 @@ const Navbar = () => {
                 </span>
               )}
             </div>
-          </Link>
+          </Link>*/}
+
+        	{/*// In your Navbar.jsx, modify the Logo Section:*/}
+
+        	{/* Logo Section - Only Logo Visible, Text Hidden for SEO */}
+			<Link to="/" className="flex items-center group cursor-pointer">
+			  {/* Logo Image - Visible to users */}
+			  {renderLogo()}
+			  
+			  {/* 🔍 SEO Text - Completely hidden from users, visible to search engines */}
+			  <div className="sr-only">
+			    {siteSettings.siteName}
+			    {siteSettings.siteDescription && ` - ${siteSettings.siteDescription}`}
+			  </div>
+			</Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-0.5">
@@ -10693,118 +10707,142 @@ const Navbar = () => {
         </div>
       )}
 
-      <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(-5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideDown {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideRight {
-          from {
-            opacity: 0;
-            transform: translateX(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
-        }
-        
-        .animate-fadeInUp {
-          animation: fadeInUp 0.15s ease-out;
-        }
-        
-        .animate-slideDown {
-          animation: slideDown 0.2s ease-out;
-        }
-        
-        .animate-slideRight {
-          animation: slideRight 0.2s ease-out;
-        }
-        
-        .line-clamp-1 {
-          display: -webkit-box;
-          -webkit-line-clamp: 1;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-        }
-        
-        /* RTL Support for Urdu */
-        .rtl {
-          direction: rtl;
-        }
-        
-        .rtl .space-x-0.5 > :not([hidden]) ~ :not([hidden]) {
-          margin-right: 0.125rem;
-          margin-left: 0;
-        }
-        
-        .rtl .space-x-1.5 > :not([hidden]) ~ :not([hidden]) {
-          margin-right: 0.375rem;
-          margin-left: 0;
-        }
-        
-        .rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
-          margin-right: 0.5rem;
-          margin-left: 0;
-        }
-        
-        .rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
-          margin-right: 0.75rem;
-          margin-left: 0;
-        }
-        
-        .rtl .left-0 {
-          left: auto;
-          right: 0;
-        }
-        
-        .rtl .right-0 {
-          right: auto;
-          left: 0;
-        }
-        
-        .rtl .pl-9 {
-          padding-left: 0;
-          padding-right: 2.25rem;
-        }
-        
-        .rtl .pr-20 {
-          padding-right: 0;
-          padding-left: 5rem;
-        }
-        
-        .rtl .ml-2 {
-          margin-left: 0;
-          margin-right: 0.5rem;
-        }
-        
-        .rtl .mr-2 {
-          margin-right: 0;
-          margin-left: 0.5rem;
-        }
-        
-        .rtl .text-left {
-          text-align: right;
-        }
-      `}</style>
+<style>{`
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(-5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes slideRight {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 0.15s ease-out;
+  }
+  
+  .animate-slideDown {
+    animation: slideDown 0.2s ease-out;
+  }
+  
+  .animate-slideRight {
+    animation: slideRight 0.2s ease-out;
+  }
+  
+  .line-clamp-1 {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  /* RTL Support for Urdu */
+  .rtl {
+    direction: rtl;
+  }
+  
+  .rtl .space-x-0.5 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0.125rem;
+    margin-left: 0;
+  }
+  
+  .rtl .space-x-1.5 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0.375rem;
+    margin-left: 0;
+  }
+  
+  .rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0.5rem;
+    margin-left: 0;
+  }
+  
+  .rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    margin-right: 0.75rem;
+    margin-left: 0;
+  }
+  
+  .rtl .left-0 {
+    left: auto;
+    right: 0;
+  }
+  
+  .rtl .right-0 {
+    right: auto;
+    left: 0;
+  }
+  
+  .rtl .pl-9 {
+    padding-left: 0;
+    padding-right: 2.25rem;
+  }
+  
+  .rtl .pr-20 {
+    padding-right: 0;
+    padding-left: 5rem;
+  }
+  
+  .rtl .ml-2 {
+    margin-left: 0;
+    margin-right: 0.5rem;
+  }
+  
+  .rtl .mr-2 {
+    margin-right: 0;
+    margin-left: 0.5rem;
+  }
+  
+  .rtl .text-left {
+    text-align: right;
+  }
+  
+  /* Screen Reader Only - Visually hidden but accessible to screen readers and search engines */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Makes element visible when focused (for keyboard navigation) */
+  .sr-only-focusable:active,
+  .sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+`}</style>
     </nav>
   )
 }
