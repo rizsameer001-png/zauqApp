@@ -8316,6 +8316,1249 @@
 
 
 
+// // client/src/components/layout/Navbar.jsx
+// import React, { useState, useEffect, useRef } from 'react'
+// import { Link, useNavigate } from 'react-router-dom'
+// import { useTranslation } from 'react-i18next'
+// import { useAuth } from '../../hooks/useAuth.js'
+// import { useSelector, useDispatch } from 'react-redux'
+// import { setLanguage } from '../../store/slices/uiSlice.js'
+// import {
+//   Search, Menu, X, BookOpen, User, LogIn, LogOut,
+//   Globe, ChevronDown, Heart, Bookmark, Headphones, Video,
+//   Sparkles, TrendingUp, Clock, Award, Compass, Flame, Zap,
+//   Mic, MicOff, Loader2, Users, BookMarked, LayoutGrid,
+//   ArrowRight, Crown, Star, Newspaper
+// } from 'lucide-react'
+// import settingsAPI from '../../api/settingsAPI.js'
+// import audioAPI from '../../api/audioAPI.js'
+// import authorAPI from '../../api/authorAPI.js'
+// import toast from 'react-hot-toast'
+
+// // Supported languages
+// const SUPPORTED_LANGUAGES = [
+//   { code: 'en', name: 'English', native: 'English', flag: '🇬🇧', dir: 'ltr' },
+//   { code: 'ur', name: 'Urdu', native: 'اردو', flag: '🇵🇰', dir: 'rtl' },
+//   { code: 'hi', name: 'Hindi', native: 'हिन्दी', flag: '🇮🇳', dir: 'ltr' }
+// ]
+
+// // Search categories
+// const SEARCH_CATEGORIES = [
+//   { id: 'all', label: 'All', icon: LayoutGrid, color: 'from-primary-500 to-secondary-500' },
+//   { id: 'audio', label: 'Audio', icon: Headphones, color: 'from-amber-500 to-orange-500' },
+//   { id: 'authors', label: 'Authors', icon: Users, color: 'from-blue-500 to-cyan-500' },
+//   { id: 'poetry', label: 'Poetry', icon: BookOpen, color: 'from-emerald-500 to-teal-500' },
+//   { id: 'books', label: 'Books', icon: BookMarked, color: 'from-purple-500 to-pink-500' },
+//   { id: 'videos', label: 'Videos', icon: Video, color: 'from-red-500 to-rose-500' },
+// ]
+
+// const Navbar = () => {
+//   const { t, i18n } = useTranslation()
+//   const { user, isAuthenticated, logout } = useAuth()
+//   const dispatch = useDispatch()
+//   const navigate = useNavigate()
+  
+//   // State declarations
+//   const [isMenuOpen, setIsMenuOpen] = useState(false)
+//   const [isSearchOpen, setIsSearchOpen] = useState(false)
+//   const [isLangOpen, setIsLangOpen] = useState(false)
+//   const [isAudioDropdownOpen, setIsAudioDropdownOpen] = useState(false)
+//   const [scrolled, setScrolled] = useState(false)
+//   const [logoError, setLogoError] = useState(false)
+//   const [faviconError, setFaviconError] = useState(false)
+//   const [searchQuery, setSearchQuery] = useState('')
+//   const [selectedCategory, setSelectedCategory] = useState('all')
+//   const [searchResults, setSearchResults] = useState([])
+//   const [searching, setSearching] = useState(false)
+//   const [isListening, setIsListening] = useState(false)
+//   const [voiceSupported, setVoiceSupported] = useState(true)
+//   const [voiceTranscript, setVoiceTranscript] = useState('')
+//   const [showResults, setShowResults] = useState(false)
+  
+//   const currentLang = useSelector((state) => state.ui.language) || 'en'
+//   const audioDropdownTimeoutRef = useRef(null)
+//   const searchTimeoutRef = useRef(null)
+//   const searchRef = useRef(null)
+//   const recognitionRef = useRef(null)
+
+//   // Dynamic settings state
+//   const [siteSettings, setSiteSettings] = useState({
+//     siteName: 'Zauq',
+//     siteDescription: 'AI Powered Urdu Literary Ecosystem',
+//     siteLogo: '',
+//     siteFavicon: '',
+//     theme: 'light',
+//     primaryColor: '#8B4513',
+//     secondaryColor: '#DAA520',
+//     fontFamily: 'Inter',
+//     enableRTL: false
+//   })
+
+//   // Fetch site settings from backend
+//   useEffect(() => {
+//     const fetchSiteSettings = async () => {
+//       try {
+//         console.log('🔵 Fetching site settings...')
+//         const response = await settingsAPI.getPublicSettings()
+//         console.log('🔵 Site settings response:', response)
+        
+//         if (response?.data) {
+//           console.log('🔵 Logo URL:', response.data.siteLogo)
+//           console.log('🔵 Favicon URL:', response.data.siteFavicon)
+//           console.log('🔵 Primary Color:', response.data.primaryColor)
+//           console.log('🔵 Secondary Color:', response.data.secondaryColor)
+          
+//           setSiteSettings({
+//             siteName: response.data.siteName || 'ZauqApp',
+//             siteDescription: response.data.siteDescription || 'AI Powered Urdu Literary Ecosystem',
+//             siteLogo: response.data.siteLogo || '',
+//             siteFavicon: response.data.siteFavicon || '',
+//             theme: response.data.theme || 'light',
+//             primaryColor: response.data.primaryColor || '#8B4513',
+//             secondaryColor: response.data.secondaryColor || '#DAA520',
+//             fontFamily: response.data.fontFamily || 'Inter',
+//             enableRTL: response.data.enableRTL || false
+//           })
+          
+//           // Apply theme
+//           if (response.data.theme === 'dark') {
+//             document.documentElement.classList.add('dark')
+//           } else {
+//             document.documentElement.classList.remove('dark')
+//           }
+          
+//           // Apply font family
+//           if (response.data.fontFamily) {
+//             document.body.style.fontFamily = response.data.fontFamily
+//             document.documentElement.style.setProperty('--font-family', response.data.fontFamily)
+//           }
+          
+//           // Apply colors as CSS variables
+//           if (response.data.primaryColor) {
+//             document.documentElement.style.setProperty('--primary-color', response.data.primaryColor)
+//             document.documentElement.style.setProperty('--primary', response.data.primaryColor)
+//           }
+//           if (response.data.secondaryColor) {
+//             document.documentElement.style.setProperty('--secondary-color', response.data.secondaryColor)
+//             document.documentElement.style.setProperty('--secondary', response.data.secondaryColor)
+//           }
+          
+//           // Apply RTL for Urdu
+//           if (currentLang === 'ur') {
+//             document.documentElement.dir = 'rtl'
+//             document.body.classList.add('rtl')
+//           } else {
+//             document.documentElement.dir = 'ltr'
+//             document.body.classList.remove('rtl')
+//           }
+//         }
+//       } catch (error) {
+//         console.error('Error fetching site settings:', error)
+//       }
+//     }
+    
+//     fetchSiteSettings()
+//   }, [currentLang])
+
+//   // Update favicon dynamically
+//   useEffect(() => {
+//     if (siteSettings.siteFavicon && siteSettings.siteFavicon.trim() !== '' && !faviconError) {
+//       console.log('🔄 Setting favicon to:', siteSettings.siteFavicon)
+      
+//       // Remove existing favicon links
+//       const existingLinks = document.querySelectorAll("link[rel*='icon']")
+//       existingLinks.forEach(link => link.remove())
+      
+//       // Create new favicon link
+//       const link = document.createElement('link')
+//       link.rel = 'icon'
+//       link.type = 'image/png'
+//       link.href = siteSettings.siteFavicon
+//       document.head.appendChild(link)
+      
+//       // Also add apple-touch-icon for mobile
+//       const appleLink = document.createElement('link')
+//       appleLink.rel = 'apple-touch-icon'
+//       appleLink.href = siteSettings.siteFavicon
+//       document.head.appendChild(appleLink)
+      
+//       console.log('✅ Favicon set successfully')
+//     }
+//   }, [siteSettings.siteFavicon, faviconError])
+
+//   // Handle scroll effect
+//   useEffect(() => {
+//     const handleScroll = () => {
+//       setScrolled(window.scrollY > 10)
+//     }
+//     window.addEventListener('scroll', handleScroll)
+//     return () => window.removeEventListener('scroll', handleScroll)
+//   }, [])
+
+//   // Initialize speech recognition
+//   useEffect(() => {
+//     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+//     if (!SpeechRecognition) {
+//       setVoiceSupported(false)
+//       return
+//     }
+
+//     const recognition = new SpeechRecognition()
+//     recognition.continuous = false
+//     recognition.interimResults = true
+//     recognition.lang = currentLang === 'hi' ? 'hi-IN' : currentLang === 'ur' ? 'ur-PK' : 'en-US'
+//     recognition.maxAlternatives = 5
+
+//     recognition.onstart = () => {
+//       setIsListening(true)
+//     }
+
+//     recognition.onend = () => {
+//       setIsListening(false)
+//     }
+
+//     recognition.onresult = (event) => {
+//       const transcript = event.results[0][0].transcript
+//       setVoiceTranscript(transcript)
+//       if (event.results[0].isFinal) {
+//         setSearchQuery(transcript)
+//         performSearch(transcript)
+//       }
+//     }
+
+//     recognition.onerror = (event) => {
+//       console.error('Speech recognition error:', event.error)
+//       setIsListening(false)
+//     }
+
+//     recognitionRef.current = recognition
+
+//     return () => {
+//       if (recognitionRef.current) {
+//         recognitionRef.current.stop()
+//       }
+//     }
+//   }, [currentLang])
+
+//   // Close search results on click outside
+//   useEffect(() => {
+//     const handleClickOutside = (event) => {
+//       if (searchRef.current && !searchRef.current.contains(event.target)) {
+//         setShowResults(false)
+//       }
+//     }
+//     document.addEventListener('mousedown', handleClickOutside)
+//     return () => document.removeEventListener('mousedown', handleClickOutside)
+//   }, [])
+
+//   // Perform search
+//   const performSearch = async (query) => {
+//     if (!query || query.trim().length < 2) {
+//       setSearchResults([])
+//       setShowResults(false)
+//       return
+//     }
+
+//     setSearching(true)
+//     setShowResults(true)
+
+//     if (searchTimeoutRef.current) {
+//       clearTimeout(searchTimeoutRef.current)
+//     }
+
+//     searchTimeoutRef.current = setTimeout(async () => {
+//       try {
+//         let results = []
+        
+//         if (selectedCategory === 'all' || selectedCategory === 'audio') {
+//           try {
+//             const audioResponse = await audioAPI.getAudioItems({ search: query, limit: 3 })
+//             const audioData = audioResponse?.data?.data || audioResponse?.data || audioResponse || []
+//             const audioResults = audioData.map(item => ({
+//               id: item._id,
+//               title: item.title,
+//               description: item.description || `${item.type} audio`,
+//               url: `/audio/${item.slug}`,
+//               type: 'audio',
+//               icon: <Headphones className="h-4 w-4" />
+//             }))
+//             results = [...results, ...audioResults]
+//           } catch (error) {
+//             console.error('Audio search error:', error)
+//           }
+//         }
+        
+//         if (selectedCategory === 'all' || selectedCategory === 'authors') {
+//           try {
+//             const authorResponse = await authorAPI.getAuthors({ search: query, limit: 3 })
+//             const authorData = authorResponse?.data?.data || authorResponse?.data || authorResponse || []
+//             const authorResults = authorData.map(item => ({
+//               id: item._id,
+//               title: item.name,
+//               description: item.bio?.substring(0, 100) || `${item.era || 'Poet'} - ${item.genres?.join(', ') || 'Author'}`,
+//               url: `/author/${item.slug}`,
+//               type: 'author',
+//               icon: <Users className="h-4 w-4" />
+//             }))
+//             results = [...results, ...authorResults]
+//           } catch (error) {
+//             console.error('Author search error:', error)
+//           }
+//         }
+        
+//         if (selectedCategory === 'all' || selectedCategory === 'poetry') {
+//           try {
+//             const poetryResponse = await audioAPI.getAudioItems({ search: query, type: 'poem_recitation', limit: 3 })
+//             const poetryData = poetryResponse?.data?.data || poetryResponse?.data || poetryResponse || []
+//             const poetryResults = poetryData.map(item => ({
+//               id: item._id,
+//               title: item.title,
+//               description: item.description || 'Poem recitation',
+//               url: `/poem/${item.slug || item._id}`,
+//               type: 'poetry',
+//               icon: <BookOpen className="h-4 w-4" />
+//             }))
+//             results = [...results, ...poetryResults]
+//           } catch (error) {
+//             console.error('Poetry search error:', error)
+//           }
+//         }
+        
+//         if (selectedCategory === 'all' || selectedCategory === 'books') {
+//           try {
+//             const bookResponse = await audioAPI.getAudioItems({ search: query, type: 'audiobook', limit: 3 })
+//             const bookData = bookResponse?.data?.data || bookResponse?.data || bookResponse || []
+//             const bookResults = bookData.map(item => ({
+//               id: item._id,
+//               title: item.title,
+//               description: item.description || 'Audiobook',
+//               url: `/book/${item.slug || item._id}`,
+//               type: 'book',
+//               icon: <BookMarked className="h-4 w-4" />
+//             }))
+//             results = [...results, ...bookResults]
+//           } catch (error) {
+//             console.error('Book search error:', error)
+//           }
+//         }
+        
+//         if (selectedCategory === 'all' || selectedCategory === 'videos') {
+//           try {
+//             const videoResponse = await audioAPI.getAudioItems({ search: query, limit: 3 })
+//             const videoData = videoResponse?.data?.data || videoResponse?.data || videoResponse || []
+//             const videoResults = videoData.map(item => ({
+//               id: item._id,
+//               title: item.title,
+//               description: item.description || `${item.type} content`,
+//               url: `/video/${item.slug || item._id}`,
+//               type: 'video',
+//               icon: <Video className="h-4 w-4" />
+//             }))
+//             results = [...results, ...videoResults]
+//           } catch (error) {
+//             console.error('Video search error:', error)
+//           }
+//         }
+        
+//         const uniqueResults = results.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i).slice(0, 8)
+//         setSearchResults(uniqueResults)
+//       } catch (error) {
+//         console.error('Search error:', error)
+//         setSearchResults([])
+//       } finally {
+//         setSearching(false)
+//       }
+//     }, 500)
+//   }
+
+//   const handleSearchChange = (e) => {
+//     const value = e.target.value
+//     setSearchQuery(value)
+//     performSearch(value)
+//   }
+
+//   const handleCategoryChange = (categoryId) => {
+//     setSelectedCategory(categoryId)
+//     if (searchQuery.trim().length >= 2) {
+//       performSearch(searchQuery)
+//     }
+//   }
+
+//   const startVoiceSearch = () => {
+//     if (!voiceSupported) {
+//       toast.error('Voice search is not supported in your browser')
+//       return
+//     }
+//     if (recognitionRef.current) {
+//       recognitionRef.current.start()
+//     }
+//   }
+
+//   const stopVoiceSearch = () => {
+//     if (recognitionRef.current) {
+//       recognitionRef.current.stop()
+//     }
+//   }
+
+//   const handleResultClick = (result) => {
+//     setShowResults(false)
+//     setSearchQuery('')
+//     setIsSearchOpen(false)
+//     navigate(result.url)
+//   }
+
+//   const handleMouseEnter = () => {
+//     if (audioDropdownTimeoutRef.current) clearTimeout(audioDropdownTimeoutRef.current)
+//     setIsAudioDropdownOpen(true)
+//   }
+
+//   const handleMouseLeave = () => {
+//     audioDropdownTimeoutRef.current = setTimeout(() => {
+//       setIsAudioDropdownOpen(false)
+//     }, 150)
+//   }
+
+//   const handleLanguageChange = (langCode) => {
+//     i18n.changeLanguage(langCode)
+//     dispatch(setLanguage(langCode))
+//     if (langCode === 'ur') {
+//       document.documentElement.dir = 'rtl'
+//       document.body.classList.add('rtl')
+//     } else {
+//       document.documentElement.dir = 'ltr'
+//       document.body.classList.remove('rtl')
+//     }
+//     setIsLangOpen(false)
+//     localStorage.setItem('language', langCode)
+//   }
+
+//   // Audio categories
+//   const audioCategories = [
+//     { path: '/audio/type/nauha', label: t('audio.nauha', 'Nauha'), icon: '😢', count: '245+', occasion: 'muharram' },
+//     { path: '/audio/type/marsiya', label: t('audio.marsiya', 'Marsiya'), icon: '💔', count: '189+', occasion: 'muharram' },
+//     { path: '/audio/type/majlis', label: t('audio.majlis', 'Majlis'), icon: '🕌', count: '156+', occasion: 'muharram' },
+//     { path: '/audio/type/soz', label: t('audio.soz', 'Soz'), icon: '🔥', count: '98+', occasion: 'muharram' },
+//     { path: '/audio/type/ghazal', label: t('audio.ghazal', 'Ghazal'), icon: '🎵', count: '1.2k+', occasion: 'general' },
+//     { path: '/audio/type/nazm', label: t('audio.nazm', 'Nazm'), icon: '📝', count: '876+', occasion: 'general' },
+//     { path: '/audio/type/podcast', label: t('audio.podcast', 'Podcast'), icon: '🎙️', count: '432+', occasion: 'general' },
+//     { path: '/audio/type/mushaira', label: t('audio.mushaira', 'Mushaira'), icon: '🎤', count: '234+', occasion: 'general' },
+//   ]
+
+//   const occasionCategories = [
+//     { path: '/audio/occasion/muharram', label: t('occasion.muharram', 'Muharram'), icon: '🖤', count: '567+' },
+//     { path: '/audio/occasion/ramadan', label: t('occasion.ramadan', 'Ramadan'), icon: '🌙', count: '432+' },
+//     { path: '/audio/occasion/eid', label: t('occasion.eid', 'Eid'), icon: '🎉', count: '198+' },
+//     { path: '/audio/occasion/milad', label: t('occasion.milad', 'Milad'), icon: '⭐', count: '267+' },
+//   ]
+
+//   // Nav links with Blog added
+//   const navLinks = [
+//     { path: '/', label: t('common.home', 'Home'), icon: Compass },
+//     { path: '/explore', label: t('common.explore', 'Explore'), icon: Sparkles },
+//     { path: '/poetry', label: t('common.poetry', 'Poetry'), icon: BookOpen },
+//     { path: '/authors', label: t('common.authors', 'Authors'), icon: User },
+//     { path: '/books', label: t('common.books', 'Books'), icon: Bookmark },
+//     { path: '/audio', label: t('common.audio', 'Audio'), icon: Headphones, dropdown: true },
+//     { path: '/videos', label: t('common.videos', 'Videos'), icon: Video },
+//     { path: '/blog', label: t('common.blog', 'Blog'), icon: Newspaper },
+//   ]
+
+//   const getUserDisplayName = () => {
+//     if (!user) return t('common.user', 'User')
+//     return user?.name?.split(' ')[0] || user?.username || user?.email?.split('@')[0] || t('common.user', 'User')
+//   }
+
+//   const getUserRole = () => {
+//     if (!user) return 'member'
+//     return user?.role || 'member'
+//   }
+
+//   const getUserEmail = () => {
+//     if (!user) return ''
+//     return user?.email || ''
+//   }
+
+//   // Logo render function
+//   const renderLogo = () => {
+//     if (siteSettings.siteLogo && siteSettings.siteLogo.trim() !== '' && !logoError) {
+//       console.log('🖼️ Rendering logo from URL:', siteSettings.siteLogo)
+//       return (
+//         <div className="relative group">
+//           <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
+//           <img 
+//             src={siteSettings.siteLogo} 
+//             alt={siteSettings.siteName}
+//             className="relative h-12 w-auto object-contain cursor-pointer"
+//             onError={(e) => {
+//               console.error('❌ Logo failed to load:', siteSettings.siteLogo)
+//               setLogoError(true)
+//               e.target.style.display = 'none'
+//             }}
+//             onLoad={() => console.log('✅ Logo loaded successfully')}
+//           />
+//         </div>
+//       )
+//     }
+
+//     // COMMENTED OUT FALLBACK FOR NOW - UNCOMMENT IF NEEDED
+//     // console.log('🎨 No logo URL, showing fallback')
+//     console.log("FINAL LOGO:", siteSettings.siteLogo)
+//     const LogoIcon = BookOpen
+//     return (
+//       <div className="relative group">
+//         <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
+//         <div className="relative bg-gradient-to-br from-amber-500 to-rose-500 rounded-xl p-2 shadow-lg">
+//           <LogoIcon className="h-6 w-6 text-white" />
+//         </div>
+//       </div>
+//     )
+//   }
+
+//   // Dynamic gradient based on site colors
+//   const getGradientStyle = () => {
+//     return {
+//       background: `linear-gradient(135deg, ${siteSettings.primaryColor || '#f59e0b'}, ${siteSettings.secondaryColor || '#e11d48'})`
+//     }
+//   }
+
+//   const renderSearchResult = (result, index) => {
+//     const typeColors = {
+//       audio: 'from-amber-500 to-orange-500',
+//       author: 'from-blue-500 to-cyan-500',
+//       poetry: 'from-emerald-500 to-teal-500',
+//       book: 'from-purple-500 to-pink-500',
+//       video: 'from-red-500 to-rose-500',
+//     }
+
+//     return (
+//       <div
+//         key={result.id || index}
+//         onClick={() => handleResultClick(result)}
+//         className="flex items-center gap-3 px-4 py-3 hover:bg-gradient-to-r hover:from-primary-50 hover:to-transparent dark:hover:from-primary-950/30 cursor-pointer transition-all duration-200 group"
+//       >
+//         <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${typeColors[result.type] || 'from-primary-100 to-secondary-100'} flex items-center justify-center`}>
+//           {result.icon}
+//         </div>
+//         <div className="flex-1 min-w-0">
+//           <p className="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-primary-600">
+//             {result.title}
+//           </p>
+//           <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+//             {result.description}
+//           </p>
+//         </div>
+//         <div className="text-xs text-gray-400 capitalize">{result.type}</div>
+//       </div>
+//     )
+//   }
+
+//   return (
+//     <nav className={`fixed top-0 w-full z-50 transition-all duration-300 pt-2 ${
+//       scrolled 
+//         ? 'bg-white/98 backdrop-blur-xl shadow-xl border-b border-gray-100/50 pt-1' 
+//         : 'bg-white/95 backdrop-blur-sm shadow-md pt-2'
+//     }`}>
+//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+//         <div className="flex justify-between items-center h-14 lg:h-16">
+          
+//           {/* Logo Section */}
+//           <Link 
+//             to="/" 
+//             className="flex items-center space-x-3 group cursor-pointer"
+//           >
+//             {renderLogo()}
+//             <div className="flex flex-col">
+//               <span 
+//                 className="text-2xl font-black bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent tracking-tight"
+//                 style={{ color: siteSettings.primaryColor }}
+//               >
+//                 {siteSettings.siteName}
+//               </span>
+//               {siteSettings.siteDescription && (
+//                 <span className="text-[10px] font-medium text-gray-400 -mt-0.5 hidden sm:block tracking-wider line-clamp-1 max-w-[150px]">
+//                   {siteSettings.siteDescription}
+//                 </span>
+//               )}
+//             </div>
+//           </Link>
+
+//           {/* Desktop Navigation */}
+//           <div className="hidden md:flex items-center space-x-0.5">
+//             {navLinks.map((link) => (
+//               <div key={link.path} className="relative">
+//                 {link.dropdown ? (
+//                   <div
+//                     onMouseEnter={handleMouseEnter}
+//                     onMouseLeave={handleMouseLeave}
+//                     className="relative"
+//                   >
+//                     <Link
+//                       to={link.path}
+//                       className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50/60 transition-all duration-200 group"
+//                     >
+//                       {link.icon && <link.icon className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />}
+//                       <span>{link.label}</span>
+//                       <ChevronDown className={`h-3 w-3 transition-all duration-200 ${isAudioDropdownOpen ? 'rotate-180 text-amber-600' : ''}`} />
+//                     </Link>
+                    
+//                     {/* Audio Dropdown Menu */}
+//                     {isAudioDropdownOpen && (
+//                       <div 
+//                         className="absolute left-0 mt-1 w-[500px] bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fadeInUp"
+//                         onMouseEnter={handleMouseEnter}
+//                         onMouseLeave={handleMouseLeave}
+//                       >
+//                         <div className="bg-gradient-to-r from-amber-50 to-rose-50/50 px-4 py-2.5 border-b border-amber-100">
+//                           <div className="flex items-center justify-between">
+//                             <div>
+//                               <h3 className="font-bold text-gray-800 text-sm">{t('audio.audioLibrary', 'Audio Library')}</h3>
+//                               <p className="text-[10px] text-gray-500 mt-0.5">{t('audio.discoverRecitations', 'Discover soulful recitations')}</p>
+//                             </div>
+//                             <div className="h-8 w-8 bg-gradient-to-br from-amber-400 to-rose-400 rounded-lg flex items-center justify-center">
+//                               <Headphones className="h-4 w-4 text-white" />
+//                             </div>
+//                           </div>
+//                         </div>
+                        
+//                         <div className="grid grid-cols-2 gap-3 p-4">
+//                           <div>
+//                             <div className="flex items-center space-x-1.5 mb-2">
+//                               <Flame className="h-3 w-3 text-amber-500" />
+//                               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('audio.categories', 'Categories')}</p>
+//                             </div>
+//                             <div className="space-y-0.5">
+//                               {audioCategories.map((category) => (
+//                                 <Link
+//                                   key={category.path}
+//                                   to={category.path}
+//                                   onClick={() => setIsAudioDropdownOpen(false)}
+//                                   className="flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200 group"
+//                                 >
+//                                   <span className="text-base">{category.icon}</span>
+//                                   <span className="flex-1 font-medium group-hover:text-amber-600">{category.label}</span>
+//                                   {category.occasion && (
+//                                     <span className="text-[9px] font-semibold text-gray-400 uppercase bg-gray-100 px-1.5 py-0.5 rounded-full">
+//                                       {category.occasion}
+//                                     </span>
+//                                   )}
+//                                 </Link>
+//                               ))}
+//                             </div>
+//                           </div>
+
+//                           <div>
+//                             <div className="flex items-center space-x-1.5 mb-2">
+//                               <Zap className="h-3 w-3 text-amber-500" />
+//                               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{t('audio.occasions', 'Occasions')}</p>
+//                             </div>
+//                             <div className="space-y-0.5 mb-3">
+//                               {occasionCategories.map((occasion) => (
+//                                 <Link
+//                                   key={occasion.path}
+//                                   to={occasion.path}
+//                                   onClick={() => setIsAudioDropdownOpen(false)}
+//                                   className="flex items-center space-x-2 px-2 py-1.5 rounded-lg text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200 group"
+//                                 >
+//                                   <span className="text-base">{occasion.icon}</span>
+//                                   <span className="font-medium group-hover:text-amber-600">{occasion.label}</span>
+//                                 </Link>
+//                               ))}
+//                             </div>
+                            
+//                             <div className="mt-2 p-2 bg-gradient-to-r from-amber-50 to-rose-50 rounded-lg border border-amber-100">
+//                               <div className="flex items-center space-x-1.5">
+//                                 <TrendingUp className="h-3 w-3 text-amber-600" />
+//                                 <span className="text-[9px] font-bold text-amber-700 uppercase">{t('audio.trending', 'Trending')}</span>
+//                               </div>
+//                               <p className="text-[11px] font-medium text-gray-800 mt-0.5">{t('audio.nauhaOfWeek', 'Nauha of the Week')}</p>
+//                               <p className="text-[9px] text-gray-500">2.5k+ {t('audio.listens', 'listens')}</p>
+//                             </div>
+//                           </div>
+//                         </div>
+                        
+//                         <div className="border-t border-gray-100 px-4 py-2 bg-gray-50/50">
+//                           <Link 
+//                             to="/audio" 
+//                             onClick={() => setIsAudioDropdownOpen(false)}
+//                             className="flex items-center justify-between text-xs font-semibold text-amber-600 hover:text-amber-700 transition-colors group"
+//                           >
+//                             <span>{t('audio.browseAll', 'Browse all audio')}</span>
+//                             <span className="group-hover:translate-x-0.5 transition-transform">→</span>
+//                           </Link>
+//                         </div>
+//                       </div>
+//                     )}
+//                   </div>
+//                 ) : (
+//                   <Link
+//                     to={link.path}
+//                     className="flex items-center space-x-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-gray-600 hover:text-amber-600 hover:bg-amber-50/60 transition-all duration-200 group"
+//                   >
+//                     {link.icon && <link.icon className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />}
+//                     <span>{link.label}</span>
+//                   </Link>
+//                 )}
+//               </div>
+//             ))}
+//           </div>
+
+//           {/* Right Section */}
+//           <div className="flex items-center space-x-0.5">
+//             {/* Search Button */}
+//             <div className="relative" ref={searchRef}>
+//               <button
+//                 onClick={() => setIsSearchOpen(!isSearchOpen)}
+//                 className="p-1.5 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-amber-50/60 transition-all duration-200"
+//               >
+//                 <Search className="h-4 w-4" />
+//               </button>
+
+//               {isSearchOpen && (
+//                 <div className="absolute right-0 mt-2 w-[90vw] md:w-[500px] bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50 animate-fadeInUp">
+//                   <div className="p-3 border-b border-gray-100">
+//                     <div className="relative">
+//                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+//                       <input
+//                         type="text"
+//                         value={searchQuery}
+//                         onChange={handleSearchChange}
+//                         placeholder={t('search.placeholder', 'Search poems, authors, books, audio...')}
+//                         className="w-full pl-9 pr-20 py-2.5 bg-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+//                         autoFocus
+//                       />
+//                       {searchQuery && (
+//                         <button
+//                           onClick={() => {
+//                             setSearchQuery('')
+//                             setSearchResults([])
+//                             setShowResults(false)
+//                           }}
+//                           className="absolute right-10 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+//                         >
+//                           <X className="h-4 w-4" />
+//                         </button>
+//                       )}
+//                       <button
+//                         onClick={isListening ? stopVoiceSearch : startVoiceSearch}
+//                         className={`absolute right-2 top-1/2 transform -translate-y-1/2 p-1 rounded-md transition-all ${
+//                           isListening ? 'bg-red-500 text-white animate-pulse' : 'text-gray-500 hover:text-primary-600'
+//                         }`}
+//                       >
+//                         {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+//                       </button>
+//                     </div>
+//                     {voiceTranscript && !isListening && (
+//                       <div className="mt-2 text-xs text-primary-600 bg-primary-50 px-2 py-1 rounded">
+//                         "{voiceTranscript}"
+//                       </div>
+//                     )}
+//                   </div>
+
+//                   {/* Category Filters */}
+//                   <div className="px-3 py-2 border-b border-gray-100 overflow-x-auto scrollbar-hide">
+//                     <div className="flex gap-1">
+//                       {SEARCH_CATEGORIES.map((category) => (
+//                         <button
+//                           key={category.id}
+//                           onClick={() => handleCategoryChange(category.id)}
+//                           className={`flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-all whitespace-nowrap ${
+//                             selectedCategory === category.id
+//                               ? `bg-gradient-to-r ${category.color} text-white shadow-md`
+//                               : 'text-gray-600 hover:bg-gray-100'
+//                           }`}
+//                         >
+//                           <category.icon className="h-3 w-3" />
+//                           {category.label}
+//                         </button>
+//                       ))}
+//                     </div>
+//                   </div>
+
+//                   {/* Results */}
+//                   <div className="max-h-[350px] overflow-y-auto">
+//                     {searching ? (
+//                       <div className="flex justify-center py-8">
+//                         <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+//                         <span className="ml-2 text-sm text-gray-500">{t('search.searching', 'Searching...')}</span>
+//                       </div>
+//                     ) : searchResults.length > 0 ? (
+//                       <>
+//                         <div className="px-3 py-1.5 bg-gray-50">
+//                           <p className="text-xs font-semibold text-gray-500">{t('search.results', 'Results')}</p>
+//                         </div>
+//                         {searchResults.map((result, idx) => renderSearchResult(result, idx))}
+//                         <div className="border-t p-2">
+//                           <button
+//                             onClick={() => {
+//                               navigate(`/search?q=${searchQuery}&category=${selectedCategory}`)
+//                               setIsSearchOpen(false)
+//                             }}
+//                             className="w-full text-center text-xs font-medium text-primary-600 py-1.5"
+//                           >
+//                             {t('search.viewAll', 'View all results')} →
+//                           </button>
+//                         </div>
+//                       </>
+//                     ) : searchQuery && searchQuery.trim().length >= 2 ? (
+//                       <div className="text-center py-8">
+//                         <Search className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+//                         <p className="text-gray-500 text-sm">{t('search.noResults', 'No results found for')} "{searchQuery}"</p>
+//                       </div>
+//                     ) : (
+//                       <div className="text-center py-8">
+//                         <Mic className="h-10 w-10 text-gray-300 mx-auto mb-2" />
+//                         <p className="text-gray-500 text-sm">{t('search.voicePrompt', 'Try voice search or type your query')}</p>
+//                         <div className="flex flex-wrap gap-2 justify-center mt-3">
+//                           <button onClick={() => setSearchQuery('nauha')} className="px-2 py-1 text-xs bg-gray-100 rounded-full hover:bg-primary-100">nauha</button>
+//                           <button onClick={() => setSearchQuery('ghazal')} className="px-2 py-1 text-xs bg-gray-100 rounded-full hover:bg-primary-100">ghazal</button>
+//                           <button onClick={() => setSearchQuery('Mirza Ghalib')} className="px-2 py-1 text-xs bg-gray-100 rounded-full hover:bg-primary-100">Mirza Ghalib</button>
+//                         </div>
+//                       </div>
+//                     )}
+//                   </div>
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Language Switcher */}
+//             <div className="relative">
+//               <button
+//                 onClick={() => setIsLangOpen(!isLangOpen)}
+//                 className="flex items-center space-x-1 px-1.5 py-1.5 rounded-lg text-gray-500 hover:text-amber-600 hover:bg-amber-50/60 transition-all duration-200"
+//               >
+//                 <Globe className="h-3.5 w-3.5" />
+//                 <span className="text-xs font-bold hidden sm:inline">
+//                   {SUPPORTED_LANGUAGES.find(l => l.code === currentLang)?.native || 'EN'}
+//                 </span>
+//                 <ChevronDown className={`h-2.5 w-2.5 transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
+//               </button>
+              
+//               {isLangOpen && (
+//                 <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 z-50 animate-fadeInUp">
+//                   <div className="px-3 py-1.5 border-b border-gray-100">
+//                     <p className="text-[9px] font-bold text-gray-400 uppercase tracking-wider">{t('language.selectLanguage', 'Select Language')}</p>
+//                   </div>
+//                   {SUPPORTED_LANGUAGES.map((lang) => (
+//                     <button
+//                       key={lang.code}
+//                       onClick={() => handleLanguageChange(lang.code)}
+//                       className={`w-full text-left px-3 py-2 text-sm transition-all duration-200 ${
+//                         currentLang === lang.code 
+//                           ? 'text-amber-600 font-semibold bg-gradient-to-r from-amber-50 to-transparent' 
+//                           : 'text-gray-700 hover:bg-gray-50'
+//                       }`}
+//                     >
+//                       <div className="flex items-center justify-between">
+//                         <div className="flex items-center gap-2">
+//                           <span className="text-base">{lang.flag}</span>
+//                           <div>
+//                             <p className="font-medium">{lang.name}</p>
+//                             <p className="text-[10px] text-gray-400">{lang.native}</p>
+//                           </div>
+//                         </div>
+//                         {currentLang === lang.code && (
+//                           <div className="h-1.5 w-1.5 bg-amber-500 rounded-full"></div>
+//                         )}
+//                       </div>
+//                     </button>
+//                   ))}
+//                 </div>
+//               )}
+//             </div>
+
+//             {/* Auth Buttons */}
+//             {isAuthenticated ? (
+//               <div className="flex items-center space-x-0.5">
+//                 <Link
+//                   to="/dashboard/favorites"
+//                   className="hidden sm:flex items-center justify-center p-1.5 rounded-lg text-gray-500 hover:text-rose-500 hover:bg-rose-50/60 transition-all duration-200 group relative"
+//                   title={t('common.favorites', 'Favorites')}
+//                 >
+//                   <Heart className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
+//                   <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 px-1.5 py-0.5 bg-gray-800 text-white text-[9px] rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+//                     {t('common.favorites', 'Favorites')}
+//                   </span>
+//                 </Link>
+//                 <Link
+//                   to="/dashboard/history"
+//                   className="hidden sm:flex items-center justify-center p-1.5 rounded-lg text-gray-500 hover:text-amber-500 hover:bg-amber-50/60 transition-all duration-200 group relative"
+//                   title={t('common.history', 'History')}
+//                 >
+//                   <Clock className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
+//                   <span className="absolute -top-7 left-1/2 transform -translate-x-1/2 px-1.5 py-0.5 bg-gray-800 text-white text-[9px] rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+//                     {t('common.history', 'History')}
+//                   </span>
+//                 </Link>
+                
+//                 {/* User Menu */}
+//                 <div className="relative group">
+//                   <button className="flex items-center space-x-1.5 p-0.5 rounded-lg hover:bg-gray-50 transition-all duration-200">
+//                     {user?.avatar ? (
+//                       <img src={user.avatar} alt={getUserDisplayName()} className="h-7 w-7 rounded-lg object-cover ring-1 ring-amber-200" />
+//                     ) : (
+//                       <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-amber-100 to-rose-100 flex items-center justify-center">
+//                         <User className="h-3.5 w-3.5 text-amber-600" />
+//                       </div>
+//                     )}
+//                     <div className="hidden lg:block text-left">
+//                       <p className="text-xs font-bold text-gray-700 leading-tight">{getUserDisplayName()}</p>
+//                       <p className="text-[9px] text-gray-400 capitalize">{getUserRole()}</p>
+//                     </div>
+//                     <ChevronDown className="h-3 w-3 text-gray-400 transition-transform duration-200 group-hover:rotate-180" />
+//                   </button>
+                  
+//                   <div className="absolute right-0 mt-1 w-48 bg-white rounded-xl shadow-2xl border border-gray-100 py-1.5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 z-50">
+//                     <div className="px-3 py-2 border-b border-gray-100">
+//                       <p className="text-xs font-bold text-gray-800">{user?.name || getUserDisplayName()}</p>
+//                       <p className="text-[10px] text-gray-500 truncate">{getUserEmail()}</p>
+//                     </div>
+//                     <div className="py-0.5">
+//                       <Link to="/dashboard" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200">
+//                         <Award className="h-3 w-3" />
+//                         <span>{t('common.dashboard', 'Dashboard')}</span>
+//                       </Link>
+//                       <Link to="/dashboard/profile" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200">
+//                         <User className="h-3 w-3" />
+//                         <span>{t('common.profile', 'Profile')}</span>
+//                       </Link>
+//                       <Link to="/dashboard/favorites" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200">
+//                         <Heart className="h-3 w-3" />
+//                         <span>{t('common.favorites', 'Favorites')}</span>
+//                       </Link>
+//                       <Link to="/dashboard/history" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-gray-700 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200">
+//                         <Clock className="h-3 w-3" />
+//                         <span>{t('common.history', 'History')}</span>
+//                       </Link>
+//                     </div>
+//                     <div className="border-t border-gray-100 my-1"></div>
+//                     {getUserRole() === 'admin' && (
+//                       <>
+//                         <Link to="/admin" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-purple-600 hover:bg-gradient-to-r hover:from-purple-50 hover:to-transparent transition-all duration-200">
+//                           <Sparkles className="h-3 w-3" />
+//                           <span>{t('common.adminPanel', 'Admin Panel')}</span>
+//                         </Link>
+//                         <div className="border-t border-gray-100 my-1"></div>
+//                       </>
+//                     )}
+//                     {getUserRole() === 'creator' && (
+//                       <>
+//                         <Link to="/creator" className="flex items-center space-x-2 px-3 py-1.5 text-xs text-blue-600 hover:bg-gradient-to-r hover:from-blue-50 hover:to-transparent transition-all duration-200">
+//                           <Award className="h-3 w-3" />
+//                           <span>{t('common.creator', 'Creator')}</span>
+//                         </Link>
+//                         <div className="border-t border-gray-100 my-1"></div>
+//                       </>
+//                     )}
+//                     <button
+//                       onClick={logout}
+//                       className="w-full flex items-center space-x-2 px-3 py-1.5 text-xs text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-transparent transition-all duration-200"
+//                     >
+//                       <LogOut className="h-3 w-3" />
+//                       <span>{t('common.signOut', 'Sign Out')}</span>
+//                     </button>
+//                   </div>
+//                 </div>
+//               </div>
+//             ) : (
+//               <div className="flex items-center space-x-1">
+//                 <Link
+//                   to="/login"
+//                   className="hidden sm:flex items-center space-x-1 px-2.5 py-1.5 text-xs font-bold text-gray-600 hover:text-amber-600 transition-all duration-200 rounded-lg hover:bg-amber-50/60"
+//                 >
+//                   <LogIn className="h-3 w-3" />
+//                   <span>{t('common.signIn', 'Sign In')}</span>
+//                 </Link>
+//                 <Link
+//                   to="/register"
+//                   className="px-3 py-1.5 text-xs font-bold text-white rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
+//                   style={getGradientStyle()}
+//                 >
+//                   {t('common.getStarted', 'Get Started')}
+//                 </Link>
+//               </div>
+//             )}
+
+//             {/* Mobile Menu Button */}
+//             <button
+//               onClick={() => setIsMenuOpen(!isMenuOpen)}
+//               className="md:hidden p-1.5 rounded-lg text-gray-600 hover:bg-amber-50 hover:text-amber-600 transition-all duration-200"
+//             >
+//               {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+
+//       {/* Mobile Menu */}
+//       {isMenuOpen && (
+//         <div className="md:hidden border-t border-gray-100 bg-white/98 backdrop-blur-md max-h-[calc(100vh-56px)] overflow-y-auto animate-slideRight">
+//           <div className="px-3 py-2 space-y-0.5">
+//             {navLinks.map((link) => (
+//               <div key={link.path}>
+//                 {link.dropdown ? (
+//                   <>
+//                     <Link
+//                       to={link.path}
+//                       onClick={() => setIsMenuOpen(false)}
+//                       className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:text-amber-600 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200"
+//                     >
+//                       {link.icon && <link.icon className="h-4 w-4" />}
+//                       <span>{link.label}</span>
+//                     </Link>
+//                     <div className="pl-8 space-y-0.5 mt-0.5 mb-1">
+//                       <p className="px-3 py-1 text-[9px] font-bold text-gray-400 uppercase tracking-wider">{t('audio.categories', 'Categories')}</p>
+//                       {audioCategories.slice(0, 6).map((category) => (
+//                         <Link
+//                           key={category.path}
+//                           to={category.path}
+//                           onClick={() => setIsMenuOpen(false)}
+//                           className="flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs text-gray-600 hover:text-amber-600 hover:bg-amber-50/60 transition-all duration-200"
+//                         >
+//                           <span className="text-sm">{category.icon}</span>
+//                           <span>{category.label}</span>
+//                         </Link>
+//                       ))}
+//                       <Link
+//                         to="/audio"
+//                         onClick={() => setIsMenuOpen(false)}
+//                         className="flex items-center justify-between px-3 py-1.5 text-xs font-semibold text-amber-600"
+//                       >
+//                         <span>{t('audio.viewAll', 'View All Audio')}</span>
+//                         <span>→</span>
+//                       </Link>
+//                     </div>
+//                   </>
+//                 ) : (
+//                   <Link
+//                     to={link.path}
+//                     onClick={() => setIsMenuOpen(false)}
+//                     className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-semibold text-gray-700 hover:text-amber-600 hover:bg-gradient-to-r hover:from-amber-50 hover:to-transparent transition-all duration-200"
+//                   >
+//                     {link.icon && <link.icon className="h-4 w-4" />}
+//                     <span>{link.label}</span>
+//                   </Link>
+//                 )}
+//               </div>
+//             ))}
+            
+//             {!isAuthenticated && (
+//               <div className="pt-3 space-y-1 border-t border-gray-100 mt-2">
+//                 <Link
+//                   to="/login"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+//                 >
+//                   <LogIn className="h-4 w-4" />
+//                   <span>{t('common.signIn', 'Sign In')}</span>
+//                 </Link>
+//                 <Link
+//                   to="/register"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center justify-center px-3 py-2 rounded-lg text-sm font-bold text-white"
+//                   style={getGradientStyle()}
+//                 >
+//                   {t('common.getStarted', 'Get Started')}
+//                 </Link>
+//               </div>
+//             )}
+            
+//             {isAuthenticated && (
+//               <div className="pt-3 space-y-0.5 border-t border-gray-100 mt-2">
+//                 <Link
+//                   to="/dashboard"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+//                 >
+//                   <Award className="h-4 w-4" />
+//                   <span>{t('common.dashboard', 'Dashboard')}</span>
+//                 </Link>
+//                 <Link
+//                   to="/dashboard/favorites"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+//                 >
+//                   <Heart className="h-4 w-4" />
+//                   <span>{t('common.favorites', 'Favorites')}</span>
+//                 </Link>
+//                 <Link
+//                   to="/dashboard/history"
+//                   onClick={() => setIsMenuOpen(false)}
+//                   className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-all duration-200"
+//                 >
+//                   <Clock className="h-4 w-4" />
+//                   <span>{t('common.history', 'History')}</span>
+//                 </Link>
+//                 {getUserRole() === 'admin' && (
+//                   <Link
+//                     to="/admin"
+//                     onClick={() => setIsMenuOpen(false)}
+//                     className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-purple-600 hover:bg-purple-50 transition-all duration-200"
+//                   >
+//                     <Sparkles className="h-4 w-4" />
+//                     <span>{t('common.adminPanel', 'Admin Panel')}</span>
+//                   </Link>
+//                 )}
+//                 {getUserRole() === 'creator' && (
+//                   <Link
+//                     to="/creator"
+//                     onClick={() => setIsMenuOpen(false)}
+//                     className="flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-blue-600 hover:bg-blue-50 transition-all duration-200"
+//                   >
+//                     <Award className="h-4 w-4" />
+//                     <span>{t('common.creator', 'Creator')}</span>
+//                   </Link>
+//                 )}
+//                 <button
+//                   onClick={() => {
+//                     logout()
+//                     setIsMenuOpen(false)
+//                   }}
+//                   className="w-full flex items-center space-x-2 px-3 py-2 rounded-lg text-sm font-medium text-red-600 hover:bg-red-50 transition-all duration-200"
+//                 >
+//                   <LogOut className="h-4 w-4" />
+//                   <span>{t('common.signOut', 'Sign Out')}</span>
+//                 </button>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       )}
+
+//       <style>{`
+//         @keyframes fadeInUp {
+//           from {
+//             opacity: 0;
+//             transform: translateY(-5px);
+//           }
+//           to {
+//             opacity: 1;
+//             transform: translateY(0);
+//           }
+//         }
+        
+//         @keyframes slideDown {
+//           from {
+//             opacity: 0;
+//             transform: translateY(-10px);
+//           }
+//           to {
+//             opacity: 1;
+//             transform: translateY(0);
+//           }
+//         }
+        
+//         @keyframes slideRight {
+//           from {
+//             opacity: 0;
+//             transform: translateX(-10px);
+//           }
+//           to {
+//             opacity: 1;
+//             transform: translateX(0);
+//           }
+//         }
+        
+//         .animate-fadeInUp {
+//           animation: fadeInUp 0.15s ease-out;
+//         }
+        
+//         .animate-slideDown {
+//           animation: slideDown 0.2s ease-out;
+//         }
+        
+//         .animate-slideRight {
+//           animation: slideRight 0.2s ease-out;
+//         }
+        
+//         .line-clamp-1 {
+//           display: -webkit-box;
+//           -webkit-line-clamp: 1;
+//           -webkit-box-orient: vertical;
+//           overflow: hidden;
+//         }
+        
+//         /* RTL Support for Urdu */
+//         .rtl {
+//           direction: rtl;
+//         }
+        
+//         .rtl .space-x-0.5 > :not([hidden]) ~ :not([hidden]) {
+//           margin-right: 0.125rem;
+//           margin-left: 0;
+//         }
+        
+//         .rtl .space-x-1.5 > :not([hidden]) ~ :not([hidden]) {
+//           margin-right: 0.375rem;
+//           margin-left: 0;
+//         }
+        
+//         .rtl .space-x-2 > :not([hidden]) ~ :not([hidden]) {
+//           margin-right: 0.5rem;
+//           margin-left: 0;
+//         }
+        
+//         .rtl .space-x-3 > :not([hidden]) ~ :not([hidden]) {
+//           margin-right: 0.75rem;
+//           margin-left: 0;
+//         }
+        
+//         .rtl .left-0 {
+//           left: auto;
+//           right: 0;
+//         }
+        
+//         .rtl .right-0 {
+//           right: auto;
+//           left: 0;
+//         }
+        
+//         .rtl .pl-9 {
+//           padding-left: 0;
+//           padding-right: 2.25rem;
+//         }
+        
+//         .rtl .pr-20 {
+//           padding-right: 0;
+//           padding-left: 5rem;
+//         }
+        
+//         .rtl .ml-2 {
+//           margin-left: 0;
+//           margin-right: 0.5rem;
+//         }
+        
+//         .rtl .mr-2 {
+//           margin-right: 0;
+//           margin-left: 0.5rem;
+//         }
+        
+//         .rtl .text-left {
+//           text-align: right;
+//         }
+//       `}</style>
+//     </nav>
+//   )
+// }
+
+// export default Navbar
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/components/layout/Navbar.jsx
 import React, { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -8334,6 +9577,12 @@ import settingsAPI from '../../api/settingsAPI.js'
 import audioAPI from '../../api/audioAPI.js'
 import authorAPI from '../../api/authorAPI.js'
 import toast from 'react-hot-toast'
+
+// Helper function to clean URLs (remove line breaks, spaces, newlines, tabs)
+const cleanUrl = (url) => {
+  if (!url) return '';
+  return url.replace(/\s+/g, '').trim();
+}
 
 // Supported languages
 const SUPPORTED_LANGUAGES = [
@@ -8383,7 +9632,7 @@ const Navbar = () => {
 
   // Dynamic settings state
   const [siteSettings, setSiteSettings] = useState({
-    siteName: 'ZauqApp',
+    siteName: 'Zauq',
     siteDescription: 'AI Powered Urdu Literary Ecosystem',
     siteLogo: '',
     siteFavicon: '',
@@ -8394,53 +9643,59 @@ const Navbar = () => {
     enableRTL: false
   })
 
-  // Fetch site settings from backend
+  // Fetch site settings from backend - FIXED: Direct data access
   useEffect(() => {
     const fetchSiteSettings = async () => {
       try {
         console.log('🔵 Fetching site settings...')
         const response = await settingsAPI.getPublicSettings()
-        console.log('🔵 Site settings response:', response)
+        console.log('🔵 Raw API response:', response)
         
-        if (response?.data) {
-          console.log('🔵 Logo URL:', response.data.siteLogo)
-          console.log('🔵 Favicon URL:', response.data.siteFavicon)
-          console.log('🔵 Primary Color:', response.data.primaryColor)
-          console.log('🔵 Secondary Color:', response.data.secondaryColor)
+        // The API returns { success: true, data: {...} }
+        const settingsData = response?.data || response
+        
+        if (settingsData) {
+          // Clean URLs
+          const cleanedLogoUrl = cleanUrl(settingsData.siteLogo)
+          const cleanedFaviconUrl = cleanUrl(settingsData.siteFavicon)
           
+          console.log('🔵 Cleaned Logo URL:', cleanedLogoUrl)
+          console.log('🔵 Cleaned Favicon URL:', cleanedFaviconUrl)
+          
+          // Update state
           setSiteSettings({
-            siteName: response.data.siteName || 'ZauqApp',
-            siteDescription: response.data.siteDescription || 'AI Powered Urdu Literary Ecosystem',
-            siteLogo: response.data.siteLogo || '',
-            siteFavicon: response.data.siteFavicon || '',
-            theme: response.data.theme || 'light',
-            primaryColor: response.data.primaryColor || '#8B4513',
-            secondaryColor: response.data.secondaryColor || '#DAA520',
-            fontFamily: response.data.fontFamily || 'Inter',
-            enableRTL: response.data.enableRTL || false
+            siteName: settingsData.siteName || 'ZauqApp',
+            siteDescription: settingsData.siteDescription || 'AI Powered Urdu Literary Ecosystem',
+            siteLogo: cleanedLogoUrl,
+            siteFavicon: cleanedFaviconUrl,
+            theme: settingsData.theme || 'light',
+            primaryColor: settingsData.primaryColor || '#8B4513',
+            secondaryColor: settingsData.secondaryColor || '#DAA520',
+            fontFamily: settingsData.fontFamily || 'Inter',
+            enableRTL: settingsData.enableRTL || false
           })
           
           // Apply theme
-          if (response.data.theme === 'dark') {
+          if (settingsData.theme === 'dark') {
             document.documentElement.classList.add('dark')
           } else {
             document.documentElement.classList.remove('dark')
           }
           
           // Apply font family
-          if (response.data.fontFamily) {
-            document.body.style.fontFamily = response.data.fontFamily
-            document.documentElement.style.setProperty('--font-family', response.data.fontFamily)
+          if (settingsData.fontFamily) {
+            document.body.style.fontFamily = settingsData.fontFamily
+            document.documentElement.style.setProperty('--font-family', settingsData.fontFamily)
           }
           
           // Apply colors as CSS variables
-          if (response.data.primaryColor) {
-            document.documentElement.style.setProperty('--primary-color', response.data.primaryColor)
-            document.documentElement.style.setProperty('--primary', response.data.primaryColor)
+          if (settingsData.primaryColor) {
+            document.documentElement.style.setProperty('--primary-color', settingsData.primaryColor)
+            document.documentElement.style.setProperty('--primary', settingsData.primaryColor)
           }
-          if (response.data.secondaryColor) {
-            document.documentElement.style.setProperty('--secondary-color', response.data.secondaryColor)
-            document.documentElement.style.setProperty('--secondary', response.data.secondaryColor)
+          if (settingsData.secondaryColor) {
+            document.documentElement.style.setProperty('--secondary-color', settingsData.secondaryColor)
+            document.documentElement.style.setProperty('--secondary', settingsData.secondaryColor)
           }
           
           // Apply RTL for Urdu
@@ -8460,10 +9715,22 @@ const Navbar = () => {
     fetchSiteSettings()
   }, [currentLang])
 
+  // Debug: Monitor siteSettings state changes
+  useEffect(() => {
+    console.log('🔍 DEBUG - siteSettings state updated:', {
+      siteLogo: siteSettings.siteLogo,
+      siteLogoLength: siteSettings.siteLogo?.length,
+      siteFavicon: siteSettings.siteFavicon,
+      theme: siteSettings.theme
+    })
+  }, [siteSettings])
+
   // Update favicon dynamically
   useEffect(() => {
-    if (siteSettings.siteFavicon && siteSettings.siteFavicon.trim() !== '' && !faviconError) {
-      console.log('🔄 Setting favicon to:', siteSettings.siteFavicon)
+    const cleanedFaviconUrl = siteSettings.siteFavicon ? cleanUrl(siteSettings.siteFavicon) : '';
+    
+    if (cleanedFaviconUrl && cleanedFaviconUrl.trim() !== '' && !faviconError) {
+      console.log('🔄 Setting favicon to cleaned URL:', cleanedFaviconUrl)
       
       // Remove existing favicon links
       const existingLinks = document.querySelectorAll("link[rel*='icon']")
@@ -8473,13 +9740,13 @@ const Navbar = () => {
       const link = document.createElement('link')
       link.rel = 'icon'
       link.type = 'image/png'
-      link.href = siteSettings.siteFavicon
+      link.href = cleanedFaviconUrl
       document.head.appendChild(link)
       
       // Also add apple-touch-icon for mobile
       const appleLink = document.createElement('link')
       appleLink.rel = 'apple-touch-icon'
-      appleLink.href = siteSettings.siteFavicon
+      appleLink.href = cleanedFaviconUrl
       document.head.appendChild(appleLink)
       
       console.log('✅ Favicon set successfully')
@@ -8778,15 +10045,19 @@ const Navbar = () => {
     return user?.email || ''
   }
 
-  // Logo render function
+  // Logo render function with cleaned URL - FIXED: Uses siteSettings.siteLogo directly
   const renderLogo = () => {
+    console.log('🔍 renderLogo - siteSettings.siteLogo:', siteSettings.siteLogo)
+    console.log('🔍 renderLogo - siteLogo length:', siteSettings.siteLogo?.length)
+    
+    // Use the state directly (already cleaned when fetched)
     if (siteSettings.siteLogo && siteSettings.siteLogo.trim() !== '' && !logoError) {
       console.log('🖼️ Rendering logo from URL:', siteSettings.siteLogo)
       return (
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-xl blur opacity-0 group-hover:opacity-60 transition duration-300"></div>
           <img 
-            src={siteSettings.siteLogo} 
+            src={siteSettings.siteLogo}
             alt={siteSettings.siteName}
             className="relative h-12 w-auto object-contain cursor-pointer"
             onError={(e) => {
@@ -8800,6 +10071,7 @@ const Navbar = () => {
       )
     }
     
+    console.log("🎨 No valid logo URL, showing fallback icon")
     const LogoIcon = BookOpen
     return (
       <div className="relative group">
