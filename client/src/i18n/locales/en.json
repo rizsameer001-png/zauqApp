@@ -100,6 +100,12 @@
   },
 
   "blog": {
+    "latestInsights": "Latest Insights",
+    "blogArticles": "Blog & Articles",
+    "blogSubtitle": "Insights, stories, and literary discussions",
+    "searchPlaceholder": "Search articles by title, topic, or author...",
+    "searchResultsFor": "Search results for:",
+    "resultsFound": "results found",
     "voiceSearch": "Voice Search",
     "listening": "Listening...",
     "listeningPrompt": "Say something to search...",
