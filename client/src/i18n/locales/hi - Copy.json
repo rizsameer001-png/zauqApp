@@ -42,11 +42,7 @@
      "discoverPoetry": "कविता खोजें",
      "poetryCollection": "कविता संग्रह",
     "exploreText": "विभिन्न पीढ़ियों के महान शायरों की ग़ज़लें, नज़्में, शेर और बहुत कुछ खोजें",
-    "audioLibrary": "ऑडियो लाइब्रेरी",
-    "viewAll": "सभी देखें",
-    "errorLoading": "सामग्री लोड करने में विफल",
-    "retry": "पुनः प्रयास करें",
-    "unknown": "अज्ञात"
+    "audioLibrary": "ऑडियो लाइब्रेरी"
 
   },
   "home": {
@@ -57,11 +53,7 @@
     "popularBooks": "लोकप्रिय पुस्तकें",
     "videoHighlights": "वीडियो हाइलाइट्स",
     "dailyQuote": "दैनिक उद्धरण",
-    "premiumCTA": "प्रीमियम सामग्री अनलॉक करें",
-    "trendingPoems": "ट्रेंडिंग कविताएँ",
-    "trendingSubtitle": "हमारे समुदाय द्वारा सबसे पसंदीदा कविता",
-    "trendingPoem": "ट्रेंडिंग कविता",
-    "trendingPoems": "ट्रेंडिंग कविताएँ"
+    "premiumCTA": "प्रीमियम सामग्री अनलॉक करें"
   },
   "poetry": {
     "ghazals": "गजल",
@@ -72,7 +64,6 @@
     "roman": "रोमन",
     "ghazal": "ग़ज़ल",
     "nazm": "नज़्म",
-    "rekhti": "रेख्ती",
     "qasida": "क़सीदा",
     "marsiya": "मर्सिया",
     "other": "अन्य",
@@ -83,7 +74,17 @@
     "audioNarration": "ऑडियो वर्णन",
     "aiExplanation": "AI व्याख्या",
     "relatedPoems": "संबंधित कविताएं",
-    "readMore": "और पढ़ें"
+    "allGenres": "सभी विधाएँ",
+    "popular": "सबसे लोकप्रिय",
+    "recent": "सबसे नया",
+    "mostViewed": "सबसे अधिक देखा गया",
+    "mostLiked": "सबसे अधिक पसंद किया गया",
+    "urdu": "उर्दू",
+    "hindi": "हिंदी",
+    "english": "अंग्रेजी",
+    "urduTranslation": "उर्दू अनुवाद",
+    "hindiTranslation": "हिंदी अनुवाद",
+    "englishTranslation": "अंग्रेजी अनुवाद",
   },
   "auth": {
     "welcomeBack": "वापसी पर स्वागत",
@@ -126,43 +127,5 @@
     "seoManagement": "SEO प्रबंधन",
     "analytics": "एनालिटिक्स",
     "settings": "सेटिंग्स"
-  },
-
-  "pricing": {
-    "membershipPlans": "सदस्यता योजनाएँ",
-    "upgradeExperience": "अपने अनुभव को उन्नत करें",
-    "premiumAccessDesc": "पुस्तकों, कविता और ऑडियो तक प्रीमियम पहुंच — आपके लिए खूबसूरती से डिज़ाइन किया गया।",
-    "free": "मुफ्त",
-    "basic": "बेसिक",
-    "premium": "प्रीमियम",
-    "pro": "प्रो",
-    "popular": "लोकप्रिय",
-    "bestValue": "सर्वोत्तम मूल्य",
-    "creator": "क्रिएटर",
-    "perMonth": "माह",
-    "save": "बचत",
-    "startFree": "मुफ्त शुरू करें",
-    "get": "प्राप्त करें",
-    "getStarted": "शुरू करें",
-    "securePayments": "सुरक्षित भुगतान",
-    "support247": "24/7 सहायता",
-    "cancelAnytime": "कभी भी रद्द करें",
-    "freeFeature1": "मुफ्त कविताएँ और पुस्तकें",
-    "freeFeature2": "बुनियादी खोज",
-    "freeFeature3": "सार्वजनिक सामग्री",
-    "freeFeature4": "50 पठन/दिन",
-    "basicFeature1": "मुफ्त में सब कुछ",
-    "basicFeature2": "5 डाउनलोड/माह",
-    "basicFeature3": "ऑडियो पहुंच",
-    "basicFeature4": "कोई विज्ञापन नहीं",
-    "premiumFeature1": "असीमित डाउनलोड",
-    "premiumFeature2": "एचडी ऑडियो",
-    "premiumFeature3": "एआई व्याख्याएँ",
-    "premiumFeature4": "जल्दी पहुंच",
-    "proFeature1": "क्रिएटर टूल्स",
-    "proFeature2": "सामग्री अपलोड करें",
-    "proFeature3": "मुद्रीकरण",
-    "proFeature4": "एपीआई पहुंच"
   }
-
 }

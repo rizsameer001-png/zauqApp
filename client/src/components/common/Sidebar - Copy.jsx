@@ -1245,7 +1245,69 @@ const Sidebar = () => {
       </nav>
 
       {/* Quick Access Section */}
-
+{/*      <div className="p-4 border-t border-gray-100">
+        <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          Quick Access
+        </p>
+        <div className="space-y-1">
+          {/* Blog Quick Links */}
+          <Link
+            to="/admin/blog/new"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Edit className="h-5 w-5 text-gray-400" />
+            <span>Write New Blog</span>
+          </Link>
+          <Link
+            to="/blog"
+            target="_blank"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Eye className="h-5 w-5 text-gray-400" />
+            <span>View Blog Site</span>
+          </Link>
+          <div className="border-t border-gray-100 my-2"></div>
+          <Link
+            to="/videos"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <Video className="h-5 w-5 text-gray-400" />
+            <span>Video Library</span>
+          </Link>
+          <Link
+            to="/books"
+            className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <BookOpen className="h-5 w-5 text-gray-400" />
+            <span>Ebook Library</span>
+          </Link>
+        </div>
+        
+        {/* Audio Categories Quick Links (for Admin) */}
+        {isAdmin && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <p className="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+              Audio Categories
+            </p>
+            <div className="space-y-1">
+              <Link
+                to="/admin/audio/types?type=nauha"
+                className="flex items-center space-x-3 px-3 py-1.5 rounded-lg text-xs text-gray-600 hover:bg-gray-50"
+              >
+                <Mic className="h-3 w-3" />
+                <span>Nauha</span>
+              </Link>
+              <Link
+                to="/admin/audio/types?type=marsiya"
+                className="flex items-center space-x-3 px-3 py-1.5 rounded-lg text-xs text-gray-600 hover:bg-gray-50"
+              >
+                <Music className="h-3 w-3" />
+                <span>Marsiya</span>
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>*/}
 
       {/* Blog Stats Card (for Admin) */}
       {isAdmin && (

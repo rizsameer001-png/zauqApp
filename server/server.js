@@ -921,6 +921,8 @@ import backupRoutes from './routes/backup.routes.js';
 import appSettingsRoutes from './routes/appSettings.routes.js';
 // server/server.js - Add captcha routes
 import captchaRoutes from './routes/captcha.routes.js';
+import commentRoutes from './routes/comment.routes.js';
+import adRoutes from './routes/ad.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1045,6 +1047,8 @@ app.use('/api/backup', backupRoutes);
 // 🔴 This is the NEW endpoint that returns ALL settings fields
 app.use('/api/app-settings', appSettingsRoutes);
 app.use('/api/captcha', captchaRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/ads', adRoutes);
 
 // ============================================
 // Health Checks

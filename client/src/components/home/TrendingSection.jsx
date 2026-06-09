@@ -1354,6 +1354,295 @@
 
 
 
+// import React, { useState, useEffect } from 'react'
+// import { Link } from 'react-router-dom'
+// import { useTranslation } from 'react-i18next'
+// import { motion } from 'framer-motion'
+// import { TrendingUp, ArrowRight, Heart, Eye, Sparkles, Flame } from 'lucide-react'
+// import poemAPI from '../../api/poemAPI'
+
+// // Beautiful poem-specific images (different for each)
+// const poemImages = [
+//   'https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?w=600',
+//   'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600',
+//   'https://images.unsplash.com/photo-1509114397022-ed747cca3f65?w=600',
+//   'https://images.unsplash.com/photo-1532012197267-da84d127e765?w=600'
+// ]
+
+// const TrendingSection = () => {
+//   const { t } = useTranslation()
+//   const [trendingPoems, setTrendingPoems] = useState([])
+//   const [loading, setLoading] = useState(true)
+//   const [error, setError] = useState(null)
+
+//   useEffect(() => {
+//     fetchTrendingPoems()
+//   }, [])
+
+//   const fetchTrendingPoems = async () => {
+//     try {
+//       setLoading(true)
+//       const response = await poemAPI.getTrendingPoems()
+//       const poems = response.data?.data || response.data || response
+//       setTrendingPoems(Array.isArray(poems) ? poems.slice(0, 4) : [])
+//       setError(null)
+//     } catch (err) {
+//       console.error('Error fetching trending poems:', err)
+//       setError(t('common.errorLoading'))
+//     } finally {
+//       setLoading(false)
+//     }
+//   }
+
+//   const getPoemImage = (index) => {
+//     return poemImages[index % poemImages.length]
+//   }
+
+//   const formatNumber = (num) => {
+//     if (!num) return '0'
+//     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M'
+//     if (num >= 1000) return (num / 1000).toFixed(1) + 'K'
+//     return num.toString()
+//   }
+
+//   // Function to get correct poem URL based on routes in App.jsx
+//   const getPoemUrl = (poem) => {
+//     if (poem.slug) {
+//       return `/poem/${poem.slug}`
+//     }
+//     if (poem.id || poem._id) {
+//       return `/poem/${poem.id || poem._id}`
+//     }
+//     return '/poetry'
+//   }
+
+//   if (loading) {
+//     return (
+//       <section className="py-16 bg-gradient-to-br from-amber-50 via-pink-50 to-purple-50">
+//         <div className="max-w-7xl mx-auto px-6">
+//           <div className="flex items-center gap-3 mb-8">
+//             <div className="p-3 bg-gradient-to-r from-amber-500 to-pink-500 rounded-xl animate-pulse" />
+//             <div>
+//               <div className="h-6 w-40 bg-gray-200 rounded animate-pulse" />
+//               <div className="h-4 w-56 bg-gray-200 rounded mt-2 animate-pulse" />
+//             </div>
+//           </div>
+
+//           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+//             {[1, 2, 3, 4].map((i) => (
+//               <div key={i} className="rounded-2xl overflow-hidden bg-white/60 backdrop-blur-lg shadow-xl animate-pulse">
+//                 <div className="h-56 bg-gradient-to-r from-amber-100 via-pink-100 to-purple-100" />
+//                 <div className="p-4 space-y-2">
+//                   <div className="h-5 bg-gray-200 rounded w-3/4" />
+//                   <div className="h-4 bg-gray-200 rounded w-1/2" />
+//                   <div className="h-3 bg-gray-200 rounded w-full" />
+//                   <div className="flex justify-between pt-2">
+//                     <div className="h-4 bg-pink-200 rounded w-16" />
+//                     <div className="h-4 bg-purple-200 rounded w-16" />
+//                   </div>
+//                 </div>
+//               </div>
+//             ))}
+//           </div>
+//         </div>
+//       </section>
+//     )
+//   }
+
+//   if (error) {
+//     return (
+//       <section className="py-16 text-center bg-gradient-to-br from-amber-50 to-pink-50">
+//         <p className="text-red-500">{error}</p>
+//         <button
+//           onClick={fetchTrendingPoems}
+//           className="mt-4 px-6 py-2 rounded-full bg-gradient-to-r from-amber-500 to-pink-500 text-white shadow-lg hover:shadow-xl transition"
+//         >
+//           {t('common.retry')}
+//         </button>
+//       </section>
+//     )
+//   }
+
+//   if (!trendingPoems.length) return null
+
+//   return (
+//     <section className="py-16 relative overflow-hidden">
+//       <div className="absolute inset-0 bg-gradient-to-br from-amber-50 via-pink-50 to-purple-50" />
+      
+//       <div className="absolute top-20 left-10 w-72 h-72 bg-amber-300 opacity-20 blur-3xl rounded-full animate-pulse" />
+//       <div className="absolute bottom-20 right-10 w-96 h-96 bg-pink-300 opacity-20 blur-3xl rounded-full animate-pulse" />
+//       <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-300 opacity-10 blur-3xl rounded-full animate-pulse" />
+
+//       <div className="relative max-w-7xl mx-auto px-6">
+//         {/* Header */}
+//         <div className="flex items-center justify-between mb-10">
+//           <div className="flex items-center gap-4">
+//             <div className="relative">
+//               <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl blur-lg animate-pulse" />
+//               <div className="relative p-3 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 shadow-xl">
+//                 <TrendingUp className="h-6 w-6 text-white" />
+//               </div>
+//             </div>
+
+//             <div>
+//               <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+//                 {t('home.trendingPoems')}
+//               </h2>
+//               <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
+//                 <Sparkles className="h-3 w-3 text-amber-500" />
+//                 Most loved poetry by our community
+//                 <Sparkles className="h-3 w-3 text-pink-500" />
+//               </p>
+//             </div>
+//           </div>
+
+//           <Link
+//             to="/poetry"
+//             className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full bg-white/80 backdrop-blur-sm shadow-md hover:shadow-xl transition-all hover:scale-105 group border border-amber-200"
+//           >
+//             <span className="bg-gradient-to-r from-amber-600 to-pink-600 bg-clip-text text-transparent font-medium text-sm">
+//               {t('common.viewAll')}
+//             </span>
+//             <ArrowRight className="h-3 w-3 text-pink-500 group-hover:translate-x-1 transition" />
+//           </Link>
+//         </div>
+
+//         {/* Cards Grid */}
+//         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+//           {trendingPoems.map((poem, index) => {
+//             const poemImage = getPoemImage(index)
+//             const poemUrl = getPoemUrl(poem)
+            
+//             return (
+//               <motion.div
+//                 key={poem.id || poem._id}
+//                 initial={{ opacity: 0, y: 30 }}
+//                 whileInView={{ opacity: 1, y: 0 }}
+//                 transition={{ duration: 0.5, delay: index * 0.1 }}
+//                 viewport={{ once: true }}
+//                 whileHover={{ y: -5 }}
+//               >
+//                 <Link
+//                   to={poemUrl}
+//                   className="group block relative"
+//                 >
+//                   <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl opacity-0 group-hover:opacity-100 blur transition duration-500" />
+                  
+//                   <div className="relative bg-white/90 backdrop-blur-sm rounded-2xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-500">
+//                     <div className="relative h-56 overflow-hidden">
+//                       <img
+//                         src={poemImage}
+//                         alt={poem.title}
+//                         className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out"
+//                       />
+                      
+//                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      
+//                       <div className="absolute top-3 right-3">
+//                         <div className="bg-gradient-to-r from-amber-500 to-pink-500 text-white px-2 py-1 rounded-full text-xs font-bold shadow-lg flex items-center gap-1">
+//                           <Flame className="h-3 w-3" />
+//                           #{index + 1}
+//                         </div>
+//                       </div>
+
+//                       <div className="absolute top-3 left-3">
+//                         <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+//                           <Heart className="h-3 w-3 text-pink-400 fill-pink-400" />
+//                           {formatNumber(poem.likes || poem.likeCount || 0)}
+//                         </div>
+//                       </div>
+
+//                       <div className="absolute bottom-3 left-3 right-3">
+//                         <p className="text-white/90 text-xs font-medium flex items-center gap-2">
+//                           <span className="w-6 h-px bg-gradient-to-r from-amber-400 to-transparent" />
+//                           {poem.author?.name || poem.author}
+//                         </p>
+//                       </div>
+//                     </div>
+
+//                     <div className="p-4">
+//                       <h3 className="font-bold text-base text-gray-900 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-amber-600 group-hover:to-pink-600 group-hover:bg-clip-text transition line-clamp-1">
+//                         {poem.title}
+//                       </h3>
+
+//                       <p className="urdu-text text-gray-500 text-sm mt-1 line-clamp-1">
+//                         {poem.titleUr || poem.titleTranslation?.ur || ''}
+//                       </p>
+
+//                       {/* UPDATED: Increased text size for excerpt */}
+//                       <div className="relative mt-3 pt-2">
+//                         <div className="absolute -top-1 left-0 text-2xl text-amber-300 opacity-50">"</div>
+//                         <p className="text-gray-600 text-sm pl-4 line-clamp-2 italic">
+//                           {poem.excerpt || (poem.content?.substring(0, 80) + '...') || ''}
+//                         </p>
+//                       </div>
+
+//                       <div className="flex items-center justify-between mt-4 pt-2 border-t border-gray-100">
+//                         <div className="flex items-center gap-3">
+//                           <span className="flex items-center gap-1.5 text-pink-500 group-hover:scale-105 transition">
+//                             <Heart className="h-4 w-4 fill-pink-500/20" />
+//                             <span className="text-sm font-medium">{formatNumber(poem.likes || poem.likeCount || 0)}</span>
+//                           </span>
+                          
+//                           <span className="flex items-center gap-1.5 text-purple-500 group-hover:scale-105 transition">
+//                             <Eye className="h-4 w-4" />
+//                             <span className="text-sm font-medium">{formatNumber(poem.views || poem.viewCount || 0)}</span>
+//                           </span>
+//                         </div>
+
+//                         <div className="flex items-center gap-1 text-xs text-amber-500 opacity-0 group-hover:opacity-100 transition">
+//                           <span>Read</span>
+//                           <ArrowRight className="h-3 w-3" />
+//                         </div>
+//                       </div>
+//                     </div>
+//                   </div>
+//                 </Link>
+//               </motion.div>
+//             )
+//           })}
+//         </div>
+
+//         {/* Mobile View All Button */}
+//         <div className="mt-8 text-center sm:hidden">
+//           <Link
+//             to="/poetry"
+//             className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 text-white shadow-lg hover:shadow-xl transition-all hover:scale-105 text-sm"
+//           >
+//             <span className="font-semibold">{t('common.viewAll')}</span>
+//             <ArrowRight className="h-4 w-4" />
+//           </Link>
+//         </div>
+
+//         {/* Stats Counter */}
+//         <div className="mt-6 text-center">
+//           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-sm border border-amber-200">
+//             <Sparkles className="h-3 w-3 text-amber-500" />
+//             <span className="text-xs text-gray-600">
+//               {trendingPoems.length} trending {trendingPoems.length === 1 ? 'poem' : 'poems'}
+//             </span>
+//             <Sparkles className="h-3 w-3 text-pink-500" />
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   )
+// }
+
+// export default TrendingSection
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/components/home/TrendingSection.jsx
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -1370,10 +1659,13 @@ const poemImages = [
 ]
 
 const TrendingSection = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [trendingPoems, setTrendingPoems] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  
+  const currentLang = i18n.language
+  const isRTL = currentLang === 'ur'
 
   useEffect(() => {
     fetchTrendingPoems()
@@ -1405,7 +1697,7 @@ const TrendingSection = () => {
     return num.toString()
   }
 
-  // Function to get correct poem URL based on routes in App.jsx
+  // Function to get correct poem URL based on routes
   const getPoemUrl = (poem) => {
     if (poem.slug) {
       return `/poem/${poem.slug}`
@@ -1416,11 +1708,52 @@ const TrendingSection = () => {
     return '/poetry'
   }
 
+  // Get poem title based on language
+  const getPoemTitle = (poem) => {
+    if (currentLang === 'ur' && poem.titleUrdu) {
+      return poem.titleUrdu
+    }
+    if (currentLang === 'hi' && poem.titleHindi) {
+      return poem.titleHindi
+    }
+    return poem.title
+  }
+
+  // Get poem excerpt based on language
+  const getPoemExcerpt = (poem) => {
+    if (currentLang === 'ur' && poem.contentUrdu) {
+      const excerpt = poem.contentUrdu.substring(0, 80)
+      return excerpt.length < poem.contentUrdu.length ? excerpt + '...' : excerpt
+    }
+    if (currentLang === 'hi' && poem.contentHindi) {
+      const excerpt = poem.contentHindi.substring(0, 80)
+      return excerpt.length < poem.contentHindi.length ? excerpt + '...' : excerpt
+    }
+    if (poem.content) {
+      const excerpt = poem.content.substring(0, 80)
+      return excerpt.length < poem.content.length ? excerpt + '...' : excerpt
+    }
+    if (poem.excerpt) return poem.excerpt
+    return t('poetry.readMore')
+  }
+
+  // Get author name based on language
+  const getAuthorName = (poem) => {
+    const author = poem.author?.name || poem.author
+    if (currentLang === 'ur' && poem.author?.nameUrdu) {
+      return poem.author.nameUrdu
+    }
+    if (currentLang === 'hi' && poem.author?.nameHindi) {
+      return poem.author.nameHindi
+    }
+    return author || t('common.unknown')
+  }
+
   if (loading) {
     return (
       <section className="py-16 bg-gradient-to-br from-amber-50 via-pink-50 to-purple-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center gap-3 mb-8">
+          <div className="flex items-center gap-3 mb-8" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="p-3 bg-gradient-to-r from-amber-500 to-pink-500 rounded-xl animate-pulse" />
             <div>
               <div className="h-6 w-40 bg-gray-200 rounded animate-pulse" />
@@ -1475,8 +1808,8 @@ const TrendingSection = () => {
 
       <div className="relative max-w-7xl mx-auto px-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-10">
-          <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between mb-10" dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className={`flex items-center gap-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
             <div className="relative">
               <div className="absolute inset-0 bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 rounded-2xl blur-lg animate-pulse" />
               <div className="relative p-3 rounded-2xl bg-gradient-to-r from-amber-500 via-pink-500 to-purple-500 shadow-xl">
@@ -1484,13 +1817,13 @@ const TrendingSection = () => {
               </div>
             </div>
 
-            <div>
+            <div className={isRTL ? 'text-right' : ''}>
               <h2 className="text-3xl font-bold bg-gradient-to-r from-amber-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
                 {t('home.trendingPoems')}
               </h2>
               <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
                 <Sparkles className="h-3 w-3 text-amber-500" />
-                Most loved poetry by our community
+                {t('home.trendingSubtitle')}
                 <Sparkles className="h-3 w-3 text-pink-500" />
               </p>
             </div>
@@ -1512,6 +1845,9 @@ const TrendingSection = () => {
           {trendingPoems.map((poem, index) => {
             const poemImage = getPoemImage(index)
             const poemUrl = getPoemUrl(poem)
+            const poemTitle = getPoemTitle(poem)
+            const poemExcerpt = getPoemExcerpt(poem)
+            const authorName = getAuthorName(poem)
             
             return (
               <motion.div
@@ -1532,7 +1868,7 @@ const TrendingSection = () => {
                     <div className="relative h-56 overflow-hidden">
                       <img
                         src={poemImage}
-                        alt={poem.title}
+                        alt={poemTitle}
                         className="w-full h-full object-cover group-hover:scale-110 transition duration-700 ease-out"
                       />
                       
@@ -1548,32 +1884,36 @@ const TrendingSection = () => {
                       <div className="absolute top-3 left-3">
                         <div className="bg-black/50 backdrop-blur-sm text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
                           <Heart className="h-3 w-3 text-pink-400 fill-pink-400" />
-                          {formatNumber(poem.likes || poem.likeCount || 0)}
+                          {formatNumber(poem.stats?.likes || poem.likes || poem.likeCount || 0)}
                         </div>
                       </div>
 
                       <div className="absolute bottom-3 left-3 right-3">
                         <p className="text-white/90 text-xs font-medium flex items-center gap-2">
                           <span className="w-6 h-px bg-gradient-to-r from-amber-400 to-transparent" />
-                          {poem.author?.name || poem.author}
+                          {authorName}
                         </p>
                       </div>
                     </div>
 
                     <div className="p-4">
-                      <h3 className="font-bold text-base text-gray-900 group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-amber-600 group-hover:to-pink-600 group-hover:bg-clip-text transition line-clamp-1">
-                        {poem.title}
+                      <h3 className={`font-bold text-base group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-amber-600 group-hover:to-pink-600 group-hover:bg-clip-text transition line-clamp-1 ${isRTL ? 'urdu-text' : ''}`}>
+                        {poemTitle}
                       </h3>
 
-                      <p className="urdu-text text-gray-500 text-sm mt-1 line-clamp-1">
-                        {poem.titleUr || poem.titleTranslation?.ur || ''}
-                      </p>
+                      {/* Urdu subtitle if available */}
+                      {currentLang !== 'ur' && poem.titleUrdu && (
+                        <p className="urdu-text text-gray-500 text-xs mt-1 line-clamp-1" dir="rtl">
+                          {poem.titleUrdu}
+                        </p>
+                      )}
 
-                      {/* UPDATED: Increased text size for excerpt */}
                       <div className="relative mt-3 pt-2">
-                        <div className="absolute -top-1 left-0 text-2xl text-amber-300 opacity-50">"</div>
-                        <p className="text-gray-600 text-sm pl-4 line-clamp-2 italic">
-                          {poem.excerpt || (poem.content?.substring(0, 80) + '...') || ''}
+                        <div className={`absolute -top-1 text-2xl text-amber-300 opacity-50 ${isRTL ? 'right-0' : 'left-0'}`}>
+                          {isRTL ? '”' : '"'}
+                        </div>
+                        <p className={`text-gray-600 text-sm ${isRTL ? 'pr-4 text-right' : 'pl-4'} line-clamp-2 italic ${isRTL ? 'urdu-text' : ''}`}>
+                          {poemExcerpt}
                         </p>
                       </div>
 
@@ -1581,18 +1921,19 @@ const TrendingSection = () => {
                         <div className="flex items-center gap-3">
                           <span className="flex items-center gap-1.5 text-pink-500 group-hover:scale-105 transition">
                             <Heart className="h-4 w-4 fill-pink-500/20" />
-                            <span className="text-sm font-medium">{formatNumber(poem.likes || poem.likeCount || 0)}</span>
+                            <span className="text-sm font-medium">{formatNumber(poem.stats?.likes || poem.likes || poem.likeCount || 0)}</span>
                           </span>
                           
                           <span className="flex items-center gap-1.5 text-purple-500 group-hover:scale-105 transition">
                             <Eye className="h-4 w-4" />
-                            <span className="text-sm font-medium">{formatNumber(poem.views || poem.viewCount || 0)}</span>
+                            <span className="text-sm font-medium">{formatNumber(poem.stats?.views || poem.views || poem.viewCount || 0)}</span>
                           </span>
                         </div>
 
                         <div className="flex items-center gap-1 text-xs text-amber-500 opacity-0 group-hover:opacity-100 transition">
-                          <span>Read</span>
-                          <ArrowRight className="h-3 w-3" />
+                          <span>{t('poetry.readMore')}</span>
+                          {!isRTL && <ArrowRight className="h-3 w-3" />}
+                          {isRTL && <ArrowRight className="h-3 w-3 rotate-180" />}
                         </div>
                       </div>
                     </div>
@@ -1619,7 +1960,7 @@ const TrendingSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/50 backdrop-blur-sm border border-amber-200">
             <Sparkles className="h-3 w-3 text-amber-500" />
             <span className="text-xs text-gray-600">
-              {trendingPoems.length} trending {trendingPoems.length === 1 ? 'poem' : 'poems'}
+              {trendingPoems.length} {trendingPoems.length === 1 ? t('home.trendingPoem') : t('home.trendingPoems')}
             </span>
             <Sparkles className="h-3 w-3 text-pink-500" />
           </div>
