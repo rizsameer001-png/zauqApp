@@ -97,5 +97,33 @@
     "seoManagement": "SEO Management",
     "analytics": "Analytics",
     "settings": "Settings"
+  },
+
+  "blog": {
+    "voiceSearch": "Voice Search",
+    "listening": "Listening...",
+    "listeningPrompt": "Say something to search...",
+    "voiceNotSupported": "Voice search is not supported in your browser",
+    "listenToBlog": "Listen to Blog",
+    "audioPlayer": "Audio Player",
+    "play": "Play",
+    "pause": "Pause",
+    "stop": "Stop",
+    "voice": "Voice",
+    "speed": "Speed",
+    "ttsNotSupported": "Text-to-speech is not supported in your browser",
+    "noContentToRead": "No content to read",
+    "readingStarted": "Reading aloud...",
+    "readingCompleted": "Finished reading",
+    "ttsError": "Failed to read aloud. Please try again.",
+    "shareThis": "Share This",
+    "relatedBlogs": "Related Blogs",
+    "removedBookmark": "Removed bookmark",
+    "bookmarked": "Bookmarked!",
+    "bookmarkError": "Failed to update bookmark",
+    "loginToBookmark": "Please login to bookmark"
   }
+
+
+
 }

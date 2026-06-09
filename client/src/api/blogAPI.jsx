@@ -26,70 +26,70 @@
 
 
 
-// client/src/api/blogAPI.js
-import api from './apiConfig';
+// // working client/src/api/blogAPI.js
+// import api from './apiConfig';
 
-const blogAPI = {
-  // Get all blogs with pagination and filters
-  getBlogs: (params) => api.get('/blogs', { params }).then(res => res.data),
+// const blogAPI = {
+//   // Get all blogs with pagination and filters
+//   getBlogs: (params) => api.get('/blogs', { params }).then(res => res.data),
   
-  // Get single blog by slug (public)
-  getBlog: (slug) => api.get(`/blogs/${slug}`).then(res => res.data),
+//   // Get single blog by slug (public)
+//   getBlog: (slug) => api.get(`/blogs/${slug}`).then(res => res.data),
   
-  // Get blog by ID (admin)
-  getBlogById: (id) => api.get(`/blogs/admin/${id}`).then(res => res.data),
+//   // Get blog by ID (admin)
+//   getBlogById: (id) => api.get(`/blogs/admin/${id}`).then(res => res.data),
   
-  // Get featured blogs
-  getFeaturedBlogs: () => api.get('/blogs/featured').then(res => res.data),
+//   // Get featured blogs
+//   getFeaturedBlogs: () => api.get('/blogs/featured').then(res => res.data),
   
-  // Get blogs by category
-  getBlogsByCategory: (category, params) => api.get(`/blogs/category/${category}`, { params }).then(res => res.data),
+//   // Get blogs by category
+//   getBlogsByCategory: (category, params) => api.get(`/blogs/category/${category}`, { params }).then(res => res.data),
   
-  // Get related blogs
-  getRelatedBlogs: (id) => api.get(`/blogs/${id}/related`).then(res => res.data),
+//   // Get related blogs
+//   getRelatedBlogs: (id) => api.get(`/blogs/${id}/related`).then(res => res.data),
   
-  // Create blog (admin only)
-  createBlog: (data) => api.post('/blogs', data).then(res => res.data),
+//   // Create blog (admin only)
+//   createBlog: (data) => api.post('/blogs', data).then(res => res.data),
   
-  // Update blog (admin only)
-  updateBlog: (id, data) => api.put(`/blogs/${id}`, data).then(res => res.data),
+//   // Update blog (admin only)
+//   updateBlog: (id, data) => api.put(`/blogs/${id}`, data).then(res => res.data),
   
-  // Delete blog (admin only)
-  deleteBlog: (id) => api.delete(`/blogs/${id}`).then(res => res.data),
+//   // Delete blog (admin only)
+//   deleteBlog: (id) => api.delete(`/blogs/${id}`).then(res => res.data),
   
-  // Like blog
-  likeBlog: (id) => api.post(`/blogs/${id}/like`).then(res => res.data),
+//   // Like blog
+//   likeBlog: (id) => api.post(`/blogs/${id}/like`).then(res => res.data),
   
-  // Add comment
-  addComment: (id, data) => api.post(`/blogs/${id}/comments`, data).then(res => res.data),
+//   // Add comment
+//   addComment: (id, data) => api.post(`/blogs/${id}/comments`, data).then(res => res.data),
 
-  // Add to client/src/api/blogAPI.js
+//   // Add to client/src/api/blogAPI.js
 
-// Search blogs
-searchBlogs: (query, params = {}) => {
-  if (!query || !query.trim()) return Promise.reject(new Error('Search query is required'));
-  return api.get('/blogs/search', { params: { q: query, ...params } });
-},
+// // Search blogs
+// searchBlogs: (query, params = {}) => {
+//   if (!query || !query.trim()) return Promise.reject(new Error('Search query is required'));
+//   return api.get('/blogs/search', { params: { q: query, ...params } });
+// },
 
-// Get blogs by author
-getBlogsByAuthor: (authorId, params = {}) => {
-  if (!authorId) return Promise.reject(new Error('Author ID is required'));
-  return api.get(`/blogs/author/${authorId}`, { params });
-},
+// // Get blogs by author
+// getBlogsByAuthor: (authorId, params = {}) => {
+//   if (!authorId) return Promise.reject(new Error('Author ID is required'));
+//   return api.get(`/blogs/author/${authorId}`, { params });
+// },
 
-// Get columnists (featured authors)
-getColumnists: (params = {}) => {
-  return api.get('/blogs/columnists', { params });
-},
+// // Get columnists (featured authors)
+// getColumnists: (params = {}) => {
+//   return api.get('/blogs/columnists', { params });
+// },
 
-// Bookmark blog
-bookmarkBlog: (blogId) => {
-  if (!blogId) return Promise.reject(new Error('Blog ID is required'));
-  return api.post(`/blogs/${blogId}/bookmark`);
-},
-};
+// // Bookmark blog
+// bookmarkBlog: (blogId) => {
+//   if (!blogId) return Promise.reject(new Error('Blog ID is required'));
+//   return api.post(`/blogs/${blogId}/bookmark`);
+// },
+// };
 
-export default blogAPI;
+// export default blogAPI;
 
 
 
@@ -198,3 +198,119 @@ export default blogAPI;
 // };
 
 // export default blogAPI;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// client/src/api/blogAPI.js
+import api from './apiConfig';
+
+const blogAPI = {
+  // Get all blogs with pagination and filters
+  getBlogs: (params) => api.get('/blogs', { params }).then(res => res.data),
+  
+  // Get single blog by slug (public)
+  getBlog: (slug) => api.get(`/blogs/${slug}`).then(res => res.data),
+  
+  // Get blog by ID (admin)
+  getBlogById: (id) => api.get(`/blogs/admin/${id}`).then(res => res.data),
+  
+  // Get featured blogs
+  getFeaturedBlogs: () => api.get('/blogs/featured').then(res => res.data),
+  
+  // Get blogs by category
+  getBlogsByCategory: (category, params) => api.get(`/blogs/category/${category}`, { params }).then(res => res.data),
+  
+  // Get related blogs
+  getRelatedBlogs: (id) => api.get(`/blogs/related/${id}`).then(res => res.data),
+  
+  // Get most viewed blogs
+  getMostViewedBlogs: (params) => api.get('/blogs/stats/most-viewed', { params }).then(res => res.data),
+  
+  // Get most liked blogs
+  getMostLikedBlogs: (params) => api.get('/blogs/stats/most-liked', { params }).then(res => res.data),
+  
+  // FIXED: Search blogs
+  searchBlogs: async (query, params = {}) => {
+    if (!query || !query.trim()) {
+      return Promise.reject(new Error('Search query is required'));
+    }
+    try {
+      const response = await api.get('/blogs/search', { 
+        params: { q: query.trim(), ...params } 
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Search error:', error);
+      return { success: false, data: [], error: error.message };
+    }
+  },
+  
+  // Get blogs by author
+  getBlogsByAuthor: (authorId, params = {}) => {
+    if (!authorId) return Promise.reject(new Error('Author ID is required'));
+    return api.get(`/blogs/author/${authorId}`, { params }).then(res => res.data);
+  },
+  
+  // Get columnists
+  getColumnists: (params = {}) => {
+    return api.get('/blogs/columnists', { params }).then(res => res.data);
+  },
+  
+  // Like blog
+  likeBlog: (id) => api.post(`/blogs/${id}/like`).then(res => res.data),
+  
+  // Bookmark blog
+  bookmarkBlog: (id) => api.post(`/blogs/${id}/bookmark`).then(res => res.data),
+  
+  // Add comment
+  addComment: (id, data) => api.post(`/blogs/${id}/comments`, data).then(res => res.data),
+  
+  // Create blog (admin)
+  createBlog: (data) => api.post('/blogs', data).then(res => res.data),
+  
+  // Update blog (admin)
+  updateBlog: (id, data) => api.put(`/blogs/${id}`, data).then(res => res.data),
+  
+  // Delete blog (admin)
+  deleteBlog: (id) => api.delete(`/blogs/${id}`).then(res => res.data),
+  
+  // Bulk upload blogs (admin)
+  bulkUploadBlogs: (blogs) => api.post('/blogs/bulk/upload', { blogs }).then(res => res.data),
+  
+  // Bulk delete blogs (admin)
+  bulkDeleteBlogs: (ids) => api.post('/blogs/bulk-delete', { ids }).then(res => res.data),
+  
+  // Bulk publish blogs (admin)
+  bulkPublishBlogs: (ids, publish = true) => api.post('/blogs/bulk-publish', { ids, publish }).then(res => res.data),
+  
+  // Toggle featured (admin)
+  toggleFeatured: (id) => api.patch(`/blogs/${id}/featured`).then(res => res.data),
+  
+  // Toggle publish (admin)
+  togglePublish: (id) => api.patch(`/blogs/${id}/publish`).then(res => res.data),
+  
+  // Get comments (admin)
+  getComments: (id, status = 'pending') => api.get(`/blogs/${id}/comments`, { params: { status } }).then(res => res.data),
+  
+  // Delete comment (admin)
+  deleteComment: (blogId, commentId) => api.delete(`/blogs/${blogId}/comments/${commentId}`).then(res => res.data),
+  
+  // Approve comment (admin)
+  approveComment: (blogId, commentId) => api.patch(`/blogs/${blogId}/comments/${commentId}/approve`).then(res => res.data),
+  
+  // Bulk approve comments (admin)
+  bulkApproveComments: (blogId, commentIds) => api.post('/blogs/comments/bulk-approve', { blogId, commentIds }).then(res => res.data)
+};
+
+export default blogAPI;
