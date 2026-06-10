@@ -1,0 +1,32 @@
+# Robots.txt for ZauqApp
+# https://zauqapp-site.onrender.com
+
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /creator/
+Disallow: /login
+Disallow: /register
+
+# Allow all important content
+Allow: /poetry/
+Allow: /poem/
+Allow: /authors/
+Allow: /author/
+Allow: /books/
+Allow: /book/
+Allow: /audio/
+Allow: /video/
+Allow: /blog/
+Allow: /explore/
+
+# Sitemap location
+Sitemap: https://zauqapp-site.onrender.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1
+
+# Host
+Host: https://zauqapp-site.onrender.com

@@ -923,6 +923,7 @@ import appSettingsRoutes from './routes/appSettings.routes.js';
 import captchaRoutes from './routes/captcha.routes.js';
 import commentRoutes from './routes/comment.routes.js';
 import adRoutes from './routes/ad.routes.js';
+import sitemapRoutes from './routes/sitemap.routes.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1049,6 +1050,8 @@ app.use('/api/app-settings', appSettingsRoutes);
 app.use('/api/captcha', captchaRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/ads', adRoutes);
+// sitemap routes
+app.use('/api/sitemap', sitemapRoutes);
 
 // ============================================
 // Health Checks

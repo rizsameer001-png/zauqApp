@@ -2189,6 +2189,370 @@
 
 
 
+// // client/src/App.jsx
+// import React from 'react'
+// import { Routes, Route, Navigate } from 'react-router-dom'
+// import { useSelector } from 'react-redux'
+
+// // Layouts
+// import MainLayout from './layouts/MainLayout.jsx'
+// import DashboardLayout from './layouts/DashboardLayout.jsx'
+// import AdminLayout from './layouts/AdminLayout.jsx'
+
+// // Public Pages
+// import HomePage from './pages/public/HomePage.jsx'
+// import ExplorePage from './pages/public/ExplorePage.jsx'
+// import PoetryListPage from './pages/public/PoetryListPage.jsx'
+// import PoetryDetailPage from './pages/public/PoetryDetailPage.jsx'
+// import AuthorsListPage from './pages/public/AuthorsListPage.jsx'
+// import AuthorDetailPage from './pages/public/AuthorDetailPage.jsx'
+// import BooksListPage from './pages/public/BooksListPage.jsx'
+// import BookDetailPage from './pages/public/BookDetailPage.jsx'
+
+// // Audio Public Pages
+// import AudioListPage from './pages/public/AudioListPage.jsx'
+// import AudioDetailPage from './pages/public/AudioDetailPage.jsx'
+// import AudioByTypePage from './pages/public/AudioByTypePage.jsx'
+// import AudioByOccasionPage from './pages/public/AudioByOccasionPage.jsx'
+
+// // Video Public Pages
+// import VideoListPage from './pages/public/VideoListPage.jsx'
+// import VideoDetailPage from './pages/public/VideoDetailPage.jsx'
+
+// // Other Public Pages
+// import SearchPage from './pages/public/SearchPage.jsx'
+// import AboutPage from './pages/public/AboutPage.jsx'
+// import SubscriptionPlansPage from './pages/public/SubscriptionPlansPage'
+
+// // Blog
+// import BlogListPage from './pages/public/BlogListPage'
+// import BlogDetailPage from './pages/public/BlogDetailPage'
+
+// // Subscription Pages
+// import SubscriptionPage from './pages/subscription/SubscriptionPage.jsx'
+// import SubscriptionSuccessPage from './pages/subscription/SubscriptionSuccessPage.jsx'
+// import SubscriptionCancelPage from './pages/subscription/SubscriptionCancelPage.jsx'
+
+// // Auth Pages
+// import LoginPage from './pages/auth/LoginPage.jsx'
+// import RegisterPage from './pages/auth/RegisterPage.jsx'
+
+// // User Dashboard Pages
+// import UserDashboardPage from './pages/user/UserDashboard.jsx'
+// import ProfilePage from './pages/user/UserProfile.jsx'
+// import FavoritesPage from './pages/user/UserFavorites.jsx'
+// import HistoryPage from './pages/user/UserHistory.jsx'
+// import DownloadsPage from './pages/user/DownloadsPage.jsx'
+// import UserSubscriptionsPage from './pages/user/UserSubscriptionsPage.jsx'
+// import UserBillingPage from './pages/user/UserBillingPage.jsx'
+// import PaymentMethodsPage from './pages/user/PaymentMethodsPage.jsx'
+// import InvoicesPage from './pages/user/InvoicesPage.jsx'
+// import NotificationsPage from './pages/user/NotificationsPage'
+
+// // Creator Dashboard Pages
+// import CreatorDashboardPage from './pages/creator/CreatorDashboardPage.jsx'
+// import UploadPoetryPage from './pages/creator/UploadPoetryPage.jsx'
+// import RevenueAnalyticsPage from './pages/creator/RevenueAnalyticsPage.jsx'
+
+// // Admin Pages
+// import AdminDashboardPage from './pages/admin/AdminDashboardPage.jsx'
+// import UserManagementPage from './pages/admin/UserManagementPage.jsx'
+// import PoetryCMSPage from './pages/admin/PoetryCMSPage.jsx'
+// import AuthorCMSPage from './pages/admin/AuthorCMSPage.jsx'
+// import EbookCMSPage from './pages/admin/EbookCMSPage.jsx'
+// import AudioCMSPage from './pages/admin/AudioCMSPage.jsx'
+// import AudioTypesPage from './pages/admin/AudioTypesPage.jsx'
+// import AudioPlaylistsPage from './pages/admin/AudioPlaylistsPage.jsx'
+// import AudioBulkUploadPage from './pages/admin/AudioBulkUploadPage.jsx'
+// import AudioAnalyticsPage from './pages/admin/AudioAnalyticsPage.jsx'
+// import VideoCMSPage from './pages/admin/VideoCMSPage.jsx'
+// import SubscriptionCMSPage from './pages/admin/SubscriptionCMSPage.jsx'
+// import HomepageCMSPage from './pages/admin/HomepageCMSPage.jsx'
+// import SEOManagementPage from './pages/admin/SEOManagementPage.jsx'
+// import AnalyticsPage from './pages/admin/AnalyticsPage.jsx'
+// import SubscribersListPage from './pages/admin/SubscribersListPage.jsx'
+// import TransactionsPage from './pages/admin/TransactionsPage.jsx'
+// import SubscriptionAnalyticsPage from './pages/admin/SubscriptionAnalyticsPage.jsx'
+// import SettingsPage from './pages/admin/SettingsPage.jsx'
+// import NotificationCMSPage from './pages/admin/NotificationCMSPage'
+// import CategoriesManagementPage from './pages/admin/CategoriesManagementPage.jsx'
+// import AudioOccasionsPage from './pages/admin/AudioOccasionsPage'
+// import BlogCMSPage from './pages/admin/BlogCMSPage'
+// import BlogCategoriesPage from './pages/admin/BlogCategoriesPage'
+// import BlogCommentsPage from './pages/admin/BlogCommentsPage'
+// import DatabaseBackup from './pages/admin/DatabaseBackup'
+
+// // Audio Player Component
+// import AudioPlayerBar from './components/AudioPlayerBar'
+
+// // Protected Route Component
+// const ProtectedRoute = ({ children, allowedRoles = [] }) => {
+//   const { isAuthenticated, user } = useSelector((state) => state.auth)
+
+//   if (!isAuthenticated) {
+//     return <Navigate to="/login" replace />
+//   }
+
+//   if (allowedRoles.length > 0 && !allowedRoles.includes(user?.role)) {
+//     return <Navigate to="/" replace />
+//   }
+
+//   return children
+// }
+
+// // Temporary placeholder component for missing pages
+// const PlaceholderPage = ({ title }) => (
+//   <div className="flex items-center justify-center min-h-[60vh]">
+//     <div className="text-center">
+//       <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
+//       <p className="text-gray-500">This page is under construction.</p>
+//     </div>
+//   </div>
+// )
+
+// const App = () => {
+//   return (
+//     <>
+//       <Routes>
+//         {/* ============================================
+//             PUBLIC ROUTES - Using SLUGS instead of IDs
+//         ============================================ */}
+//         <Route element={<MainLayout />}>
+//           {/* Home & Explore */}
+//           <Route path="/" element={<HomePage />} />
+//           <Route path="/explore" element={<ExplorePage />} />
+//           <Route path="/search" element={<SearchPage />} />
+//           <Route path="/about" element={<AboutPage />} />
+
+//           {/* Poetry Routes */}
+//           <Route path="/poetry" element={<PoetryListPage />} />
+//           <Route path="/poem/:slug" element={<PoetryDetailPage />} />
+//           <Route path="/poetry/:id" element={<Navigate to="/poetry" replace />} />
+
+//           {/* Author Routes */}
+//           <Route path="/authors" element={<AuthorsListPage />} />
+//           <Route path="/author/:slug" element={<AuthorDetailPage />} />
+//           <Route path="/authors/:id" element={<Navigate to="/authors" replace />} />
+
+//           {/* Book Routes */}
+//           <Route path="/books" element={<BooksListPage />} />
+//           <Route path="/book/:slug" element={<BookDetailPage />} />
+//           <Route path="/books/:id" element={<Navigate to="/books" replace />} />
+
+//           {/* Audio Routes - Public */}
+//           <Route path="/audio" element={<AudioListPage />} />
+//           <Route path="/audio/:slug" element={<AudioDetailPage />} />
+//           <Route path="/audio/type/:type" element={<AudioByTypePage />} />
+//           <Route path="/audio/occasion/:occasion" element={<AudioByOccasionPage />} />
+//           <Route path="/audio/category/:type" element={<AudioByTypePage />} />
+//           <Route path="/audio/id/:id" element={<Navigate to="/audio" replace />} />
+
+//           {/* Video Routes */}
+//           <Route path="/videos" element={<VideoListPage />} />
+//           <Route path="/video/:slug" element={<VideoDetailPage />} />
+//           <Route path="/videos/:id" element={<Navigate to="/videos" replace />} />
+
+//           {/* Blog Routes - Public */}
+//           <Route path="/blog" element={<BlogListPage />} />
+//           <Route path="/blog/:slug" element={<BlogDetailPage />} />
+//         </Route>
+
+//         {/* ============================================
+//             AUTH ROUTES
+//         ============================================ */}
+//         <Route path="/login" element={<LoginPage />} />
+//         <Route path="/register" element={<RegisterPage />} />
+
+//         {/* ============================================
+//             SUBSCRIPTION ROUTES - PUBLIC
+//             FIXED: Removed duplicate /subscription route
+//         ============================================ */}
+//         {/* Main subscription plans page */}
+//         <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
+        
+//         {/* My subscriptions page (public access, but shows login prompt if not logged in) */}
+//         <Route path="/my-subscriptions" element={<UserSubscriptionsPage />} />
+        
+//         {/* Old /subscription route - Redirect to plans page */}
+//         <Route path="/subscription" element={<Navigate to="/subscription-plans" replace />} />
+        
+//         {/* Payment success/failure pages */}
+//         <Route path="/subscription/success" element={<SubscriptionSuccessPage />} />
+//         <Route path="/subscription/cancel" element={<SubscriptionCancelPage />} />
+
+//         {/* ============================================
+//             USER DASHBOARD ROUTES
+//         ============================================ */}
+//         <Route
+//           path="/dashboard"
+//           element={
+//             <ProtectedRoute>
+//               <DashboardLayout />
+//             </ProtectedRoute>
+//           }
+//         >
+//           <Route index element={<UserDashboardPage />} />
+//           <Route path="profile" element={<ProfilePage />} />
+//           <Route path="favorites" element={<FavoritesPage />} />
+//           <Route path="downloads" element={<DownloadsPage />} />
+//           <Route path="history" element={<HistoryPage />} />
+          
+//           {/* User Subscription Routes */}
+//           <Route path="subscriptions" element={<UserSubscriptionsPage />} />
+//           <Route path="billing" element={<UserBillingPage />} />
+//           <Route path="payment-methods" element={<PaymentMethodsPage />} />
+//           <Route path="invoices" element={<InvoicesPage />} />
+//           <Route path="notifications" element={<NotificationsPage />} />
+//         </Route>
+
+//         {/* ============================================
+//             CREATOR DASHBOARD ROUTES
+//         ============================================ */}
+//         <Route
+//           path="/creator"
+//           element={
+//             <ProtectedRoute allowedRoles={['creator', 'admin']}>
+//               <DashboardLayout />
+//             </ProtectedRoute>
+//           }
+//         >
+//           <Route index element={<CreatorDashboardPage />} />
+//           <Route path="upload-poetry" element={<UploadPoetryPage />} />
+//           <Route path="analytics" element={<RevenueAnalyticsPage />} />
+//           <Route path="revenue" element={<RevenueAnalyticsPage />} />
+          
+//           {/* Creator Subscription Routes */}
+//           <Route path="subscription" element={<PlaceholderPage title="Creator Subscription" />} />
+//           <Route path="earnings" element={<PlaceholderPage title="Earnings" />} />
+//         </Route>
+
+//         {/* ============================================
+//             ADMIN ROUTES
+//         ============================================ */}
+//         <Route
+//           path="/admin"
+//           element={
+//             <ProtectedRoute allowedRoles={['admin']}>
+//               <AdminLayout />
+//             </ProtectedRoute>
+//           }
+//         >
+//           {/* Main Admin Dashboard */}
+//           <Route index element={<AdminDashboardPage />} />
+          
+//           {/* User Management */}
+//           <Route path="users" element={<UserManagementPage />} />
+//           <Route path="users/:id" element={<PlaceholderPage title="User Details" />} />
+          
+//           {/* Content Management */}
+//           <Route path="poetry" element={<PoetryCMSPage />} />
+//           <Route path="authors" element={<AuthorCMSPage />} />
+//           <Route path="books" element={<EbookCMSPage />} />
+          
+//           {/* ============================================
+//               AUDIO CMS - ADMIN (FULLY CONFIGURED)
+//           ============================================ */}
+//           <Route path="audio" element={<AudioCMSPage />} />
+//           <Route path="audio/types" element={<AudioTypesPage />} />
+//           <Route path="audio/occasions" element={<AudioOccasionsPage />} />
+//           <Route path="audio/playlists" element={<AudioPlaylistsPage />} />
+//           <Route path="audio/bulk-upload" element={<AudioBulkUploadPage />} />
+//           <Route path="audio/analytics" element={<AudioAnalyticsPage />} />
+//           <Route path="audio/categories" element={<CategoriesManagementPage type="audio" />} />
+//           <Route path="audio/reports" element={<PlaceholderPage title="Audio Reports" />} />
+          
+//           {/* ============================================
+//               VIDEO CMS - ADMIN
+//           ============================================ */}
+//           <Route path="videos" element={<VideoCMSPage />} />
+//           <Route path="videos/types" element={<PlaceholderPage title="Video Types Management" />} />
+//           <Route path="videos/analytics" element={<PlaceholderPage title="Video Analytics" />} />
+
+//           {/* ============================================
+//               BLOG CMS - ADMIN
+//           ============================================ */}
+//           <Route path="blog" element={<BlogListPage />} />
+//           <Route path="blog/new" element={<BlogCMSPage />} />
+//           <Route path="blog/edit/:id" element={<BlogCMSPage />} />
+//           <Route path="blog/categories" element={<BlogCategoriesPage />} />
+//           <Route path="blog/comments" element={<BlogCommentsPage />} />
+
+//           {/* ============================================
+//               NOTIFICATION CMS - ADMIN
+//           ============================================ */}
+//           <Route path="notifications" element={<NotificationCMSPage />} />
+
+//           {/* ============================================
+//               SUBSCRIPTION CMS - ADMIN (FULLY CONFIGURED)
+//           ============================================ */}
+//           <Route path="subscriptions" element={<SubscriptionCMSPage />} />
+//           <Route path="subscriptions/plans" element={<SubscriptionCMSPage />} />
+//           <Route path="subscriptions/users" element={<SubscribersListPage />} />
+//           <Route path="subscriptions/subscribers" element={<SubscribersListPage />} />
+//           <Route path="subscriptions/subscribers/:id" element={<PlaceholderPage title="Subscriber Details" />} />
+//           <Route path="subscriptions/transactions" element={<TransactionsPage />} />
+//           <Route path="subscriptions/payments" element={<TransactionsPage />} />
+//           <Route path="subscriptions/transactions/:id" element={<PlaceholderPage title="Transaction Details" />} />
+//           <Route path="subscriptions/analytics" element={<SubscriptionAnalyticsPage />} />
+//           <Route path="subscriptions/stats" element={<SubscriptionAnalyticsPage />} />
+//           <Route path="subscriptions/reports" element={<PlaceholderPage title="Subscription Reports" />} />
+//           <Route path="subscriptions/features" element={<PlaceholderPage title="Feature Toggles" />} />
+//           <Route path="subscriptions/coupons" element={<PlaceholderPage title="Coupon Management" />} />
+//           <Route path="subscriptions/discounts" element={<PlaceholderPage title="Discount Management" />} />
+
+//           {/* ============================================
+//               SITE MANAGEMENT - ADMIN
+//           ============================================ */}
+//           <Route path="homepage" element={<HomepageCMSPage />} />
+//           <Route path="seo" element={<SEOManagementPage />} />
+//           <Route path="analytics" element={<AnalyticsPage />} />
+//           <Route path="settings" element={<SettingsPage />} />
+          
+//           {/* Category Management */}
+//           <Route path="categories" element={<CategoriesManagementPage />} />
+//           <Route path="categories/audio" element={<CategoriesManagementPage type="audio" />} />
+//           <Route path="categories/video" element={<CategoriesManagementPage type="video" />} />
+          
+//           {/* Reports */}
+//           <Route path="reports" element={<PlaceholderPage title="Reports" />} />
+//           <Route path="reports/audio" element={<PlaceholderPage title="Audio Reports" />} />
+//           <Route path="reports/payments" element={<PlaceholderPage title="Payment Reports" />} />
+          
+//           {/* System */}
+//           <Route path="system/logs" element={<PlaceholderPage title="System Logs" />} />
+//           <Route path="system/backup" element={<DatabaseBackup />} />
+//           <Route path="system/database-backup" element={<DatabaseBackup />} />
+//         </Route>
+
+//         {/* ============================================
+//             FALLBACK - 404 PAGE
+//         ============================================ */}
+//         <Route path="*" element={<Navigate to="/" replace />} />
+//       </Routes>
+      
+//       {/* Global Audio Player Bar - Shows when audio is playing */}
+//       <AudioPlayerBar />
+//     </>
+//   )
+// }
+
+// export default App
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // client/src/App.jsx
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
@@ -2227,6 +2591,10 @@ import SubscriptionPlansPage from './pages/public/SubscriptionPlansPage'
 // Blog
 import BlogListPage from './pages/public/BlogListPage'
 import BlogDetailPage from './pages/public/BlogDetailPage'
+
+// Sitemap & Robots Pages
+import SitemapPage from './pages/public/SitemapPage.jsx'
+import RobotsTxtPage from './pages/public/RobotsTxtPage.jsx'
 
 // Subscription Pages
 import SubscriptionPage from './pages/subscription/SubscriptionPage.jsx'
@@ -2315,6 +2683,18 @@ const App = () => {
     <>
       <Routes>
         {/* ============================================
+            SITEMAP & ROBOTS.TXT ROUTES
+            These must come first to ensure they're matched before catch-all routes
+        ============================================ */}
+        <Route path="/sitemap.xml" element={<SitemapPage />} />
+        <Route path="/sitemap-pages.xml" element={<SitemapPage />} />
+        <Route path="/sitemap-poems.xml" element={<SitemapPage />} />
+        <Route path="/sitemap-authors.xml" element={<SitemapPage />} />
+        <Route path="/sitemap-books.xml" element={<SitemapPage />} />
+        <Route path="/sitemap-blogs.xml" element={<SitemapPage />} />
+        <Route path="/robots.txt" element={<RobotsTxtPage />} />
+
+        {/* ============================================
             PUBLIC ROUTES - Using SLUGS instead of IDs
         ============================================ */}
         <Route element={<MainLayout />}>
@@ -2365,7 +2745,6 @@ const App = () => {
 
         {/* ============================================
             SUBSCRIPTION ROUTES - PUBLIC
-            FIXED: Removed duplicate /subscription route
         ============================================ */}
         {/* Main subscription plans page */}
         <Route path="/subscription-plans" element={<SubscriptionPlansPage />} />
@@ -2526,6 +2905,7 @@ const App = () => {
 
         {/* ============================================
             FALLBACK - 404 PAGE
+            This catches any routes not defined above
         ============================================ */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
