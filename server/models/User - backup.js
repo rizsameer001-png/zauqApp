@@ -347,392 +347,6 @@
 
 
 
-// //working  server/models/User.js
-// import mongoose from 'mongoose';
-// import bcrypt from 'bcryptjs';
-
-// const userSchema = new mongoose.Schema({
-//   name: {
-//     type: String,
-//     required: [true, 'Name is required'],
-//     trim: true,
-//     maxlength: [100, 'Name cannot exceed 100 characters']
-//   },
-//   email: {
-//     type: String,
-//     required: [true, 'Email is required'],
-//     unique: true,
-//     lowercase: true,
-//     trim: true
-//   },
-//   password: {
-//     type: String,
-//     minlength: [6, 'Password must be at least 6 characters'],
-//     select: false
-//   },
-//   avatar: {
-//     type: String,
-//     default: ''
-//   },
-//   bio: {
-//     type: String,
-//     maxlength: [500, 'Bio cannot exceed 500 characters']
-//   },
-//   role: {
-//     type: String,
-//     enum: ['user', 'creator', 'admin', 'moderator'],
-//     default: 'user'
-//   },
-//   isVerified: {
-//     type: Boolean,
-//     default: false
-//   },
-//   googleId: {
-//     type: String,
-//     sparse: true
-//   },
-//   subscription: {
-//     plan: {
-//       type: String,
-//       enum: ['free', 'basic', 'premium', 'pro'],
-//       default: 'free'
-//     },
-//     expiresAt: Date,
-//     startedAt: { type: Date, default: Date.now }
-//   },
-  
-//   // ============================================
-//   // 🔐 REFRESH TOKEN FIELD - FIX FOR PERSISTENT LOGIN
-//   // ============================================
-//   /**
-//    * refreshToken: Stores the current refresh token for this user
-//    * - Used to validate refresh token requests
-//    * - Helps prevent token theft by allowing token revocation
-//    * - When user logs out, this field is cleared
-//    * - When token is refreshed, a new token is generated and stored
-//    * - select: false means it won't be returned in normal queries (security)
-//    */
-//   refreshToken: {
-//     type: String,
-//     select: false  // Don't return by default for security
-//   },
-  
-//   // ============================================
-//   // UPDATED: Enhanced preferences with notification settings
-//   // ============================================
-//   preferences: {
-//     language: { type: String, default: 'en' },
-//     theme: { type: String, default: 'light' },
-//     // NEW: Master notification toggle
-//     notifications: { type: Boolean, default: true },
-//     // NEW: Last time user dismissed the global notice
-//     lastNoticeDismissed: { type: Date, default: null },
-//     // NEW: Email notification preferences
-//     emailNotifications: {
-//       type: Boolean,
-//       default: true
-//     },
-//     // NEW: Push notification preferences
-//     pushNotifications: {
-//       type: Boolean,
-//       default: true
-//     },
-//     // NEW: Specific notification types
-//     notificationTypes: {
-//       follows: { type: Boolean, default: true },
-//       likes: { type: Boolean, default: true },
-//       comments: { type: Boolean, default: true },
-//       newContent: { type: Boolean, default: true },
-//       subscription: { type: Boolean, default: true },
-//       system: { type: Boolean, default: true },
-//       announcements: { type: Boolean, default: true }
-//     },
-//     // NEW: Quiet hours settings
-//     quietHours: {
-//       enabled: { type: Boolean, default: false },
-//       start: { type: String, default: '22:00' },
-//       end: { type: String, default: '08:00' }
-//     },
-//     // NEW: Digest settings
-//     digest: {
-//       enabled: { type: Boolean, default: true },
-//       frequency: { type: String, enum: ['daily', 'weekly', 'never'], default: 'daily' }
-//     }
-//   },
-//   favorites: {
-//     poems: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Poem' }],
-//     books: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Book' }],
-//     audio: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Audio' }],
-//     videos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Video' }]
-//   },
-//   following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Author' }],
-//   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-//   readingHistory: [{
-//     contentType: String,
-//     contentId: mongoose.Schema.Types.ObjectId,
-//     progress: Number,
-//     lastRead: { type: Date, default: Date.now }
-//   }],
-//   downloads: [{
-//     contentType: String,
-//     contentId: mongoose.Schema.Types.ObjectId,
-//     title: String,
-//     slug: String,
-//     downloadedAt: { type: Date, default: Date.now }
-//   }],
-  
-//   // ============================================
-//   // ADDED: Payment Methods and Invoices
-//   // ============================================
-//   paymentMethods: [{
-//     _id: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
-//     cardNumber: { type: String, required: true },
-//     cardHolder: { type: String, required: true },
-//     expiryMonth: { type: String, required: true },
-//     expiryYear: { type: String, required: true },
-//     lastFourDigits: { type: String },
-//     cardBrand: { type: String, enum: ['visa', 'mastercard', 'amex', 'rupay', 'other'], default: 'other' },
-//     isDefault: { type: Boolean, default: false },
-//     createdAt: { type: Date, default: Date.now },
-//     lastUsed: { type: Date }
-//   }],
-  
-//   invoices: [{
-//     _id: { type: mongoose.Schema.Types.ObjectId, default: () => new mongoose.Types.ObjectId() },
-//     invoiceNumber: { type: String, unique: true },
-//     plan: { type: String, required: true },
-//     amount: { type: Number, required: true },
-//     originalAmount: { type: Number },
-//     discountAmount: { type: Number, default: 0 },
-//     currency: { type: String, default: 'INR' },
-//     billingCycle: { type: String, enum: ['monthly', 'quarterly', 'yearly'], default: 'monthly' },
-//     status: { type: String, enum: ['paid', 'pending', 'failed', 'refunded'], default: 'paid' },
-//     paymentMethod: { type: String },
-//     transactionId: { type: String },
-//     paymentId: { type: String },
-//     orderId: { type: String },
-//     description: { type: String },
-//     pdfUrl: { type: String },
-//     createdAt: { type: Date, default: Date.now },
-//     paidAt: { type: Date }
-//   }],
-  
-//   deviceTokens: [String],
-//   lastLogin: Date,
-//   isActive: { type: Boolean, default: true },
-//   isBanned: { type: Boolean, default: false }
-// }, {
-//   timestamps: true
-// });
-
-// // ============================================
-// // INDEXES (Updated with refreshToken index)
-// // ============================================
-// userSchema.index({ name: 'text', email: 'text' });
-// userSchema.index({ 'downloads.contentType': 1 });
-// userSchema.index({ 'downloads.downloadedAt': -1 });
-// userSchema.index({ 'paymentMethods.isDefault': 1 });
-// userSchema.index({ 'invoices.createdAt': -1 });
-// // NEW: Index for notification preferences queries
-// userSchema.index({ 'preferences.emailNotifications': 1 });
-// userSchema.index({ 'preferences.pushNotifications': 1 });
-// // ✅ NEW: Index for refresh token queries (for faster lookups during token refresh)
-// userSchema.index({ refreshToken: 1 });
-
-// // ============================================
-// // PRE-SAVE MIDDLEWARE
-// // ============================================
-
-// // Generate invoice number before saving
-// userSchema.pre('save', function(next) {
-//   if (this.invoices && this.invoices.length > 0) {
-//     this.invoices.forEach(invoice => {
-//       if (!invoice.invoiceNumber) {
-//         invoice.invoiceNumber = `INV-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
-//       }
-//     });
-//   }
-//   next();
-// });
-
-// // Hash password before saving
-// userSchema.pre('save', async function(next) {
-//   if (!this.isModified('password')) return next();
-//   this.password = await bcrypt.hash(this.password, 12);
-//   next();
-// });
-
-// // ✅ NEW: Clear sensitive data before sending toJSON/toObject
-// userSchema.set('toJSON', {
-//   transform: function(doc, ret) {
-//     delete ret.refreshToken;  // Never send refresh token in responses
-//     delete ret.__v;
-//     return ret;
-//   }
-// });
-
-// // ============================================
-// // INSTANCE METHODS
-// // ============================================
-
-// // Compare password
-// userSchema.methods.comparePassword = async function(candidatePassword) {
-//   return await bcrypt.compare(candidatePassword, this.password);
-// };
-
-// // ✅ NEW: Method to check if refresh token is valid
-// userSchema.methods.isRefreshTokenValid = async function(refreshToken) {
-//   if (!this.refreshToken) return false;
-//   return this.refreshToken === refreshToken;
-// };
-
-// // ✅ NEW: Method to clear refresh token (used on logout)
-// userSchema.methods.clearRefreshToken = async function() {
-//   this.refreshToken = null;
-//   await this.save();
-// };
-
-// // ✅ NEW: Method to update refresh token (used on token rotation)
-// userSchema.methods.updateRefreshToken = async function(newRefreshToken) {
-//   this.refreshToken = newRefreshToken;
-//   await this.save();
-// };
-
-// // ============================================
-// // Helper methods for preferences
-// // ============================================
-
-// // Check if user should receive a notification type
-// userSchema.methods.shouldReceiveNotification = function(notificationType) {
-//   if (!this.preferences.notifications) return false;
-  
-//   const typeMap = {
-//     'follow': 'follows',
-//     'like': 'likes',
-//     'comment': 'comments',
-//     'new_content': 'newContent',
-//     'subscription': 'subscription',
-//     'system': 'system',
-//     'announcement': 'announcements'
-//   };
-  
-//   const prefKey = typeMap[notificationType] || 'system';
-//   return this.preferences.notificationTypes[prefKey] !== false;
-// };
-
-// // Check if quiet hours are active
-// userSchema.methods.isQuietHours = function() {
-//   if (!this.preferences.quietHours.enabled) return false;
-  
-//   const now = new Date();
-//   const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-//   const { start, end } = this.preferences.quietHours;
-  
-//   if (start <= end) {
-//     return currentTime >= start && currentTime <= end;
-//   } else {
-//     // Overnight quiet hours (e.g., 22:00 to 08:00)
-//     return currentTime >= start || currentTime <= end;
-//   }
-// };
-
-// // Get user's preferred notification channels
-// userSchema.methods.getNotificationChannels = function() {
-//   const channels = [];
-//   if (this.preferences.notifications && this.preferences.pushNotifications) {
-//     channels.push('push');
-//   }
-//   if (this.preferences.notifications && this.preferences.emailNotifications) {
-//     channels.push('email');
-//   }
-//   return channels;
-// };
-
-// // Update last notice dismissed timestamp
-// userSchema.methods.dismissGlobalNotice = function() {
-//   this.preferences.lastNoticeDismissed = new Date();
-//   return this.save();
-// };
-
-// // Check if global notice should be shown
-// userSchema.methods.shouldShowGlobalNotice = function(noticeCreatedAt) {
-//   if (!noticeCreatedAt) return true;
-//   if (!this.preferences.lastNoticeDismissed) return true;
-//   return new Date(noticeCreatedAt) > this.preferences.lastNoticeDismissed;
-// };
-
-// // Get public profile (updated to include preferences summary)
-// userSchema.methods.toPublicProfile = function() {
-//   return {
-//     id: this._id,
-//     name: this.name,
-//     avatar: this.avatar,
-//     bio: this.bio,
-//     role: this.role,
-//     subscription: this.subscription.plan,
-//     followersCount: this.followers?.length || 0,
-//     followingCount: this.following?.length || 0,
-//     // Include notification preferences summary
-//     preferences: {
-//       notifications: this.preferences.notifications,
-//       language: this.preferences.language,
-//       theme: this.preferences.theme
-//     }
-//   };
-// };
-
-// // Get full preferences (for settings page)
-// userSchema.methods.getFullPreferences = function() {
-//   return {
-//     language: this.preferences.language,
-//     theme: this.preferences.theme,
-//     notifications: this.preferences.notifications,
-//     emailNotifications: this.preferences.emailNotifications,
-//     pushNotifications: this.preferences.pushNotifications,
-//     notificationTypes: this.preferences.notificationTypes,
-//     quietHours: this.preferences.quietHours,
-//     digest: this.preferences.digest
-//   };
-// };
-
-// // Get downloads with populated content
-// userSchema.methods.getPopulatedDownloads = async function() {
-//   const populatedDownloads = [];
-  
-//   for (const download of this.downloads) {
-//     let ContentModel;
-//     switch (download.contentType) {
-//       case 'book':
-//         ContentModel = mongoose.model('Book');
-//         break;
-//       case 'poem':
-//         ContentModel = mongoose.model('Poem');
-//         break;
-//       case 'audio':
-//         ContentModel = mongoose.model('Audio');
-//         break;
-//       case 'video':
-//         ContentModel = mongoose.model('Video');
-//         break;
-//       default:
-//         continue;
-//     }
-    
-//     const content = await ContentModel.findById(download.contentId).select('title slug coverImage');
-//     populatedDownloads.push({
-//       ...download.toObject(),
-//       content
-//     });
-//   }
-  
-//   return populatedDownloads;
-// };
-
-// const User = mongoose.model('User', userSchema);
-// export default User;
-
-
-
 // server/models/User.js
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -777,10 +391,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     sparse: true
   },
-  
-  // ============================================
-  // 🔴 FIXED: Complete subscription field with all required properties
-  // ============================================
   subscription: {
     plan: {
       type: String,
@@ -788,42 +398,23 @@ const userSchema = new mongoose.Schema({
       default: 'free'
     },
     expiresAt: Date,
-    startedAt: { type: Date, default: Date.now },
-    // 🔴 NEW: Status field - tracks subscription state
-    status: {
-      type: String,
-      enum: ['active', 'cancelled', 'expired', 'pending', 'trial'],
-      default: 'active'
-    },
-    // 🔴 NEW: Billing cycle - tracks payment frequency
-    billingCycle: {
-      type: String,
-      enum: ['monthly', 'quarterly', 'yearly'],
-      default: 'monthly'
-    },
-    // 🔴 NEW: Last payment ID - reference to payment transaction
-    lastPaymentId: {
-      type: String,
-      default: null
-    },
-    // 🔴 NEW: Cancellation date - when subscription was cancelled
-    cancelledAt: {
-      type: Date,
-      default: null
-    },
-    // 🔴 NEW: Trial end date - for trial subscriptions
-    trialEndsAt: {
-      type: Date,
-      default: null
-    }
+    startedAt: { type: Date, default: Date.now }
   },
   
   // ============================================
   // 🔐 REFRESH TOKEN FIELD - FIX FOR PERSISTENT LOGIN
   // ============================================
+  /**
+   * refreshToken: Stores the current refresh token for this user
+   * - Used to validate refresh token requests
+   * - Helps prevent token theft by allowing token revocation
+   * - When user logs out, this field is cleared
+   * - When token is refreshed, a new token is generated and stored
+   * - select: false means it won't be returned in normal queries (security)
+   */
   refreshToken: {
     type: String,
-    select: false
+    select: false  // Don't return by default for security
   },
   
   // ============================================
@@ -832,10 +423,21 @@ const userSchema = new mongoose.Schema({
   preferences: {
     language: { type: String, default: 'en' },
     theme: { type: String, default: 'light' },
+    // NEW: Master notification toggle
     notifications: { type: Boolean, default: true },
+    // NEW: Last time user dismissed the global notice
     lastNoticeDismissed: { type: Date, default: null },
-    emailNotifications: { type: Boolean, default: true },
-    pushNotifications: { type: Boolean, default: true },
+    // NEW: Email notification preferences
+    emailNotifications: {
+      type: Boolean,
+      default: true
+    },
+    // NEW: Push notification preferences
+    pushNotifications: {
+      type: Boolean,
+      default: true
+    },
+    // NEW: Specific notification types
     notificationTypes: {
       follows: { type: Boolean, default: true },
       likes: { type: Boolean, default: true },
@@ -845,11 +447,13 @@ const userSchema = new mongoose.Schema({
       system: { type: Boolean, default: true },
       announcements: { type: Boolean, default: true }
     },
+    // NEW: Quiet hours settings
     quietHours: {
       enabled: { type: Boolean, default: false },
       start: { type: String, default: '22:00' },
       end: { type: String, default: '08:00' }
     },
+    // NEW: Digest settings
     digest: {
       enabled: { type: Boolean, default: true },
       frequency: { type: String, enum: ['daily', 'weekly', 'never'], default: 'daily' }
@@ -922,19 +526,18 @@ const userSchema = new mongoose.Schema({
 });
 
 // ============================================
-// INDEXES
+// INDEXES (Updated with refreshToken index)
 // ============================================
 userSchema.index({ name: 'text', email: 'text' });
 userSchema.index({ 'downloads.contentType': 1 });
 userSchema.index({ 'downloads.downloadedAt': -1 });
 userSchema.index({ 'paymentMethods.isDefault': 1 });
 userSchema.index({ 'invoices.createdAt': -1 });
+// NEW: Index for notification preferences queries
 userSchema.index({ 'preferences.emailNotifications': 1 });
 userSchema.index({ 'preferences.pushNotifications': 1 });
+// ✅ NEW: Index for refresh token queries (for faster lookups during token refresh)
 userSchema.index({ refreshToken: 1 });
-// 🔴 NEW: Index for subscription queries
-userSchema.index({ 'subscription.plan': 1, 'subscription.status': 1 });
-userSchema.index({ 'subscription.expiresAt': 1 });
 
 // ============================================
 // PRE-SAVE MIDDLEWARE
@@ -959,22 +562,10 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
-// 🔴 NEW: Ensure subscription defaults
-userSchema.pre('save', function(next) {
-  if (!this.subscription) {
-    this.subscription = {
-      plan: 'free',
-      status: 'active',
-      billingCycle: 'monthly',
-      startedAt: new Date()
-    };
-  }
-  next();
-});
-
+// ✅ NEW: Clear sensitive data before sending toJSON/toObject
 userSchema.set('toJSON', {
   transform: function(doc, ret) {
-    delete ret.refreshToken;
+    delete ret.refreshToken;  // Never send refresh token in responses
     delete ret.__v;
     return ret;
   }
@@ -989,54 +580,19 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// 🔴 NEW: Check if user has active premium subscription
-userSchema.methods.hasActiveSubscription = function() {
-  return this.subscription && 
-         this.subscription.plan !== 'free' && 
-         this.subscription.status === 'active' &&
-         (!this.subscription.expiresAt || new Date(this.subscription.expiresAt) > new Date());
-};
-
-// 🔴 NEW: Check if subscription is expiring soon (within 7 days)
-userSchema.methods.isSubscriptionExpiringSoon = function() {
-  if (!this.subscription.expiresAt) return false;
-  const daysRemaining = Math.ceil((new Date(this.subscription.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
-  return daysRemaining > 0 && daysRemaining <= 7;
-};
-
-// 🔴 NEW: Get subscription days remaining
-userSchema.methods.getSubscriptionDaysRemaining = function() {
-  if (!this.subscription.expiresAt) return null;
-  return Math.ceil((new Date(this.subscription.expiresAt) - new Date()) / (1000 * 60 * 60 * 24));
-};
-
-// 🔴 NEW: Cancel subscription
-userSchema.methods.cancelSubscription = async function() {
-  this.subscription.status = 'cancelled';
-  this.subscription.cancelledAt = new Date();
-  await this.save();
-};
-
-// 🔴 NEW: Renew subscription
-userSchema.methods.renewSubscription = async function(plan, billingCycle, expiresAt) {
-  this.subscription.plan = plan;
-  this.subscription.status = 'active';
-  this.subscription.billingCycle = billingCycle;
-  this.subscription.expiresAt = expiresAt;
-  this.subscription.cancelledAt = null;
-  await this.save();
-};
-
+// ✅ NEW: Method to check if refresh token is valid
 userSchema.methods.isRefreshTokenValid = async function(refreshToken) {
   if (!this.refreshToken) return false;
   return this.refreshToken === refreshToken;
 };
 
+// ✅ NEW: Method to clear refresh token (used on logout)
 userSchema.methods.clearRefreshToken = async function() {
   this.refreshToken = null;
   await this.save();
 };
 
+// ✅ NEW: Method to update refresh token (used on token rotation)
 userSchema.methods.updateRefreshToken = async function(newRefreshToken) {
   this.refreshToken = newRefreshToken;
   await this.save();
@@ -1046,6 +602,7 @@ userSchema.methods.updateRefreshToken = async function(newRefreshToken) {
 // Helper methods for preferences
 // ============================================
 
+// Check if user should receive a notification type
 userSchema.methods.shouldReceiveNotification = function(notificationType) {
   if (!this.preferences.notifications) return false;
   
@@ -1063,6 +620,7 @@ userSchema.methods.shouldReceiveNotification = function(notificationType) {
   return this.preferences.notificationTypes[prefKey] !== false;
 };
 
+// Check if quiet hours are active
 userSchema.methods.isQuietHours = function() {
   if (!this.preferences.quietHours.enabled) return false;
   
@@ -1073,10 +631,12 @@ userSchema.methods.isQuietHours = function() {
   if (start <= end) {
     return currentTime >= start && currentTime <= end;
   } else {
+    // Overnight quiet hours (e.g., 22:00 to 08:00)
     return currentTime >= start || currentTime <= end;
   }
 };
 
+// Get user's preferred notification channels
 userSchema.methods.getNotificationChannels = function() {
   const channels = [];
   if (this.preferences.notifications && this.preferences.pushNotifications) {
@@ -1088,21 +648,20 @@ userSchema.methods.getNotificationChannels = function() {
   return channels;
 };
 
+// Update last notice dismissed timestamp
 userSchema.methods.dismissGlobalNotice = function() {
   this.preferences.lastNoticeDismissed = new Date();
   return this.save();
 };
 
+// Check if global notice should be shown
 userSchema.methods.shouldShowGlobalNotice = function(noticeCreatedAt) {
   if (!noticeCreatedAt) return true;
   if (!this.preferences.lastNoticeDismissed) return true;
   return new Date(noticeCreatedAt) > this.preferences.lastNoticeDismissed;
 };
 
-// ============================================
-// PUBLIC PROFILE METHODS
-// ============================================
-
+// Get public profile (updated to include preferences summary)
 userSchema.methods.toPublicProfile = function() {
   return {
     id: this._id,
@@ -1110,13 +669,10 @@ userSchema.methods.toPublicProfile = function() {
     avatar: this.avatar,
     bio: this.bio,
     role: this.role,
-    subscription: {
-      plan: this.subscription.plan,
-      status: this.subscription.status,
-      expiresAt: this.subscription.expiresAt
-    },
+    subscription: this.subscription.plan,
     followersCount: this.followers?.length || 0,
     followingCount: this.following?.length || 0,
+    // Include notification preferences summary
     preferences: {
       notifications: this.preferences.notifications,
       language: this.preferences.language,
@@ -1125,6 +681,7 @@ userSchema.methods.toPublicProfile = function() {
   };
 };
 
+// Get full preferences (for settings page)
 userSchema.methods.getFullPreferences = function() {
   return {
     language: this.preferences.language,
@@ -1138,6 +695,7 @@ userSchema.methods.getFullPreferences = function() {
   };
 };
 
+// Get downloads with populated content
 userSchema.methods.getPopulatedDownloads = async function() {
   const populatedDownloads = [];
   

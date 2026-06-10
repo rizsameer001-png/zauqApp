@@ -128,7 +128,123 @@
     "bookmarked": "Bookmarked!",
     "bookmarkError": "Failed to update bookmark",
     "loginToBookmark": "Please login to bookmark"
+  },
+
+  "subscription": {
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "save17": "Save 17%",
+    "recommended": "Recommended",
+    "currentPlan": "Current Plan",
+    "whatsIncluded": "What's included",
+    "moreFeatures": "more features",
+    "getStarted": "Get Started",
+    "subscribeTo": "Subscribe to",
+    "processing": "Processing...",
+    "freeActivated": "Free subscription activated!",
+    "activationFailed": "Failed to activate subscription",
+    "paymentRequired": "Payment required to complete subscription",
+    "proceedToPayment": "Proceed to payment of",
+    "activated": "Subscription activated successfully!",
+    "subscriptionFailed": "Failed to create subscription",
+    "paymentSuccess": "Payment successful! Subscription activated.",
+    "paymentFailed": "Payment failed. Please try again.",
+    "loginRequired": "Please login to subscribe",
+    "fetchError": "Failed to load subscription plans",
+    "month": "month",
+    "quarter": "quarter",
+    "year": "year",
+    "annually": "annually",
+    "billedAs": "billed {cycle}",
+    "savePercent": "Save {percent}% compared to monthly",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "Perfect for getting started"
+      },
+      "basic": {
+        "name": "Basic",
+        "description": "Great for regular readers"
+      },
+      "premium": {
+        "name": "Premium",
+        "description": "For serious literature enthusiasts"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "For creators and power users"
+      }
+    },
+    "features": {
+      "free": {
+        "0": "Browse all content",
+        "1": "Read public poems",
+        "2": "Basic search",
+        "3": "50 poems/day"
+      },
+      "basic": {
+        "0": "All free features",
+        "1": "Unlimited poem reading",
+        "2": "Download 5 ebooks/month",
+        "3": "Basic audio streaming"
+      },
+      "premium": {
+        "0": "All Basic features",
+        "1": "Unlimited downloads",
+        "2": "HD audio streaming",
+        "3": "Ad-free experience",
+        "4": "AI explanations"
+      },
+      "pro": {
+        "0": "All Premium features",
+        "1": "Creator tools",
+        "2": "Priority support",
+        "3": "Analytics dashboard",
+        "4": "Early access"
+      }
+    }
+  },
+  
+  "pricing": {
+    "currentPlan": "Current Plan",
+    "membershipPlans": "Membership Plans",
+    "upgradeExperience": "Upgrade Your Experience",
+    "premiumAccessDesc": "Premium access to books, poetry, and audio — beautifully designed for you.",
+    "free": "Free",
+    "basic": "Basic",
+    "premium": "Premium",
+    "pro": "Pro",
+    "popular": "Popular",
+    "bestValue": "Best Value",
+    "creator": "Creator",
+    "perMonth": "mo",
+    "save": "Save",
+    "startFree": "Start Free",
+    "get": "Get",
+    "getStarted": "Get Started",
+    "securePayments": "Secure Payments",
+    "support247": "24/7 Support",
+    "cancelAnytime": "Cancel Anytime",
+    "freeFeature1": "Free poems & books",
+    "freeFeature2": "Basic search",
+    "freeFeature3": "Public content",
+    "freeFeature4": "50 reads/day",
+    "basicFeature1": "Everything in Free",
+    "basicFeature2": "5 downloads/month",
+    "basicFeature3": "Audio access",
+    "basicFeature4": "No ads",
+    "premiumFeature1": "Unlimited downloads",
+    "premiumFeature2": "HD audio",
+    "premiumFeature3": "AI explanations",
+    "premiumFeature4": "Early access",
+    "proFeature1": "Creator tools",
+    "proFeature2": "Upload content",
+    "proFeature3": "Monetization",
+    "proFeature4": "API access"
   }
+
+
 
 
 
