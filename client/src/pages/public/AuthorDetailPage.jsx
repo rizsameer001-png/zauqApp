@@ -8592,7 +8592,7 @@
 
 
 // client/src/pages/public/AuthorDetailPage.jsx
-import React, { useState, useEffect, lazy, Suspense } from 'react'
+import React, { useState, useEffect, lazy, Suspense, useMemo } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -8613,12 +8613,6 @@ import authorAPI from '../../api/authorAPI'
 import userAPI from '../../api/userAPI'
 import { useAudioPlayer } from '../../context/AudioPlayerContext'
 
-// Lazy load components for better performance
-const PoemCard = lazy(() => import('../../components/PoemCard'))
-const BookCard = lazy(() => import('../../components/BookCard'))
-const AudioCard = lazy(() => import('../../components/AudioCard'))
-const VideoCard = lazy(() => import('../../components/VideoCard'))
-
 const AuthorDetailPage = () => {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -8636,7 +8630,7 @@ const AuthorDetailPage = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
 
-  // Fetch author data FIRST
+  // Fetch author data
   const { 
     data: authorData, 
     isLoading: authorLoading, 
@@ -8651,7 +8645,7 @@ const AuthorDetailPage = () => {
 
   const author = authorData?.data || authorData
 
-  // Fetch all content data upfront (not conditionally) to get counts
+  // Fetch poems
   const { 
     data: poemsResponse, 
     isLoading: poemsLoading,
@@ -8663,6 +8657,7 @@ const AuthorDetailPage = () => {
     staleTime: 2 * 60 * 1000,
   })
 
+  // Fetch books
   const { 
     data: booksResponse, 
     isLoading: booksLoading 
@@ -8673,26 +8668,29 @@ const AuthorDetailPage = () => {
     staleTime: 2 * 60 * 1000,
   })
 
+  // Fetch audio
   const { 
     data: audioResponse, 
     isLoading: audioLoading 
   } = useQuery({
     queryKey: ['author-audio', slug],
-    queryFn: () => authorAPI.getAuthorAudio(slug, { limit: 12 }),
+    queryFn: () => authorAPI.getAuthorAudio(slug, { limit: 50 }),
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
   })
 
+  // Fetch videos
   const { 
     data: videosResponse, 
     isLoading: videosLoading 
   } = useQuery({
     queryKey: ['author-videos', slug],
-    queryFn: () => authorAPI.getAuthorVideos(slug, { limit: 12 }),
+    queryFn: () => authorAPI.getAuthorVideos(slug, { limit: 50 }),
     enabled: !!slug,
     staleTime: 5 * 60 * 1000,
   })
 
+  // Fetch timeline
   const { 
     data: timelineResponse, 
     isLoading: timelineLoading 
@@ -8703,6 +8701,7 @@ const AuthorDetailPage = () => {
     staleTime: 10 * 60 * 1000,
   })
 
+  // Fetch gallery
   const { 
     data: galleryResponse, 
     isLoading: galleryLoading 
@@ -8713,6 +8712,7 @@ const AuthorDetailPage = () => {
     staleTime: 5 * 60 * 1000,
   })
 
+  // Fetch quotes
   const { 
     data: quotesResponse, 
     isLoading: quotesLoading 
@@ -8753,26 +8753,32 @@ const AuthorDetailPage = () => {
 
   const socialLinks = author?.socialLinks || {}
 
-  // Get counts from author stats or fetched data
-  const poemsCount = author?.stats?.poemsCount || poemsPagination.total || poems.length || 0
-  const booksCount = author?.stats?.booksCount || booksPagination.total || books.length || 0
-  const audioCount = audioItems.length || 0
-  const videosCount = videos.length || 0
-  const timelineCount = timeline.length || 0
-  const galleryCount = gallery.length || 0
-  const quotesCount = quotes.length || 0
+  // Calculate counts - use the actual data lengths as source of truth
+  const poemsCount = useMemo(() => {
+    return poemsPagination.total || poems.length || author?.stats?.poemsCount || 0
+  }, [poemsPagination.total, poems.length, author?.stats?.poemsCount])
 
-  // Update document title for SEO
+  const booksCount = useMemo(() => {
+    return booksPagination.total || books.length || author?.stats?.booksCount || 0
+  }, [booksPagination.total, books.length, author?.stats?.booksCount])
+
+  const audioCount = useMemo(() => audioItems.length, [audioItems.length])
+  const videosCount = useMemo(() => videos.length, [videos.length])
+  const timelineCount = useMemo(() => timeline.length, [timeline.length])
+  const galleryCount = useMemo(() => gallery.length, [gallery.length])
+  const quotesCount = useMemo(() => quotes.length, [quotes.length])
+
+  // Update document title
   useEffect(() => {
     if (author?.name) {
-      document.title = `${author.name} | ZauqApp - Poet, Author & Literary Works`
+      document.title = `${author.name} | ZauqApp`
     }
     return () => {
-      document.title = 'ZauqApp - Literary Platform'
+      document.title = 'ZauqApp'
     }
   }, [author?.name])
 
-  // Handle scroll effect for sticky header
+  // Handle scroll
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 200)
@@ -8781,7 +8787,7 @@ const AuthorDetailPage = () => {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Video modal state
+  // Video modal
   const [videoModal, setVideoModal] = useState({
     isOpen: false,
     video: null
@@ -8860,36 +8866,11 @@ const AuthorDetailPage = () => {
   const shareText = author?.bio ? author.bio.substring(0, 100) : 'Explore the literary works of this renowned poet and author.'
 
   const shareLinks = [
-    {
-      name: 'WhatsApp',
-      icon: MessageCircle,
-      color: 'bg-green-500 hover:bg-green-600',
-      url: `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n\n${shareText}\n\n${shareUrl}`)}`
-    },
-    {
-      name: 'Twitter',
-      icon: Twitter,
-      color: 'bg-[#1DA1F2] hover:bg-[#1a8cd8]',
-      url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}`
-    },
-    {
-      name: 'Facebook',
-      icon: Facebook,
-      color: 'bg-[#1877F2] hover:bg-[#1664d9]',
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`
-    },
-    {
-      name: 'LinkedIn',
-      icon: Linkedin,
-      color: 'bg-[#0077B5] hover:bg-[#006396]',
-      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
-    },
-    {
-      name: 'Email',
-      icon: Mail,
-      color: 'bg-gray-600 hover:bg-gray-700',
-      url: `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
-    }
+    { name: 'WhatsApp', icon: MessageCircle, color: 'bg-green-500 hover:bg-green-600', url: `https://wa.me/?text=${encodeURIComponent(`${shareTitle}\n\n${shareText}\n\n${shareUrl}`)}` },
+    { name: 'Twitter', icon: Twitter, color: 'bg-[#1DA1F2] hover:bg-[#1a8cd8]', url: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareTitle)}&url=${encodeURIComponent(shareUrl)}` },
+    { name: 'Facebook', icon: Facebook, color: 'bg-[#1877F2] hover:bg-[#1664d9]', url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
+    { name: 'LinkedIn', icon: Linkedin, color: 'bg-[#0077B5] hover:bg-[#006396]', url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}` },
+    { name: 'Email', icon: Mail, color: 'bg-gray-600 hover:bg-gray-700', url: `mailto:?subject=${encodeURIComponent(shareTitle)}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}` }
   ]
 
   const copyToClipboard = async () => {
@@ -8914,7 +8895,7 @@ const AuthorDetailPage = () => {
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
-  // Tabs with counts - using the calculated counts
+  // Tabs with counts
   const tabs = [
     { id: 'biography', label: 'Biography', icon: User, mobileLabel: 'Bio' },
     { id: 'poems', label: 'Poems', icon: BookOpen, count: poemsCount, mobileLabel: 'Poems' },
@@ -8926,7 +8907,7 @@ const AuthorDetailPage = () => {
     { id: 'quotes', label: 'Quotes', icon: Quote, count: quotesCount, mobileLabel: 'Quotes' }
   ]
 
-  // Loading skeleton for better UX
+  // Loading skeleton
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -8939,7 +8920,6 @@ const AuthorDetailPage = () => {
     </div>
   )
 
-  // Early return for loading state
   if (authorLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50 flex items-center justify-center">
@@ -8953,13 +8933,11 @@ const AuthorDetailPage = () => {
             </div>
           </div>
           <p className="text-gray-600 font-medium">Loading author...</p>
-          <p className="text-sm text-gray-400 mt-1">Discovering literary greatness</p>
         </div>
       </div>
     )
   }
 
-  // Early return for error state
   if (authorError || !author) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50">
@@ -8967,7 +8945,6 @@ const AuthorDetailPage = () => {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
             className="inline-flex items-center justify-center w-20 h-20 bg-red-100 rounded-2xl mb-6"
           >
             <AlertCircle className="h-10 w-10 text-red-500" />
@@ -8983,7 +8960,7 @@ const AuthorDetailPage = () => {
     )
   }
 
-  // Render functions with animations
+  // Render functions
   const EmptyState = ({ icon: Icon, title, message }) => (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -8996,226 +8973,98 @@ const AuthorDetailPage = () => {
     </motion.div>
   )
 
-  const renderBiography = () => {
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="grid md:grid-cols-3 gap-6"
-      >
-        <div className="md:col-span-2">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300">
-            <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Quote className="h-5 w-5 text-primary-600" />
-              Biography
-            </h2>
-            <p className="text-gray-700 leading-relaxed whitespace-pre-line">{author.bio}</p>
-            {author.bioUrdu && (
-              <p className="urdu-text text-gray-700 leading-relaxed mt-4 pt-4 border-t border-gray-100" dir="rtl">
-                {author.bioUrdu}
-              </p>
+  const renderBiography = () => (
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="grid md:grid-cols-3 gap-6">
+      <div className="md:col-span-2">
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Quote className="h-5 w-5 text-primary-600" />
+            Biography
+          </h2>
+          <p className="text-gray-700 leading-relaxed whitespace-pre-line">{author.bio}</p>
+          {author.bioUrdu && (
+            <p className="urdu-text text-gray-700 leading-relaxed mt-4 pt-4 border-t border-gray-100" dir="rtl">
+              {author.bioUrdu}
+            </p>
+          )}
+          <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
+            {author.birthDate && (
+              <span className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
+                <Calendar className="h-4 w-4 text-primary-500" />
+                <span>Born: {new Date(author.birthDate).getFullYear()}{author.deathDate && ` - Died: ${new Date(author.deathDate).getFullYear()}`}</span>
+              </span>
             )}
-            <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
-              {author.birthDate && (
-                <motion.span 
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full"
-                >
-                  <Calendar className="h-4 w-4 text-primary-500" />
-                  <span>
-                    Born: {new Date(author.birthDate).toLocaleDateString()} 
-                    {author.deathDate && ` - Died: ${new Date(author.deathDate).toLocaleDateString()}`}
-                  </span>
-                </motion.span>
-              )}
-              {author.birthPlace && (
-                <motion.span 
-                  whileHover={{ scale: 1.05 }}
-                  className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full"
-                >
-                  <MapPin className="h-4 w-4 text-primary-500" />
-                  <span>Birth Place: {author.birthPlace}</span>
-                </motion.span>
-              )}
-            </div>
-            {renderSocialLinks()}
+            {author.birthPlace && (
+              <span className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full">
+                <MapPin className="h-4 w-4 text-primary-500" />
+                <span>{author.birthPlace}</span>
+              </span>
+            )}
           </div>
         </div>
-        
-        <div>
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300"
-          >
-            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <Star className="h-5 w-5 text-amber-500" />
-              Literary Genres
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {author.genres?.map((genre, index) => (
-                <motion.span 
-                  key={index} 
-                  whileHover={{ scale: 1.05 }}
-                  className="px-3 py-1.5 bg-gradient-to-r from-primary-50 to-amber-50 rounded-full text-sm text-gray-700 capitalize cursor-default"
-                >
-                  {genre}
-                </motion.span>
-              ))}
-              {(!author.genres || author.genres.length === 0) && (
-                <p className="text-gray-500 text-sm">No genres listed</p>
-              )}
-            </div>
-          </motion.div>
-
-          <motion.div 
-            whileHover={{ y: -5 }}
-            className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-4 hover:shadow-lg transition-all duration-300"
-          >
-            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <TrendingUp className="h-5 w-5 text-green-500" />
-              Author Stats
-            </h3>
-            <div className="space-y-3">
-              {[
-                { label: 'Total Poems', value: poemsCount },
-                { label: 'Total Books', value: booksCount },
-                { label: 'Total Followers', value: (author.stats?.followers || 0).toLocaleString() },
-                { label: 'Total Views', value: (author.stats?.views || 0).toLocaleString() }
-              ].map((stat, idx) => (
-                <motion.div 
-                  key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  className="flex justify-between items-center"
-                >
-                  <span className="text-gray-600">{stat.label}</span>
-                  <span className="font-bold text-gray-900 text-lg">{stat.value}</span>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+      </div>
+      <div>
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Star className="h-5 w-5 text-amber-500" />
+            Literary Genres
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {author.genres?.map((genre, index) => (
+              <span key={index} className="px-3 py-1.5 bg-gradient-to-r from-primary-50 to-amber-50 rounded-full text-sm text-gray-700 capitalize">
+                {genre}
+              </span>
+            ))}
+          </div>
         </div>
-      </motion.div>
-    )
-  }
+        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-4">
+          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <TrendingUp className="h-5 w-5 text-green-500" />
+            Author Stats
+          </h3>
+          <div className="space-y-3">
+            <div className="flex justify-between items-center"><span className="text-gray-600">Total Poems</span><span className="font-bold text-gray-900 text-lg">{poemsCount}</span></div>
+            <div className="flex justify-between items-center"><span className="text-gray-600">Total Books</span><span className="font-bold text-gray-900 text-lg">{booksCount}</span></div>
+            <div className="flex justify-between items-center"><span className="text-gray-600">Total Followers</span><span className="font-bold text-gray-900 text-lg">{(author.stats?.followers || 0).toLocaleString()}</span></div>
+            <div className="flex justify-between items-center"><span className="text-gray-600">Total Views</span><span className="font-bold text-gray-900 text-lg">{(author.stats?.views || 0).toLocaleString()}</span></div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
 
   const renderWorks = () => {
     if (poemsLoading) return <LoadingSkeleton />
-
-    if (poems.length === 0) {
-      return (
-        <EmptyState 
-          icon={BookOpen}
-          title="No Poems Yet"
-          message="Poems by this author will appear here once added."
-        />
-      )
-    }
-
+    if (poems.length === 0) return <EmptyState icon={BookOpen} title="No Poems Yet" message="Poems by this author will appear here once added." />
     return (
       <>
         <div className="flex justify-between items-center mb-4">
-          <h3 className="font-semibold text-gray-900">
-            Poems ({poemsCount})
-          </h3>
+          <h3 className="font-semibold text-gray-900">Poems ({poemsCount})</h3>
           <div className="flex border border-gray-200 rounded-lg overflow-hidden">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setViewMode('grid')}
-              className={`p-2 transition-all ${viewMode === 'grid' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-            >
-              <Grid className="h-4 w-4" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setViewMode('list')}
-              className={`p-2 transition-all ${viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-            >
-              <List className="h-4 w-4" />
-            </motion.button>
+            <button onClick={() => setViewMode('grid')} className={`p-2 ${viewMode === 'grid' ? 'bg-primary-600 text-white' : 'text-gray-600'}`}><Grid className="h-4 w-4" /></button>
+            <button onClick={() => setViewMode('list')} className={`p-2 ${viewMode === 'list' ? 'bg-primary-600 text-white' : 'text-gray-600'}`}><List className="h-4 w-4" /></button>
           </div>
         </div>
-        
-        <motion.div 
-          layout
-          className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}
-        >
-          <AnimatePresence mode="wait">
-            {poems.map((poem, index) => (
-              <motion.div
-                key={poem._id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                transition={{ delay: Math.min(index * 0.05, 0.3) }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="cursor-pointer"
-              >
-                <Link
-                  to={`/poem/${poem.slug}`}
-                  className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group"
-                >
-                  <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-1">
-                      {poem.title}
-                    </h4>
-                    {poem.contentUrdu && (
-                      <p className="urdu-text text-sm text-gray-500 line-clamp-1 mt-1" dir="rtl">
-                        {poem.contentUrdu.substring(0, 50)}...
-                      </p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-3 mt-2">
-                      <motion.span 
-                        whileHover={{ scale: 1.05 }}
-                        className="text-xs text-gray-500 capitalize px-2 py-0.5 bg-gray-100 rounded-full"
-                      >
-                        {poem.genre}
-                      </motion.span>
-                      <div className="flex items-center gap-2 text-xs text-gray-400">
-                        <span className="flex items-center gap-1">
-                          <Eye className="h-3 w-3" />
-                          {poem.stats?.views?.toLocaleString() || 0}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Heart className="h-3 w-3" />
-                          {poem.stats?.likes?.toLocaleString() || 0}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </motion.div>
-
+        <div className={`grid gap-4 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'}`}>
+          {poems.map((poem) => (
+            <Link key={poem._id} to={`/poem/${poem.slug}`} className="block bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-xl transition-all group">
+              <h4 className="font-medium text-gray-900 group-hover:text-primary-600 line-clamp-1">{poem.title}</h4>
+              {poem.contentUrdu && <p className="urdu-text text-sm text-gray-500 line-clamp-1 mt-1" dir="rtl">{poem.contentUrdu.substring(0, 50)}...</p>}
+              <div className="flex flex-wrap items-center gap-3 mt-2">
+                <span className="text-xs text-gray-500 capitalize px-2 py-0.5 bg-gray-100 rounded-full">{poem.genre}</span>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{poem.stats?.views?.toLocaleString() || 0}</span>
+                  <span className="flex items-center gap-1"><Heart className="h-3 w-3" />{poem.stats?.likes?.toLocaleString() || 0}</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
         {poemsPagination.totalPages > 1 && (
           <div className="flex justify-center gap-2 mt-6">
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setPoemsPage(p => Math.max(1, p - 1))}
-              disabled={poemsPage === 1}
-              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
-            >
-              Previous
-            </motion.button>
-            <span className="px-3 py-1 text-sm text-gray-600">
-              {poemsPage} / {poemsPagination.totalPages}
-            </span>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setPoemsPage(p => Math.min(poemsPagination.totalPages, p + 1))}
-              disabled={poemsPage === poemsPagination.totalPages}
-              className="px-3 py-1 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 transition-all"
-            >
-              Next
-            </motion.button>
+            <button onClick={() => setPoemsPage(p => Math.max(1, p - 1))} disabled={poemsPage === 1} className="px-3 py-1 rounded-lg border border-gray-200 disabled:opacity-50">Previous</button>
+            <span className="px-3 py-1 text-sm text-gray-600">{poemsPage} / {poemsPagination.totalPages}</span>
+            <button onClick={() => setPoemsPage(p => Math.min(poemsPagination.totalPages, p + 1))} disabled={poemsPage === poemsPagination.totalPages} className="px-3 py-1 rounded-lg border border-gray-200 disabled:opacity-50">Next</button>
           </div>
         )}
       </>
@@ -9224,842 +9073,183 @@ const AuthorDetailPage = () => {
 
   const renderBooks = () => {
     if (booksLoading) return <LoadingSkeleton />
-
-    if (books.length === 0) {
-      return (
-        <EmptyState 
-          icon={BookMarked}
-          title="No Books Available"
-          message="Books by this author will appear here once added."
-        />
-      )
-    }
-
+    if (books.length === 0) return <EmptyState icon={BookMarked} title="No Books Available" message="Books by this author will appear here once added." />
     return (
-      <motion.div 
-        layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        <AnimatePresence mode="wait">
-          {books.map((book, index) => (
-            <motion.div
-              key={book._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ delay: Math.min(index * 0.05, 0.3) }}
-              whileHover={{ y: -8, scale: 1.02 }}
-            >
-              <Link
-                to={`/book/${book.slug}`}
-                className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group"
-              >
-                {book.coverImage && (
-                  <div className="relative h-48 overflow-hidden">
-                    <img 
-                      src={book.coverImage} 
-                      alt={book.title}
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {book.isPremium && (
-                      <div className="absolute top-2 right-2">
-                        <span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-xs font-medium rounded-full">
-                          <Crown className="h-3 w-3" />
-                          Premium
-                        </span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                <div className="p-4">
-                  <h4 className="font-medium text-gray-900 line-clamp-1 group-hover:text-primary-600 transition-colors">{book.title}</h4>
-                  <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
-                  <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                    <span className="capitalize">{book.type || 'Ebook'}</span>
-                    <span className="flex items-center gap-1">
-                      <Eye className="h-3 w-3" />
-                      {book.stats?.views?.toLocaleString() || 0}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Download className="h-3 w-3" />
-                      {book.stats?.downloads?.toLocaleString() || 0}
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {books.map((book) => (
+          <Link key={book._id} to={`/book/${book.slug}`} className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group">
+            {book.coverImage && (
+              <div className="relative h-48 overflow-hidden">
+                <img src={book.coverImage} alt={book.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                {book.isPremium && <div className="absolute top-2 right-2"><span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500 text-white text-xs rounded-full"><Crown className="h-3 w-3" />Premium</span></div>}
+              </div>
+            )}
+            <div className="p-4">
+              <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
+              <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+              <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                <span className="capitalize">{book.type || 'Ebook'}</span>
+                <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{book.stats?.views?.toLocaleString() || 0}</span>
+                <span className="flex items-center gap-1"><Download className="h-3 w-3" />{book.stats?.downloads?.toLocaleString() || 0}</span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
     )
   }
 
   const renderAudio = () => {
     if (audioLoading) return <LoadingSkeleton />
-
-    if (audioItems.length === 0) {
-      return (
-        <EmptyState 
-          icon={Headphones}
-          title="No Audio Content"
-          message="Audio recordings will appear here once added."
-        />
-      )
-    }
-
-    const isCurrentlyPlaying = (audio) => {
-      return audioPlayer?.currentAudio?._id === audio._id && audioPlayer?.isPlaying
-    }
-
+    if (audioItems.length === 0) return <EmptyState icon={Headphones} title="No Audio Content" message="Audio recordings will appear here once added." />
     return (
       <div className="space-y-3">
-        <AnimatePresence mode="wait">
-          {audioItems.map((audio, index) => (
-            <motion.div
-              key={audio._id}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ delay: Math.min(index * 0.05, 0.3) }}
-              whileHover={{ scale: 1.01 }}
-            >
-              <div
-                onClick={() => playAudioGlobal(audio, audioItems)}
-                className={`block rounded-xl p-4 shadow-sm border transition-all duration-300 flex items-center gap-4 group cursor-pointer ${
-                  isCurrentlyPlaying(audio) 
-                    ? 'bg-primary-50 border-primary-200 shadow-md' 
-                    : 'bg-white border-gray-100 hover:shadow-lg'
-                }`}
-              >
-                <motion.div 
-                  whileHover={{ scale: 1.1 }}
-                  className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-                    isCurrentlyPlaying(audio)
-                      ? 'bg-primary-600'
-                      : 'bg-gradient-to-br from-primary-100 to-amber-100'
-                  }`}
-                >
-                  {isCurrentlyPlaying(audio) ? (
-                    <div className="flex gap-0.5">
-                      <div className="w-1 h-4 bg-white animate-pulse" />
-                      <div className="w-1 h-4 bg-white animate-pulse delay-75" />
-                      <div className="w-1 h-4 bg-white animate-pulse delay-150" />
-                    </div>
-                  ) : (
-                    <Play className="h-6 w-6 text-primary-600" />
-                  )}
-                </motion.div>
-                <div className="flex-1">
-                  <h4 className={`font-medium line-clamp-1 ${
-                    isCurrentlyPlaying(audio) ? 'text-primary-700' : 'text-gray-900'
-                  }`}>
-                    {audio.title}
-                  </h4>
-                  <p className="text-sm text-gray-500 capitalize">{audio.type}</p>
-                </div>
-                <div className="text-sm text-gray-400">
-                  {formatDuration(audio.duration)}
-                </div>
-                <Link
-                  to={`/audio/${audio.slug}`}
-                  onClick={(e) => e.stopPropagation()}
-                  className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-primary-600 transition-colors"
-                  title="View Details"
-                >
-                  <ExternalLink className="h-4 w-4" />
-                </Link>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {audioItems.map((audio) => (
+          <div key={audio._id} onClick={() => playAudioGlobal(audio, audioItems)} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all flex items-center gap-4 group cursor-pointer">
+            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-primary-100 to-amber-100 flex items-center justify-center"><Play className="h-6 w-6 text-primary-600" /></div>
+            <div className="flex-1"><h4 className="font-medium text-gray-900">{audio.title}</h4><p className="text-sm text-gray-500 capitalize">{audio.type}</p></div>
+            <div className="text-sm text-gray-400">{formatDuration(audio.duration)}</div>
+            <Link to={`/audio/${audio.slug}`} onClick={(e) => e.stopPropagation()} className="p-2 rounded-lg hover:bg-gray-100"><ExternalLink className="h-4 w-4 text-gray-400" /></Link>
+          </div>
+        ))}
       </div>
     )
   }
 
   const renderVideos = () => {
     if (videosLoading) return <LoadingSkeleton />
-
-    if (videos.length === 0) {
-      return (
-        <EmptyState 
-          icon={Video}
-          title="No Video Content"
-          message="Videos will appear here once added."
-        />
-      )
-    }
-
+    if (videos.length === 0) return <EmptyState icon={Video} title="No Video Content" message="Videos will appear here once added." />
     return (
-      <motion.div 
-        layout
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-      >
-        <AnimatePresence mode="wait">
-          {videos.map((video, index) => (
-            <motion.div
-              key={video._id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ delay: Math.min(index * 0.05, 0.3) }}
-              whileHover={{ y: -8, scale: 1.02 }}
-            >
-              <div
-                onClick={() => openVideoPlayer(video)}
-                className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group cursor-pointer"
-              >
-                <div className="relative h-40 bg-gradient-to-br from-gray-900 to-gray-800 overflow-hidden">
-                  {video.thumbnail ? (
-                    <img 
-                      src={video.thumbnail} 
-                      alt={video.title} 
-                      loading="lazy"
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" 
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Play className="h-12 w-12 text-white/50" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                    <motion.div 
-                      whileHover={{ scale: 1.1 }}
-                      className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all"
-                    >
-                      <Play className="h-5 w-5 text-primary-600 ml-0.5" />
-                    </motion.div>
-                  </div>
-                  {video.duration && (
-                    <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-white text-xs">
-                      {formatDuration(video.duration)}
-                    </div>
-                  )}
-                  <div className="absolute bottom-2 left-2">
-                    <span className="px-2 py-0.5 bg-black/70 text-white text-xs rounded-full flex items-center gap-1">
-                      {isYouTubeUrl(video.videoUrl) ? 
-                        <Youtube className="h-3 w-3" /> : 
-                        <FileVideo className="h-3 w-3" />
-                      }
-                      <span>{isYouTubeUrl(video.videoUrl) ? 'YouTube' : 'Video'}</span>
-                    </span>
-                  </div>
-                  {video.isPremium && (
-                    <div className="absolute top-2 right-2 px-1.5 py-0.5 bg-yellow-500 text-white text-xs rounded">
-                      Premium
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h4 className="font-medium text-gray-900 line-clamp-1 group-hover:text-primary-600 transition-colors">{video.title}</h4>
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center gap-3 text-xs text-gray-500">
-                      <span className="capitalize">{video.type}</span>
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-3 w-3" />
-                        {video.stats?.views?.toLocaleString() || 0}
-                      </span>
-                    </div>
-                    <Link
-                      to={`/video/${video.slug}`}
-                      onClick={(e) => e.stopPropagation()}
-                      className="text-primary-600 hover:text-primary-700 text-xs font-medium flex items-center gap-1"
-                    >
-                      Details <ExternalLink className="h-3 w-3" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {videos.map((video) => (
+          <div key={video._id} onClick={() => openVideoPlayer(video)} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group cursor-pointer">
+            <div className="relative h-40 bg-gray-900 overflow-hidden">
+              {video.thumbnail ? <img src={video.thumbnail} alt={video.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" /> : <div className="absolute inset-0 flex items-center justify-center"><Play className="h-12 w-12 text-white/50" /></div>}
+              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors flex items-center justify-center"><div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100"><Play className="h-5 w-5 text-primary-600 ml-0.5" /></div></div>
+              {video.duration && <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/60 rounded-md text-white text-xs">{formatDuration(video.duration)}</div>}
+              <div className="absolute bottom-2 left-2"><span className="px-2 py-0.5 bg-black/70 text-white text-xs rounded-full flex items-center gap-1">{isYouTubeUrl(video.videoUrl) ? <Youtube className="h-3 w-3" /> : <FileVideo className="h-3 w-3" />}{isYouTubeUrl(video.videoUrl) ? 'YouTube' : 'Video'}</span></div>
+            </div>
+            <div className="p-4"><h4 className="font-medium text-gray-900 line-clamp-1">{video.title}</h4><div className="flex items-center justify-between mt-2"><div className="flex items-center gap-3 text-xs text-gray-500"><span className="capitalize">{video.type}</span><span className="flex items-center gap-1"><Eye className="h-3 w-3" />{video.stats?.views?.toLocaleString() || 0}</span></div><Link to={`/video/${video.slug}`} onClick={(e) => e.stopPropagation()} className="text-primary-600 text-xs">Details <ExternalLink className="h-3 w-3 inline" /></Link></div></div>
+          </div>
+        ))}
+      </div>
     )
   }
 
   const renderTimeline = () => {
     if (timelineLoading) return <LoadingSkeleton />
-
-    if (timeline.length === 0) {
-      return (
-        <EmptyState 
-          icon={Calendar}
-          title="No Timeline Events"
-          message="Important life events will be added to the timeline."
-        />
-      )
-    }
-
+    if (timeline.length === 0) return <EmptyState icon={Calendar} title="No Timeline Events" message="Important life events will be added to the timeline." />
     return (
       <div className="bg-white rounded-xl p-6 border border-gray-100">
-        <div className="space-y-6">
-          {timeline.map((event, index) => (
-            <motion.div 
-              key={index} 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ x: 10 }}
-              className="relative flex items-start"
-            >
-              <div className="flex-shrink-0 w-24">
-                <motion.span 
-                  whileHover={{ scale: 1.05 }}
-                  className="font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full text-sm inline-block"
-                >
-                  {event.year}
-                </motion.span>
-              </div>
-              <div className="flex-shrink-0 w-0.5 bg-gradient-to-b from-primary-500 to-amber-500 h-full absolute left-28 top-0 bottom-0" />
-              <div className="flex-1 ml-8 pb-6">
-                <div className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-all duration-300">
-                  <p className="text-gray-800 font-medium">{event.event}</p>
-                  {event.description && (
-                    <p className="text-sm text-gray-500 mt-1">{event.description}</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {timeline.map((event, index) => (
+          <div key={index} className="relative flex items-start mb-6 last:mb-0">
+            <div className="flex-shrink-0 w-24"><span className="font-bold text-primary-600 bg-primary-50 px-3 py-1 rounded-full text-sm">{event.year}</span></div>
+            <div className="flex-shrink-0 w-0.5 bg-gradient-to-b from-primary-500 to-amber-500 h-full absolute left-28" />
+            <div className="flex-1 ml-8"><div className="bg-gray-50 rounded-lg p-4"><p className="text-gray-800 font-medium">{event.event}</p>{event.description && <p className="text-sm text-gray-500 mt-1">{event.description}</p>}</div></div>
+          </div>
+        ))}
       </div>
     )
   }
 
   const renderGallery = () => {
     if (galleryLoading) return <LoadingSkeleton />
-
-    if (gallery.length === 0) {
-      return (
-        <EmptyState 
-          icon={ImageIcon}
-          title="No Gallery Images"
-          message="Images will appear here once added to the gallery."
-        />
-      )
-    }
-
+    if (gallery.length === 0) return <EmptyState icon={ImageIcon} title="No Gallery Images" message="Images will appear here once added to the gallery." />
     return (
-      <motion.div 
-        layout
-        className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4"
-      >
-        <AnimatePresence mode="wait">
-          {gallery.map((item, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ delay: Math.min(index * 0.05, 0.3) }}
-              whileHover={{ scale: 1.05, zIndex: 10 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative overflow-hidden rounded-xl shadow-sm">
-                <img 
-                  src={item.url} 
-                  alt={item.caption || `Image ${index + 1}`}
-                  loading="lazy"
-                  className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
-                <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                  {item.caption && (
-                    <p className="text-white text-xs line-clamp-2">{item.caption}</p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </motion.div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {gallery.map((item, index) => (
+          <div key={index} className="group cursor-pointer">
+            <div className="relative overflow-hidden rounded-xl shadow-sm"><img src={item.url} alt={item.caption || `Image ${index + 1}`} loading="lazy" className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500" /><div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" /><div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100">{item.caption && <p className="text-white text-xs line-clamp-2">{item.caption}</p>}</div></div>
+          </div>
+        ))}
+      </div>
     )
   }
 
   const renderQuotes = () => {
     if (quotesLoading) return <LoadingSkeleton />
-
-    if (quotes.length === 0) {
-      return (
-        <EmptyState 
-          icon={Quote}
-          title="No Quotes Available"
-          message="Famous quotes by this author will appear here."
-        />
-      )
-    }
-
+    if (quotes.length === 0) return <EmptyState icon={Quote} title="No Quotes Available" message="Famous quotes by this author will appear here." />
     return (
       <div className="space-y-4">
-        <AnimatePresence mode="wait">
-          {quotes.map((quote, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ delay: Math.min(index * 0.05, 0.3) }}
-              whileHover={{ scale: 1.02, x: 10 }}
-              className="bg-gradient-to-r from-primary-50 to-amber-50 rounded-xl p-6 border-l-4 border-primary-500 cursor-pointer"
-            >
-              <Quote className="h-8 w-8 text-primary-400 mb-3 opacity-50" />
-              <p className="text-lg text-gray-700 italic">"{quote.text}"</p>
-              {quote.source && (
-                <p className="text-sm text-gray-500 mt-3">— {quote.source}</p>
-              )}
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {quotes.map((quote, index) => (
+          <div key={index} className="bg-gradient-to-r from-primary-50 to-amber-50 rounded-xl p-6 border-l-4 border-primary-500"><Quote className="h-8 w-8 text-primary-400 mb-3 opacity-50" /><p className="text-lg text-gray-700 italic">"{quote.text}"</p>{quote.source && <p className="text-sm text-gray-500 mt-3">— {quote.source}</p>}</div>
+        ))}
       </div>
     )
   }
 
-  const renderSocialLinks = () => {
-    const hasSocialLinks = Object.values(socialLinks).some(v => v)
-    
-    if (!hasSocialLinks) return null
-
-    const socialIcons = {
-      website: { icon: Globe, color: 'text-gray-600 hover:text-gray-900' },
-      twitter: { icon: Twitter, color: 'text-gray-600 hover:text-[#1DA1F2]' },
-      facebook: { icon: Facebook, color: 'text-gray-600 hover:text-[#1877F2]' },
-      instagram: { icon: Instagram, color: 'text-gray-600 hover:text-[#E4405F]' },
-      youtube: { icon: Youtube, color: 'text-gray-600 hover:text-[#FF0000]' },
-      wikipedia: { icon: ExternalLink, color: 'text-gray-600 hover:text-gray-900' }
-    }
-
-    return (
-      <div className="mt-6 pt-6 border-t border-gray-100">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-          <Share2 className="h-4 w-4 text-primary-600" />
-          Connect & Follow
-        </h3>
-        <div className="flex flex-wrap gap-3">
-          {Object.entries(socialLinks).map(([platform, url]) => {
-            if (!url) return null
-            const social = socialIcons[platform]
-            if (!social) return null
-            const Icon = social.icon
-            return (
-              <motion.a
-                key={platform}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                whileHover={{ scale: 1.05, y: -2 }}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-all ${social.color}`}
-              >
-                <Icon className="h-4 w-4" />
-                <span className="text-sm capitalize">{platform}</span>
-              </motion.a>
-            )
-          })}
-        </div>
-      </div>
-    )
-  }
-
-  // Main return with all content
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-amber-50/30">
-      {/* Sticky Header for Mobile */}
-      {isScrolled && (
-        <motion.div
-          initial={{ y: -100 }}
-          animate={{ y: 0 }}
-          className="fixed top-0 left-0 right-0 bg-white/95 backdrop-blur-md shadow-lg z-40 md:hidden"
-        >
-          <div className="px-4 py-2 flex items-center justify-between">
-            <h2 className="font-semibold text-gray-900 truncate">{author?.name}</h2>
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg bg-primary-50"
-            >
-              <Menu className="h-5 w-5 text-primary-600" />
-            </button>
-          </div>
-          {isMobileMenuOpen && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="border-t border-gray-100 p-2"
-            >
-              <div className="flex flex-wrap gap-1">
-                {tabs.map((tab) => (
-                  <button
-                    key={tab.id}
-                    onClick={() => {
-                      setActiveTab(tab.id)
-                      setIsMobileMenuOpen(false)
-                    }}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                      activeTab === tab.id
-                        ? 'bg-primary-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {tab.mobileLabel}
-                  </button>
-                ))}
+      {/* Video Modal */}
+      <AnimatePresence>
+        {videoModal.isOpen && videoModal.video && (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4" onClick={closeVideoPlayer}>
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} exit={{ scale: 0.9 }} className="relative w-full max-w-6xl bg-black rounded-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+              <button onClick={closeVideoPlayer} className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full hover:bg-black/70 text-white"><X className="h-6 w-6" /></button>
+              <div className="w-full bg-black" style={{ minHeight: '400px' }}>
+                {isYouTubeUrl(videoModal.video.videoUrl) ? (
+                  <iframe src={getYouTubeEmbedUrl(videoModal.video.videoUrl)} title={videoModal.video.title} className="w-full aspect-video" style={{ height: '70vh' }} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowFullScreen />
+                ) : (
+                  <video src={videoModal.video.videoUrl} poster={videoModal.video.thumbnail} className="w-full" style={{ height: '70vh' }} controls controlsList="nodownload" autoPlay />
+                )}
               </div>
             </motion.div>
-          )}
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-        
-        {/* Video Player Modal */}
-        <AnimatePresence>
-          {videoModal.isOpen && videoModal.video && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center p-4"
-              onClick={closeVideoPlayer}
-            >
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
-                className="relative w-full max-w-6xl bg-black rounded-xl overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <button
-                  onClick={closeVideoPlayer}
-                  className="absolute top-4 right-4 z-10 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors text-white"
-                >
-                  <X className="h-6 w-6" />
-                </button>
-                <div className="absolute top-4 left-4 z-10 text-white pointer-events-none">
-                  <h3 className="text-lg font-semibold">{videoModal.video.title}</h3>
-                  <p className="text-sm text-gray-300">{author?.name}</p>
-                </div>
-                <div className="w-full bg-black" style={{ minHeight: '400px' }}>
-                  {isYouTubeUrl(videoModal.video.videoUrl) ? (
-                    <iframe
-                      src={getYouTubeEmbedUrl(videoModal.video.videoUrl)}
-                      title={videoModal.video.title}
-                      className="w-full aspect-video"
-                      style={{ height: '70vh', border: 'none' }}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  ) : (
-                    <video
-                      src={videoModal.video.videoUrl}
-                      poster={videoModal.video.thumbnail}
-                      className="w-full"
-                      style={{ height: '70vh' }}
-                      controls
-                      controlsList="nodownload"
-                      autoPlay
-                    />
-                  )}
-                </div>
-                <div className="p-4 bg-gray-900">
-                  <div className="flex items-center justify-between">
-                    <span className="text-white text-sm">
-                      {isYouTubeUrl(videoModal.video.videoUrl) ? 'YouTube' : 'Direct Video'}
-                    </span>
-                    <Link
-                      to={`/video/${videoModal.video.slug}`}
-                      onClick={closeVideoPlayer}
-                      className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition-colors"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                      <span>View Full Page</span>
-                    </Link>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Back Link */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="mb-6"
-        >
-          <Link 
-            to="/authors" 
-            className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 transition-colors group"
-          >
-            <ChevronLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-            <span>Back to Authors</span>
-          </Link>
-        </motion.div>
+        <Link to="/authors" className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600 mb-6"><ChevronLeft className="h-4 w-4" /><span>Back to Authors</span></Link>
 
         {/* Cover Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="relative mb-16"
-        >
+        <div className="relative mb-16">
           <div className="relative w-full rounded-2xl overflow-hidden shadow-xl">
-            <div className="relative" style={{ paddingBottom: '33.33%' }}>
-              {author.coverImage ? (
-                <>
-                  <img 
-                    src={author.coverImage} 
-                    alt={`${author.name} cover`}
-                    className="absolute inset-0 w-full h-full object-cover object-center"
-                    loading="eager"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                </>
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-800 via-primary-700 to-amber-800">
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-0 left-0 w-72 h-72 bg-white rounded-full filter blur-3xl animate-pulse" />
-                    <div className="absolute bottom-0 right-0 w-96 h-96 bg-amber-200 rounded-full filter blur-3xl animate-pulse delay-1000" />
-                  </div>
-                </div>
-              )}
-              
-              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8 z-10">
-                <div className="space-y-2">
-                  <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">
-                    {author.name}
-                  </h1>
-                  {author.nameUrdu && (
-                    <p className="urdu-text text-xl md:text-2xl text-white/90 drop-shadow-lg" dir="rtl">
-                      {author.nameUrdu}
-                    </p>
-                  )}
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {author.era && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-xs md:text-sm font-medium">
-                        <Award className="h-3.5 w-3.5" />
-                        {author.era} Era
-                      </span>
-                    )}
-                    {author.isVerified && (
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/80 backdrop-blur-md rounded-full text-white text-xs md:text-sm font-medium">
-                        <Check className="h-3.5 w-3.5" />
-                        Verified Author
-                      </span>
-                    )}
-                  </div>
-                </div>
+            <div className="relative pt-[33.33%]">
+              {author.coverImage ? <img src={author.coverImage} alt={`${author.name} cover`} className="absolute inset-0 w-full h-full object-cover" /> : <div className="absolute inset-0 bg-gradient-to-r from-primary-800 to-amber-800" />}
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent" />
+              <div className="absolute bottom-6 left-6 md:bottom-8 md:left-8">
+                <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white drop-shadow-lg">{author.name}</h1>
+                {author.nameUrdu && <p className="urdu-text text-xl md:text-2xl text-white/90 drop-shadow-lg" dir="rtl">{author.nameUrdu}</p>}
+                <div className="flex gap-2 mt-2">{author.era && <span className="px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-xs"><Award className="h-3.5 w-3.5 inline mr-1" />{author.era} Era</span>}{author.isVerified && <span className="px-3 py-1.5 bg-blue-500/80 backdrop-blur-md rounded-full text-white text-xs"><Check className="h-3.5 w-3.5 inline mr-1" />Verified</span>}</div>
               </div>
             </div>
           </div>
-          
-          <div className="absolute -bottom-12 left-6 md:left-8 z-20">
-            <div className="relative">
-              <motion.div 
-                whileHover={{ scale: 1.05 }}
-                className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white"
-              >
-                <img
-                  src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=128&bold=true`}
-                  alt={author.name}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                />
-              </motion.div>
-              {author.isVerified && (
-                <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 border-2 border-white">
-                  <Check className="h-3 w-3 text-white" />
-                </div>
-              )}
-            </div>
-          </div>
-        </motion.div>
+          <div className="absolute -bottom-12 left-6 md:left-8"><div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white"><img src={author.avatar || `https://ui-avatars.com/api/?name=${author.name}&background=8B4513&color=fff&size=128`} alt={author.name} className="w-full h-full object-cover" /></div>{author.isVerified && <div className="absolute -bottom-1 -right-1 bg-blue-500 rounded-full p-1 border-2 border-white"><Check className="h-3 w-3 text-white" /></div>}</div>
+        </div>
 
         <div className="h-12 md:h-16"></div>
 
-        {/* Action Buttons Row */}
+        {/* Action Buttons */}
         <div className="flex flex-wrap justify-between items-center gap-4 mb-8">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleFollowToggle}
-            disabled={followMutation.isPending || unfollowMutation.isPending}
-            className={`px-6 py-2.5 rounded-xl font-medium transition-all flex items-center gap-2 ${
-              isFollowing
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                : 'bg-gradient-to-r from-primary-600 to-amber-500 text-white hover:shadow-lg'
-            }`}
-          >
-            {isFollowing ? (
-              <>
-                <UserCheck className="h-4 w-4" />
-                <span>Following</span>
-              </>
-            ) : (
-              <>
-                <UserPlus className="h-4 w-4" />
-                <span>Follow</span>
-              </>
-            )}
-          </motion.button>
-
+          <button onClick={handleFollowToggle} className={`px-6 py-2.5 rounded-xl font-medium flex items-center gap-2 ${isFollowing ? 'bg-gray-100 text-gray-700' : 'bg-gradient-to-r from-primary-600 to-amber-500 text-white'}`}>{isFollowing ? <><UserCheck className="h-4 w-4" /><span>Following</span></> : <><UserPlus className="h-4 w-4" /><span>Follow</span></>}</button>
           <div className="flex items-center gap-6">
-            <div className="flex items-center gap-4">
-              <div className="text-right">
-                <p className="text-lg font-bold text-gray-900">{(author.stats?.followers || 0).toLocaleString()}</p>
-                <p className="text-xs text-gray-500">Followers</p>
-              </div>
-              <div className="w-px h-8 bg-gray-200"></div>
-              <div className="text-right">
-                <p className="text-lg font-bold text-gray-900">{(author.stats?.views || 0).toLocaleString()}</p>
-                <p className="text-xs text-gray-500">Views</p>
-              </div>
-            </div>
-            
-            <div className="relative">
-              <motion.button 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleShare}
-                className="p-2.5 rounded-xl border border-gray-200 bg-white hover:bg-gray-50 transition-all hover:shadow-md"
-              >
-                <Share2 className="h-5 w-5 text-gray-600" />
-              </motion.button>
-              
-              <AnimatePresence>
-                {showShareMenu && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: -10 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                    className="absolute right-0 mt-2 w-72 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
-                  >
-                    <div className="p-3 border-b border-gray-100">
-                      <p className="text-sm font-medium text-gray-700">Share this author</p>
-                    </div>
-                    <div className="p-2">
-                      {shareLinks.map((link) => (
-                        <a
-                          key={link.name}
-                          href={link.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={() => setShowShareMenu(false)}
-                          className={`flex items-center gap-3 w-full px-3 py-2 rounded-lg ${link.color} text-white mb-1 transition-all hover:shadow-md`}
-                        >
-                          <link.icon className="h-4 w-4" />
-                          <span className="text-sm font-medium">{link.name}</span>
-                        </a>
-                      ))}
-                      <button
-                        onClick={copyToClipboard}
-                        className="flex items-center gap-3 w-full px-3 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-all mt-1"
-                      >
-                        {copiedLink ? (
-                          <>
-                            <Check className="h-4 w-4 text-green-600" />
-                            <span className="text-sm font-medium text-green-600">Copied!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="h-4 w-4 text-gray-600" />
-                            <span className="text-sm font-medium text-gray-700">Copy Link</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+            <div className="flex items-center gap-4"><div className="text-right"><p className="text-lg font-bold text-gray-900">{(author.stats?.followers || 0).toLocaleString()}</p><p className="text-xs text-gray-500">Followers</p></div><div className="w-px h-8 bg-gray-200"></div><div className="text-right"><p className="text-lg font-bold text-gray-900">{(author.stats?.views || 0).toLocaleString()}</p><p className="text-xs text-gray-500">Views</p></div></div>
+            <div className="relative"><button onClick={handleShare} className="p-2.5 rounded-xl border border-gray-200 bg-white"><Share2 className="h-5 w-5 text-gray-600" /></button></div>
           </div>
         </div>
 
-        {/* Tabs - All in One Line with Responsive Design */}
-        <div className="relative mb-6">
-          {/* Desktop Tabs */}
-          <div className="hidden md:block overflow-x-auto scrollbar-hide">
-            <div className="flex gap-1 border-b border-gray-200 min-w-max">
-              {tabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <motion.button
-                    key={tab.id}
-                    whileHover={{ y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center gap-2 px-4 py-3 text-sm font-medium whitespace-nowrap transition-all duration-200 rounded-t-lg ${
-                      activeTab === tab.id
-                        ? 'text-primary-600 bg-white shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50/50'
-                    }`}
-                  >
-                    <Icon className={`h-4 w-4 transition-transform duration-200 ${activeTab === tab.id ? 'scale-110' : ''}`} />
-                    <span className="hidden sm:inline">{tab.label}</span>
-                    <span className="sm:hidden">{tab.mobileLabel}</span>
-                    {tab.count !== undefined && (
-                      <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full transition-all ${
-                        activeTab === tab.id 
-                          ? 'bg-primary-100 text-primary-700 ring-1 ring-primary-200/50' 
-                          : 'bg-gray-100 text-gray-500'
-                      }`}>
-                        {tab.count}
-                      </span>
-                    )}
-                    {activeTab === tab.id && (
-                      <motion.div
-                        layoutId="activeTabIndicator"
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary-500 to-amber-500 rounded-full"
-                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                      />
-                    )}
-                  </motion.button>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* Mobile Tabs - Scrollable */}
-          <div className="md:hidden overflow-x-auto scrollbar-hide">
-            <div className="flex gap-1 border-b border-gray-200 min-w-max">
-              {tabs.map((tab) => {
-                const Icon = tab.icon
-                return (
-                  <motion.button
-                    key={tab.id}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center gap-1.5 px-3 py-2.5 text-xs font-medium whitespace-nowrap transition-all ${
-                      activeTab === tab.id
-                        ? 'text-primary-600 border-b-2 border-primary-600'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{tab.mobileLabel}</span>
-                    {tab.count !== undefined && (
-                      <span className={`text-xs px-1 ${
-                        activeTab === tab.id ? 'text-primary-600' : 'text-gray-400'
-                      }`}>
-                        ({tab.count})
-                      </span>
-                    )}
-                  </motion.button>
-                )
-              })}
-            </div>
+        {/* Tabs */}
+        <div className="relative mb-6 overflow-x-auto scrollbar-hide">
+          <div className="flex gap-1 border-b border-gray-200 min-w-max">
+            {tabs.map((tab) => {
+              const Icon = tab.icon
+              return (
+                <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`relative flex items-center gap-2 px-3 sm:px-4 py-3 text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id ? 'text-primary-600 border-b-2 border-primary-600' : 'text-gray-500 hover:text-gray-700'}`}>
+                  <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden xs:inline">{tab.label}</span>
+                  <span className="xs:hidden">{tab.mobileLabel}</span>
+                  {tab.count !== undefined && <span className={`ml-1 text-xs px-1.5 py-0.5 rounded-full ${activeTab === tab.id ? 'bg-primary-100 text-primary-700' : 'bg-gray-100 text-gray-500'}`}>{tab.count}</span>}
+                </button>
+              )
+            })}
           </div>
         </div>
 
-        {/* Tab Content with Lazy Loading */}
+        {/* Tab Content */}
         <Suspense fallback={<LoadingSkeleton />}>
           <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="mb-8"
-            >
+            <motion.div key={activeTab} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.3 }} className="mb-8">
               {activeTab === 'biography' && renderBiography()}
               {activeTab === 'poems' && renderWorks()}
               {activeTab === 'books' && renderBooks()}

@@ -646,3 +646,19 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+
+/* Add to your global CSS file (e.g., index.css or App.css) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Urdu text support */
+.urdu-text {
+  font-family: 'Noto Nastaliq Urdu', 'Urdu Typesetting', 'Alvi Nastaleeq', serif;
+  text-align: right;
+}
