@@ -1,0 +1,196 @@
+{
+  "version": "3.0",
+  "lastUpdated": "2024-01-15",
+  "words": {
+    "کربلا": {
+      "roman": "Karbala",
+      "frequency": 1000,
+      "category": ["marsiya", "religious", "place"]
+    },
+    "حسین": {
+      "roman": "Hussain",
+      "frequency": 1000,
+      "category": ["marsiya", "religious", "person"]
+    },
+    "عباس": {
+      "roman": "Abbas",
+      "frequency": 950,
+      "category": ["marsiya", "religious", "person"]
+    },
+    "زینب": {
+      "roman": "Zainab",
+      "frequency": 900,
+      "category": ["marsiya", "religious", "person"]
+    },
+    "سکینہ": {
+      "roman": "Sakina",
+      "frequency": 850,
+      "category": ["marsiya", "religious", "person"]
+    },
+    "امام": {
+      "roman": "Imaam",
+      "frequency": 900,
+      "category": ["marsiya", "religious", "title"]
+    },
+    "شہید": {
+      "roman": "shaheed",
+      "frequency": 850,
+      "category": ["marsiya", "religious", "title"]
+    },
+    "پیاس": {
+      "roman": "pyaas",
+      "frequency": 800,
+      "category": ["marsiya", "suffering"]
+    },
+    "خون": {
+      "roman": "khoon",
+      "frequency": 800,
+      "category": ["marsiya", "suffering"]
+    },
+    "صبر": {
+      "roman": "sabr",
+      "frequency": 750,
+      "category": ["marsiya", "virtue"]
+    },
+    "علم": {
+      "roman": "alam",
+      "frequency": 700,
+      "category": ["marsiya", "symbol"]
+    },
+    "خیام": {
+      "roman": "khayam",
+      "frequency": 650,
+      "category": ["marsiya", "place"]
+    },
+    "فرات": {
+      "roman": "Furaat",
+      "frequency": 700,
+      "category": ["marsiya", "river"]
+    },
+    "نہر": {
+      "roman": "nehr",
+      "frequency": 650,
+      "category": ["marsiya", "river"]
+    },
+    "لشکر": {
+      "roman": "lashkar",
+      "frequency": 700,
+      "category": ["marsiya", "army"]
+    },
+    "میدان": {
+      "roman": "maidaan",
+      "frequency": 750,
+      "category": ["marsiya", "place"]
+    },
+    "شمشیر": {
+      "roman": "shamshir",
+      "frequency": 650,
+      "category": ["marsiya", "weapon"]
+    },
+    "نیزہ": {
+      "roman": "neezah",
+      "frequency": 600,
+      "category": ["marsiya", "weapon"]
+    },
+    "خنجر": {
+      "roman": "khanjar",
+      "frequency": 600,
+      "category": ["marsiya", "weapon"]
+    },
+    "خیمہ": {
+      "roman": "khaimah",
+      "frequency": 650,
+      "category": ["marsiya", "place"]
+    },
+    "کارواں": {
+      "roman": "karwaan",
+      "frequency": 600,
+      "category": ["marsiya", "caravan"]
+    },
+    "قافلہ": {
+      "roman": "qaflah",
+      "frequency": 600,
+      "category": ["marsiya", "caravan"]
+    },
+    "شمر": {
+      "roman": "Shimr",
+      "frequency": 700,
+      "category": ["marsiya", "enemy"]
+    },
+    "یزید": {
+      "roman": "Yazeed",
+      "frequency": 700,
+      "category": ["marsiya", "enemy"]
+    },
+    "سجدہ": {
+      "roman": "sajdah",
+      "frequency": 650,
+      "category": ["marsiya", "worship"]
+    },
+    "عزاداری": {
+      "roman": "azaadari",
+      "frequency": 600,
+      "category": ["marsiya", "ritual"]
+    },
+    "سینہ زنی": {
+      "roman": "seenah zani",
+      "frequency": 550,
+      "category": ["marsiya", "ritual"]
+    },
+    "زنجیر زنی": {
+      "roman": "zanjeer zani",
+      "frequency": 550,
+      "category": ["marsiya", "ritual"]
+    },
+    "ماتم": {
+      "roman": "maatam",
+      "frequency": 650,
+      "category": ["marsiya", "ritual"]
+    },
+    "نوحہ": {
+      "roman": "noha",
+      "frequency": 700,
+      "category": ["marsiya", "poetry"]
+    },
+    "مرثیہ": {
+      "roman": "marsiya",
+      "frequency": 750,
+      "category": ["marsiya", "poetry"]
+    },
+    "غازی": {
+      "roman": "Ghazi",
+      "frequency": 600,
+      "category": ["marsiya", "title"]
+    },
+    "علمدار": {
+      "roman": "Alamdar",
+      "frequency": 600,
+      "category": ["marsiya", "title"]
+    },
+    "روضہ": {
+      "roman": "roza",
+      "frequency": 500,
+      "category": ["marsiya", "place"]
+    },
+    "حرم": {
+      "roman": "haram",
+      "frequency": 550,
+      "category": ["marsiya", "place"]
+    },
+    "نجف": {
+      "roman": "Najaf",
+      "frequency": 600,
+      "category": ["marsiya", "place"]
+    },
+    "کوفہ": {
+      "roman": "Kufa",
+      "frequency": 600,
+      "category": ["marsiya", "place"]
+    },
+    "شام": {
+      "roman": "Shaam",
+      "frequency": 550,
+      "category": ["marsiya", "place"]
+    }
+  }
+}

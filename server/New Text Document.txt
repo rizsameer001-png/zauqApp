@@ -1,0 +1,431 @@
+# zauqAPI - Complete REST API Endpoints & Functionality
+
+## 🔐 Authentication Routes (`/api/auth`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| POST | `/api/auth/register` | Register new user account |
+| POST | `/api/auth/login` | Login user and get JWT token |
+| POST | `/api/auth/logout` | Logout user and clear session |
+| GET | `/api/auth/me` | Get current logged-in user profile |
+| POST | `/api/auth/forgot-password` | Send password reset email |
+| POST | `/api/auth/reset-password/:token` | Reset password using token |
+| PUT | `/api/auth/change-password` | Change password (authenticated) |
+| POST | `/api/auth/refresh-token` | Refresh expired JWT token |
+
+---
+
+## 👤 User Routes (`/api/users`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/users` | Get all users (Admin only) |
+| GET | `/api/users/:id` | Get single user by ID |
+| PUT | `/api/users/:id` | Update user profile |
+| DELETE | `/api/users/:id` | Delete user account (Admin) |
+| GET | `/api/users/:id/stats` | Get user statistics (poems, bookmarks, likes) |
+
+---
+
+#New Features Add: Banner Slider & Captcha Settings
+
+## 📝 Poem Routes (`/api/poems`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/poems` | Get all poems with pagination & filters |
+| GET | `/api/poems/:slug` | Get single poem by slug |
+| POST | `/api/poems` | Create new poem (Admin/Creator) |
+| PUT | `/api/poems/:id` | Update poem (Admin/Creator) |
+| DELETE | `/api/poems/:id` | Delete poem (Admin/Creator) |
+| POST | `/api/poems/:id/like` | Like a poem |
+| POST | `/api/poems/:id/bookmark` | Bookmark a poem |
+| GET | `/api/poems/featured` | Get featured poems |
+| GET | `/api/poems/trending` | Get trending poems |
+
+---
+
+## 👨‍🎨 Author Routes (`/api/authors`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/authors` | Get all authors with pagination |
+| GET | `/api/authors/:slug` | Get single author by slug |
+| POST | `/api/authors` | Create new author (Admin only) |
+| PUT | `/api/authors/:id` | Update author (Admin only) |
+| DELETE | `/api/authors/:id` | Delete author (Admin only) |
+| GET | `/api/authors/:slug/poems` | Get all poems by specific author |
+
+---
+
+## 📚 Book Routes (`/api/books`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/books` | Get all books with pagination |
+| GET | `/api/books/:slug` | Get single book by slug |
+| POST | `/api/books` | Create new book (Admin only) |
+| PUT | `/api/books/:id` | Update book (Admin only) |
+| DELETE | `/api/books/:id` | Delete book (Admin only) |
+| GET | `/api/books/:id/download` | Download book PDF |
+
+---
+
+## 🎵 Audio Routes (`/api/audio`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/audio` | Get all audio tracks |
+| GET | `/api/audio/type/:type` | Get audio by type (nauha/manqabat/qawwali/naat/hamd/marsiya/soz/salam) |
+| GET | `/api/audio/occasion/:occasion` | Get audio by occasion (muharram/ramadan/eid/milad/general) |
+| GET | `/api/audio/:slug` | Get single audio by slug |
+| GET | `/api/audio/:slug/stream` | Stream audio file |
+| GET | `/api/audio/:slug/transcript` | Get audio transcript |
+| GET | `/api/audio/:slug/similar` | Get similar audio recommendations |
+| POST | `/api/audio` | Create new audio (Admin only) |
+| PUT | `/api/audio/:id` | Update audio (Admin only) |
+| DELETE | `/api/audio/:id` | Delete audio (Admin only) |
+| POST | `/api/audio/:id/like` | Like an audio track |
+| DELETE | `/api/audio/:id/like` | Unlike an audio track |
+| POST | `/api/audio/:id/bookmark` | Bookmark an audio |
+| GET | `/api/audio/playlists/user` | Get user's audio playlists |
+| POST | `/api/audio/playlists` | Create new audio playlist |
+| POST | `/api/audio/:audioId/playlist/:playlistId` | Add audio to playlist |
+| DELETE | `/api/audio/:audioId/playlist/:playlistId` | Remove audio from playlist |
+| GET | `/api/audio/recent/played` | Get recently played audio |
+| GET | `/api/audio/recommended` | Get recommended audio |
+| GET | `/api/audio/stats` | Get audio statistics |
+| GET | `/api/audio/featured` | Get featured audio |
+| GET | `/api/audio/trending` | Get trending audio |
+| GET | `/api/audio/playlist/:playlistId` | Get audio by playlist ID |
+| GET | `/api/audio/search` | Search audio |
+| GET | `/api/audio/popular/:type` | Get popular audio by type |
+| GET | `/api/audio/author/:authorId` | Get audio by author |
+| GET | `/api/audio/tag/:tag` | Get audio by tag |
+
+---
+
+## 🎬 Video Routes (`/api/videos`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/videos` | Get all videos |
+| GET | `/api/videos/:slug` | Get single video by slug |
+| GET | `/api/videos/:slug/stream` | Stream video file |
+| POST | `/api/videos` | Create new video (Admin only) |
+| PUT | `/api/videos/:id` | Update video (Admin only) |
+| DELETE | `/api/videos/:id` | Delete video (Admin only) |
+| POST | `/api/videos/:id/like` | Like a video |
+
+---
+
+## 🏷️ Category Routes (`/api/categories`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/categories` | Get all categories |
+| GET | `/api/categories/:slug` | Get single category by slug |
+| POST | `/api/categories` | Create category (Admin only) |
+| PUT | `/api/categories/:id` | Update category (Admin only) |
+| DELETE | `/api/categories/:id` | Delete category (Admin only) |
+
+---
+
+## 🔍 Search Routes (`/api/search`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/search` | Global search across all content types |
+| GET | `/api/search/poems` | Search only in poems |
+| GET | `/api/search/authors` | Search only in authors |
+| GET | `/api/search/audio` | Search only in audio |
+| GET | `/api/search/books` | Search only in books |
+| GET | `/api/search/suggestions` | Get search suggestions |
+| POST | `/api/search/advanced` | Advanced search with multiple filters |
+
+---
+
+## 🔔 Notification Routes (`/api/notifications`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/notifications` | Get user notifications |
+| PUT | `/api/notifications/:id/read` | Mark single notification as read |
+| PUT | `/api/notifications/read-all` | Mark all notifications as read |
+| DELETE | `/api/notifications/:id` | Delete single notification |
+| DELETE | `/api/notifications` | Delete all notifications |
+
+---
+
+## 💳 Subscription Routes (`/api/subscriptions`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/subscriptions/current` | Get current user subscription |
+| GET | `/api/subscriptions/plans` | Get available subscription plans |
+| POST | `/api/subscriptions/create` | Create new subscription |
+| POST | `/api/subscriptions/cancel` | Cancel current subscription |
+| GET | `/api/subscriptions/payments` | Get payment history |
+| PUT | `/api/subscriptions/change-plan` | Change subscription plan |
+
+---
+
+## 📊 Analytics Routes (`/api/analytics`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/analytics/dashboard` | Get dashboard statistics (Admin) |
+| GET | `/api/analytics/content` | Get content analytics (Admin) |
+| GET | `/api/analytics/users` | Get user analytics (Admin) |
+| GET | `/api/admin/audio/analytics` | Get audio analytics (Admin) |
+
+---
+
+## 👑 Admin Routes (`/api/admin`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/admin/dashboard` | Admin dashboard stats |
+| GET | `/api/admin/users` | Manage all users |
+| PUT | `/api/admin/users/:id/role` | Update user role |
+| POST | `/api/admin/audio/bulk` | Bulk audio operations |
+| PATCH | `/api/admin/audio/:id/metadata` | Update audio metadata |
+| GET | `/api/admin/settings` | Get system settings |
+| PUT | `/api/admin/settings` | Update system settings |
+
+---
+
+## 🎨 Creator Routes (`/api/creator`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/creator/dashboard` | Creator dashboard |
+| GET | `/api/creator/content` | Get creator's content |
+| POST | `/api/creator/content` | Create content as creator |
+| PUT | `/api/creator/content/:id` | Update creator's content |
+| DELETE | `/api/creator/content/:id` | Delete creator's content |
+| GET | `/api/creator/stats` | Get creator statistics |
+
+---
+
+## 🏠 Homepage Routes (`/api/homepage`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/homepage` | Get all homepage data |
+| PUT | `/api/homepage/hero` | Update hero section (Admin) |
+| PUT | `/api/homepage/featured` | Update featured content (Admin) |
+
+---
+
+## 🔍 SEO Routes (`/api/seo`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/seo/settings` | Get SEO settings |
+| PUT | `/api/seo/settings` | Update SEO settings (Admin) |
+| GET | `/api/seo/meta/:page` | Get page meta tags |
+| GET | `/api/seo/sitemap` | Generate sitemap |
+
+---
+
+## 📤 Upload Routes (`/api/upload`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| POST | `/api/upload/image` | Upload single image |
+| POST | `/api/upload/cover` | Upload cover image |
+| POST | `/api/upload/images` | Upload multiple images |
+| POST | `/api/upload/pages` | Upload book pages |
+| POST | `/api/upload/pdf` | Upload PDF file |
+| POST | `/api/upload/epub` | Upload EPUB file |
+| POST | `/api/upload/ebook` | Upload eBook |
+| POST | `/api/upload/audio` | Upload audio file |
+| POST | `/api/upload/video` | Upload video file |
+| DELETE | `/api/upload/delete` | Delete uploaded file |
+
+---
+
+## ⚙️ Settings Routes
+
+### Admin Settings (`/api/admin/settings`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/admin/settings` | Get admin settings |
+| PUT | `/api/admin/settings` | Update admin settings |
+
+### Public Settings (`/api/settings`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/settings` | Get public settings |
+
+---
+
+## 🤖 AI Routes (`/api/ai`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| POST | `/api/ai/generate-poem` | Generate poem using AI |
+| POST | `/api/ai/suggest-tags` | Suggest tags for content |
+| POST | `/api/ai/translate` | Translate poem to another language |
+
+---
+
+## 🔤 Transliteration Routes (`/api/transliteration`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| POST | `/api/transliteration/urdu-to-roman` | Convert Urdu text to Roman script |
+| POST | `/api/transliteration/roman-to-urdu` | Convert Roman text to Urdu script |
+| POST | `/api/transliteration/bulk` | Bulk transliteration |
+
+---
+
+## 📋 Playlist Routes (`/api/playlists`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/playlists` | Get user playlists |
+| POST | `/api/playlists` | Create new playlist |
+| GET | `/api/playlists/:id` | Get single playlist |
+| PUT | `/api/playlists/:id` | Update playlist |
+| DELETE | `/api/playlists/:id` | Delete playlist |
+| POST | `/api/playlists/:playlistId/audio/:audioId` | Add audio to playlist |
+| DELETE | `/api/playlists/:playlistId/audio/:audioId` | Remove audio from playlist |
+
+---
+
+## 📝 Blog Routes (`/api/blogs`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/blogs` | Get all blog posts |
+| GET | `/api/blogs/:slug` | Get single blog post |
+| POST | `/api/blogs` | Create blog post (Admin) |
+| PUT | `/api/blogs/:id` | Update blog post (Admin) |
+| DELETE | `/api/blogs/:id` | Delete blog post (Admin) |
+| POST | `/api/blogs/:id/like` | Like blog post |
+
+---
+
+## 💾 Backup Routes (`/api/backup`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| POST | `/api/backup/create` | Create database backup (Admin) |
+| GET | `/api/backup/list` | List all backups (Admin) |
+| POST | `/api/backup/restore` | Restore from backup (Admin) |
+| GET | `/api/backup/download/:filename` | Download backup file (Admin) |
+
+---
+
+## ⚙️ App Settings Routes (`/api/app-settings`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/app-settings` | Get all app settings |
+| PUT | `/api/app-settings` | Update all settings (Admin) |
+| POST | `/api/app-settings/reset` | Reset to default settings (Admin) |
+| GET | `/api/app-settings/:key` | Get single setting by key |
+| PUT | `/api/app-settings/:key` | Update single setting (Admin) |
+| POST | `/api/app-settings/upload/:type` | Upload logo/favicon (Admin) |
+| POST | `/api/app-settings/api-keys` | Generate API key (Admin) |
+| DELETE | `/api/app-settings/api-keys/:keyId` | Delete API key (Admin) |
+
+---
+
+## 🔐 Captcha Routes (`/api/captcha`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/captcha/generate` | Generate new captcha |
+| GET | `/api/captcha/image/:captchaId` | Get captcha image |
+| POST | `/api/captcha/verify` | Verify captcha answer |
+
+---
+
+## 💬 Comment Routes (`/api/comments`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/comments/:contentType/:contentId` | Get comments for content |
+| POST | `/api/comments` | Create new comment |
+| PUT | `/api/comments/:id` | Update comment |
+| DELETE | `/api/comments/:id` | Delete comment |
+| POST | `/api/comments/:id/like` | Like a comment |
+| POST | `/api/comments/:id/reply` | Reply to a comment |
+
+---
+
+## 📢 Ad Routes (`/api/ads`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/ads/active` | Get active ads by position |
+| GET | `/api/ads` | Get all ads (Admin) |
+| POST | `/api/ads` | Create new ad (Admin) |
+| PUT | `/api/ads/:id` | Update ad (Admin) |
+| DELETE | `/api/ads/:id` | Delete ad (Admin) |
+| POST | `/api/ads/:id/click` | Track ad click |
+| POST | `/api/ads/:id/impression` | Track ad impression |
+
+---
+
+## 🗺️ Sitemap Routes (`/api/sitemap`)
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/sitemap/generate` | Generate sitemap |
+| GET | `/api/sitemap` | Get sitemap.xml |
+| GET | `/api/sitemap/index` | Get sitemap index |
+
+---
+
+## ❤️ Health & Test Routes
+
+| Method | Endpoint | Functionality |
+|--------|----------|---------------|
+| GET | `/api/health` | Basic health check |
+| GET | `/api/health/detailed` | Detailed health check with stats |
+| GET | `/api/audio-test` | Test audio routes configuration |
+| GET | `/api/upload-test` | Test upload routes configuration |
+| GET | `/` | API root with version info |
+
+---
+
+## 📊 Summary by Category
+
+| Category | Total Endpoints |
+|----------|----------------:|
+| Authentication | 8 |
+| Users | 5 |
+| Poems | 9 |
+| Authors | 6 |
+| Books | 6 |
+| Audio | 24 |
+| Videos | 7 |
+| Categories | 5 |
+| Search | 7 |
+| Notifications | 5 |
+| Subscriptions | 6 |
+| Analytics | 4 |
+| Admin | 7 |
+| Creator | 6 |
+| Homepage | 3 |
+| SEO | 4 |
+| Upload | 10 |
+| Settings | 3 |
+| AI | 3 |
+| Transliteration | 3 |
+| Playlists | 7 |
+| Blogs | 6 |
+| Backup | 4 |
+| App Settings | 8 |
+| Captcha | 3 |
+| Comments | 6 |
+| Ads | 7 |
+| Sitemap | 3 |
+| Health/Test | 5 |
+| **TOTAL** | **~180** |

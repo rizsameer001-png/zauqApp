@@ -1,0 +1,127 @@
+Here is the complete list of all REST API endpoints with your 
+base URL `https://zauqappbackend.onrender.com`, organized by category based on 
+your `homepageAPI.js` file:
+
+## 🔓 Public Routes (No Authentication Required)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/` | Get complete homepage data |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/daily-quote` | Get daily quote |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/featured` | Get featured content (supports query param: `?type=poems/authors/books/audio/videos`) |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/banners` | Get public banners (only active ones) |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/config` | Get public config (only active sections) |
+
+## 🔐 Admin Routes (Authentication Required)
+
+### Config Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/config` | Get config (authenticated) |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/config` | Get admin config |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/config` | Update config |
+
+### Section Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/sections/:section` | Update specific section |
+| PATCH | `https://zauqappbackend.onrender.com/api/homepage/admin/sections/:section/toggle` | Toggle section status |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/sections/reorder` | Reorder sections |
+
+**Parameters:** `:section` - Section identifier (e.g., hero, featured, banners, etc.)
+
+### Banner Management (Full CRUD)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/banners` | Get all banners |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/:id` | Get banner by ID |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/admin/banners` | Add new banner |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/:id` | Update banner |
+| DELETE | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/:id` | Remove banner |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/banners` | Update multiple banners |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/reorder` | Reorder banners |
+| PATCH | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/:id/toggle` | Toggle banner status |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/admin/banners/bulk` | Bulk upload banners |
+
+**Parameters:** `:id` - Banner ID
+
+### Featured Content Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/featured` | Get featured content (CMS) |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/featured` | Update featured content |
+
+### Quote Settings Management
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/quote-settings` | Get quote settings |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/admin/quote-settings` | Update quote settings |
+
+### Stats & Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/admin/stats` | Get homepage statistics |
+
+## 📌 Legacy Routes (Deprecated - for Backward Compatibility)
+
+### Legacy Config Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/config/admin` | Legacy config endpoint |
+
+### Legacy Banner Endpoints (No `/admin` prefix)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/banners/admin` | Get legacy banners |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/banners` | Add legacy banner |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/banners/:id` | Update legacy banner |
+| DELETE | `https://zauqappbackend.onrender.com/api/homepage/banners/:id` | Remove legacy banner |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/banners` | Update multiple legacy banners |
+| PATCH | `https://zauqappbackend.onrender.com/api/homepage/banners/:id/toggle` | Toggle legacy banner status |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/banners/reorder` | Reorder legacy banners |
+| POST | `https://zauqappbackend.onrender.com/api/homepage/banners/bulk` | Bulk upload legacy banners |
+
+### Legacy Section Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/sections/:section` | Update legacy section |
+| PATCH | `https://zauqappbackend.onrender.com/api/homepage/sections/:section/toggle` | Toggle legacy section status |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/sections/reorder` | Reorder legacy sections |
+
+### Legacy Featured Content Endpoint
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/featured` | Update legacy featured content |
+
+### Legacy Quote Settings Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/quote-settings` | Get legacy quote settings |
+| PUT | `https://zauqappbackend.onrender.com/api/homepage/quote-settings` | Update legacy quote settings |
+
+## 🧪 Debug & Test Routes
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `https://zauqappbackend.onrender.com/api/homepage/test` | Test if router is working |
+| GET | `https://zauqappbackend.onrender.com/api/homepage/debug/routes` | Get all registered routes |
+
+## 📊 Summary
+
+| Category | Count |
+|----------|-------|
+| Public Routes | 5 |
+| Admin Routes | 18 |
+| Legacy Routes | 15 |
+| Debug/Test Routes | 2 |
+| **Total Unique Endpoints** | **40** |
+
+## 🔑 Important Notes
+
+1. **Base URL**: All endpoints are prefixed with `/api/homepage` after the base URL
+2. **Authentication**: Admin routes require authentication token (likely Bearer token in Authorization header)
+3. **Admin Role**: Admin routes may also require admin privileges
+4. **Query Parameters**: 
+   - `/featured` accepts `?type=` parameter (values: poems, authors, books, audio, videos)
+5. **Deprecation Warning**: Legacy routes are marked for deprecation - use admin routes (with `/admin` prefix) for new development
+6. **Content-Type**: All POST/PUT/PATCH requests should send JSON data with `Content-Type: application/json`

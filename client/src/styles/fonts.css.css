@@ -1,0 +1,83 @@
+/* client/src/styles/fonts.css */
+
+/* Jameel Noori Nastaleeq - Urdu Font */
+@font-face {
+  font-family: 'Jameel Noori Nastaleeq';
+  src: url('/fonts/JameelNooriNastaleeq.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Jameel Noori Nastaleeq';
+  src: url('/fonts/JameelNooriNastaleeq-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Noto Nastaliq Urdu - Google Font alternative */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400;500;600;700&display=swap');
+
+/* Urdu Font Classes */
+.font-nastaliq {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', 'Segoe UI', system-ui, sans-serif;
+}
+
+.font-nastaliq-jameel {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+}
+
+.font-nastaliq-noto {
+  font-family: 'Noto Nastaliq Urdu', 'Jameel Noori Nastaleeq', serif;
+}
+
+/* Editor specific styles */
+.urdu-editor-content {
+  font-family: 'Jameel Noori Nastaleeq', 'Noto Nastaliq Urdu', serif;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  direction: rtl;
+  text-align: right;
+}
+
+.urdu-editor-content strong,
+.urdu-editor-content b {
+  font-weight: 700;
+  color: inherit;
+}
+
+.urdu-editor-content em,
+.urdu-editor-content i {
+  font-style: italic;
+}
+
+.urdu-editor-content u {
+  text-decoration: underline;
+}
+
+/* Color classes for editor */
+.urdu-editor-content .text-red { color: #ef4444; }
+.urdu-editor-content .text-blue { color: #3b82f6; }
+.urdu-editor-content .text-green { color: #10b981; }
+.urdu-editor-content .text-yellow { color: #eab308; }
+.urdu-editor-content .text-purple { color: #8b5cf6; }
+.urdu-editor-content .text-pink { color: #ec4899; }
+.urdu-editor-content .text-orange { color: #f97316; }
+.urdu-editor-content .text-amber { color: #f59e0b; }
+
+/* Background color classes */
+.urdu-editor-content .bg-red-light { background-color: #fee2e2; }
+.urdu-editor-content .bg-blue-light { background-color: #dbeafe; }
+.urdu-editor-content .bg-green-light { background-color: #d1fae5; }
+.urdu-editor-content .bg-yellow-light { background-color: #fef3c7; }
+
+/* Size classes */
+.urdu-editor-content .text-xs { font-size: 0.75rem; }
+.urdu-editor-content .text-sm { font-size: 0.875rem; }
+.urdu-editor-content .text-base { font-size: 1rem; }
+.urdu-editor-content .text-lg { font-size: 1.125rem; }
+.urdu-editor-content .text-xl { font-size: 1.25rem; }
+.urdu-editor-content .text-2xl { font-size: 1.5rem; }
+.urdu-editor-content .text-3xl { font-size: 1.875rem; }

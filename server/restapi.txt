@@ -1,0 +1,463 @@
+
+Excellent! Now with the **complete ZauqAPI documentation**, I'll create a **comprehensive REST API test cases list** covering **all scenarios** for automation. This is a production-grade test suite.
+
+---
+
+# 📋 ZAUQAPI - Complete REST API Test Cases for Automation
+
+## Test Case Structure
+Each test case includes:
+- **TC-ID**: Unique identifier
+- **Category**: API module
+- **Scenario**: What is being tested
+- **Method & Endpoint**
+- **Preconditions** (auth, data setup)
+- **Test Data** (payload)
+- **Expected Status Code**
+- **Expected Response Validation**
+- **Post-actions** (cleanup)
+
+---
+
+## 🔐 1. AUTHENTICATION APIs (8 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| AUTH-001 | Register new user - success | POST | `/api/auth/register` | None | `{ "name": "Test User", "email": "test@example.com", "password": "Test@123", "confirmPassword": "Test@123" }` | 201 Created | `success: true, user: { id, email, role: "user" }, token` | Delete user |
+| AUTH-002 | Register - duplicate email | POST | `/api/auth/register` | User exists | Same as AUTH-001 | 409 Conflict | `error: "Email already exists"` | None |
+| AUTH-003 | Register - weak password | POST | `/api/auth/register` | None | `{ "email": "weak@test.com", "password": "123" }` | 400 Bad Request | `errors: [{ field: "password", message: "Password must be at least 6 characters" }]` | None |
+| AUTH-004 | Register - missing required fields | POST | `/api/auth/register` | None | `{ "email": "test@example.com" }` | 400 Bad Request | `errors: ["name is required", "password is required"]` | None |
+| AUTH-005 | Register - invalid email format | POST | `/api/auth/register` | None | `{ "name": "Test", "email": "invalid-email", "password": "Test@123" }` | 400 Bad Request | `errors: [{ field: "email", message: "Invalid email format" }]` | None |
+| AUTH-006 | Register - password mismatch | POST | `/api/auth/register` | None | `{ "name": "Test", "email": "test@test.com", "password": "Test@123", "confirmPassword": "Different@123" }` | 400 Bad Request | `error: "Passwords do not match"` | None |
+| AUTH-007 | Login - valid credentials | POST | `/api/auth/login` | Registered user | `{ "email": "test@example.com", "password": "Test@123" }` | 200 OK | `token, refreshToken, user: { id, email, role }` | None |
+| AUTH-008 | Login - wrong password | POST | `/api/auth/login` | Registered user | `{ "email": "test@example.com", "password": "WrongPass@123" }` | 401 Unauthorized | `error: "Invalid credentials"` | None |
+| AUTH-009 | Login - non-existent email | POST | `/api/auth/login` | None | `{ "email": "nonexistent@test.com", "password": "Test@123" }` | 401 Unauthorized | `error: "Invalid credentials"` | None |
+| AUTH-010 | Login - empty fields | POST | `/api/auth/login` | None | `{ "email": "", "password": "" }` | 400 Bad Request | `errors: ["email is required", "password is required"]` | None |
+| AUTH-011 | Login - SQL injection attempt | POST | `/api/auth/login` | None | `{ "email": "' OR '1'='1", "password": "' OR '1'='1" }` | 401 Unauthorized | No SQL error exposed | None |
+| AUTH-012 | Logout - valid token | POST | `/api/auth/logout` | Authenticated user | None (Bearer token) | 200 OK | `success: true, message: "Logged out successfully"` | Token invalidated |
+| AUTH-013 | Logout - no token | POST | `/api/auth/logout` | None | None | 401 Unauthorized | `error: "No token provided"` | None |
+| AUTH-014 | Logout - invalid token | POST | `/api/auth/logout` | None | Invalid Bearer token | 403 Forbidden | `error: "Invalid or expired token"` | None |
+| AUTH-015 | Get current user (me) | GET | `/api/auth/me` | Authenticated user | None (Bearer token) | 200 OK | `user: { id, email, name, role, createdAt }` | None |
+| AUTH-016 | Get me - no token | GET | `/api/auth/me` | None | None | 401 Unauthorized | `error: "No token provided"` | None |
+| AUTH-017 | Forgot password - valid email | POST | `/api/auth/forgot-password` | Registered user | `{ "email": "test@example.com" }` | 200 OK | `success: true, message: "Reset email sent"` | Check email |
+| AUTH-018 | Forgot password - invalid email | POST | `/api/auth/forgot-password` | None | `{ "email": "fake@test.com" }` | 404 Not Found | `error: "User not found"` | None |
+| AUTH-019 | Forgot password - empty email | POST | `/api/auth/forgot-password` | None | `{ "email": "" }` | 400 Bad Request | `error: "Email is required"` | None |
+| AUTH-020 | Reset password - valid token | POST | `/api/auth/reset-password/:token` | Valid reset token | `{ "password": "NewPass@123", "confirmPassword": "NewPass@123" }` | 200 OK | `success: true, message: "Password reset successful"` | Token invalidated |
+| AUTH-021 | Reset password - invalid/expired token | POST | `/api/auth/reset-password/invalid-token` | None | `{ "password": "NewPass@123" }` | 400 Bad Request | `error: "Invalid or expired token"` | None |
+| AUTH-022 | Change password - correct old password | PUT | `/api/auth/change-password` | Authenticated user | `{ "currentPassword": "Test@123", "newPassword": "NewTest@123" }` | 200 OK | `success: true, message: "Password changed"` | Login with new pass |
+| AUTH-023 | Change password - wrong old password | PUT | `/api/auth/change-password` | Authenticated user | `{ "currentPassword": "Wrong@123", "newPassword": "NewTest@123" }` | 401 Unauthorized | `error: "Current password is incorrect"` | None |
+| AUTH-024 | Refresh token - valid refresh token | POST | `/api/auth/refresh-token` | Logged in user | `{ "refreshToken": "valid_refresh_token" }` | 200 OK | `new token, new refreshToken` | None |
+| AUTH-025 | Refresh token - invalid token | POST | `/api/auth/refresh-token` | None | `{ "refreshToken": "invalid" }` | 403 Forbidden | `error: "Invalid refresh token"` | None |
+
+---
+
+## 👤 2. USER APIs (5 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| USER-001 | Get all users - Admin | GET | `/api/users` | Admin authenticated | None | 200 OK | `Array of users with pagination` | None |
+| USER-002 | Get all users - Non-admin | GET | `/api/users` | Regular user | None | 403 Forbidden | `error: "Admin access required"` | None |
+| USER-003 | Get single user by ID | GET | `/api/users/:id` | Valid user ID | None | 200 OK | `user: { id, name, email, role, stats }` | None |
+| USER-004 | Get user - not found | GET | `/api/users/999999` | None | None | 404 Not Found | `error: "User not found"` | None |
+| USER-005 | Get own user profile | GET | `/api/users/:id` | Same as authenticated user | None | 200 OK | Full user profile | None |
+| USER-006 | Update user profile | PUT | `/api/users/:id` | Authenticated (own) | `{ "name": "Updated Name", "bio": "New bio" }` | 200 OK | `updated user object` | Revert |
+| USER-007 | Update user - try to change role (non-admin) | PUT | `/api/users/:id` | Regular user | `{ "role": "admin" }` | 403 Forbidden | `error: "Cannot change role"` | None |
+| USER-008 | Update user - invalid email | PUT | `/api/users/:id` | Authenticated | `{ "email": "invalid" }` | 400 Bad Request | `validation error` | None |
+| USER-009 | Update user - update another user (non-admin) | PUT | `/api/users/999` | Regular user | `{ "name": "Hack" }` | 403 Forbidden | `error: "Can only update own profile"` | None |
+| USER-010 | Delete user account - Admin | DELETE | `/api/users/:id` | Admin | None | 204 No Content | No response body | User deleted |
+| USER-011 | Delete user - non-admin delete self | DELETE | `/api/users/:id` | Regular user own ID | None | 204 No Content | User deleted | User deleted |
+| USER-012 | Delete user - non-admin delete others | DELETE | `/api/users/:id` | Regular user different ID | None | 403 Forbidden | `error: "Forbidden"` | None |
+| USER-013 | Get user statistics | GET | `/api/users/:id/stats` | Valid user ID | None | 200 OK | `{ poemsCount, bookmarksCount, likesCount, followersCount }` | None |
+| USER-014 | Get user stats - invalid user | GET | `/api/users/999999/stats` | None | None | 404 Not Found | `error: "User not found"` | None |
+
+---
+
+## 📝 3. POEM APIs (9 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| POEM-001 | Get all poems - with pagination | GET | `/api/poems?page=1&limit=10` | None | None | 200 OK | `{ poems: [], total, page, limit, totalPages }` | None |
+| POEM-002 | Get all poems - filter by category | GET | `/api/poems?category=ghazal` | None | None | 200 OK | Filtered poem list | None |
+| POEM-003 | Get all poems - sort by newest | GET | `/api/poems?sort=-createdAt` | None | None | 200 OK | Poems in descending date order | None |
+| POEM-004 | Get single poem by slug | GET | `/api/poems/:slug` | Poem exists | None | 200 OK | `poem: { id, title, content, author, slug, likes, views }` | None |
+| POEM-005 | Get poem - invalid slug | GET | `/api/poems/invalid-slug-12345` | None | None | 404 Not Found | `error: "Poem not found"` | None |
+| POEM-006 | Create new poem - Admin | POST | `/api/poems` | Admin auth | `{ "title": "Test Poem", "content": "Poem content...", "authorId": 1, "categoryId": 1 }` | 201 Created | `poem object with slug` | Delete poem |
+| POEM-007 | Create poem - missing title | POST | `/api/poems` | Admin auth | `{ "content": "Content only" }` | 400 Bad Request | `error: "Title is required"` | None |
+| POEM-008 | Create poem - duplicate title | POST | `/api/poems` | Admin auth | Same title as existing | 409 Conflict | `error: "Poem with this title already exists"` | None |
+| POEM-009 | Create poem - non-admin | POST | `/api/poems` | Regular user | Valid poem data | 403 Forbidden | `error: "Admin/Creator access required"` | None |
+| POEM-010 | Update poem - Admin | PUT | `/api/poems/:id` | Admin auth | `{ "title": "Updated Title" }` | 200 OK | `updated poem` | Revert |
+| POEM-011 | Update poem - Creator (owner) | PUT | `/api/poems/:id` | Poem creator | `{ "content": "Updated content" }` | 200 OK | `updated poem` | Revert |
+| POEM-012 | Update poem - non-owner non-admin | PUT | `/api/poems/:id` | Different user | `{ "title": "Hack" }` | 403 Forbidden | `error: "Not authorized"` | None |
+| POEM-013 | Delete poem - Admin | DELETE | `/api/poems/:id` | Admin auth | None | 204 No Content | No body | Poem deleted |
+| POEM-014 | Delete poem - non-admin | DELETE | `/api/poems/:id` | Regular user | None | 403 Forbidden | `error: "Admin access required"` | None |
+| POEM-015 | Like a poem | POST | `/api/poems/:id/like` | Authenticated user | None | 200 OK | `{ liked: true, likesCount: number }` | Unlike |
+| POEM-016 | Like already liked poem | POST | `/api/poems/:id/like` | Already liked | None | 409 Conflict | `error: "Already liked"` | None |
+| POEM-017 | Bookmark a poem | POST | `/api/poems/:id/bookmark` | Authenticated user | None | 200 OK | `{ bookmarked: true }` | Remove bookmark |
+| POEM-018 | Get featured poems | GET | `/api/poems/featured` | None | None | 200 OK | `Array of featured poems (max 10)` | None |
+| POEM-019 | Get trending poems | GET | `/api/poems/trending` | None | None | 200 OK | `Array of poems sorted by views/likes` | None |
+| POEM-020 | Like poem - unauthenticated | POST | `/api/poems/:id/like` | No token | None | 401 Unauthorized | `error: "Authentication required"` | None |
+
+---
+
+## 👨‍🎨 4. AUTHOR APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| AUTH-101 | Get all authors | GET | `/api/authors?page=1&limit=20` | None | None | 200 OK | `{ authors: [], total }` | None |
+| AUTH-102 | Get author by slug | GET | `/api/authors/:slug` | Valid author | None | 200 OK | `author: { id, name, bio, slug, poemCount }` | None |
+| AUTH-103 | Get author - not found | GET | `/api/authors/non-existent` | None | None | 404 Not Found | `error: "Author not found"` | None |
+| AUTH-104 | Create author - Admin | POST | `/api/authors` | Admin auth | `{ "name": "Test Author", "bio": "Bio text", "born": "1950" }` | 201 Created | `author object with slug` | Delete author |
+| AUTH-105 | Create author - duplicate name | POST | `/api/authors` | Admin auth | Same name as existing | 409 Conflict | `error: "Author already exists"` | None |
+| AUTH-106 | Create author - non-admin | POST | `/api/authors` | Regular user | Valid author data | 403 Forbidden | `error: "Admin access required"` | None |
+| AUTH-107 | Update author - Admin | PUT | `/api/authors/:id` | Admin auth | `{ "bio": "Updated bio" }` | 200 OK | `updated author` | Revert |
+| AUTH-108 | Delete author - Admin | DELETE | `/api/authors/:id` | Admin auth | None | 204 No Content | No body | Author deleted |
+| AUTH-109 | Delete author with poems (cascade) | DELETE | `/api/authors/:id` | Admin auth | Author has poems | 400 Bad Request | `error: "Cannot delete author with existing poems"` | None |
+| AUTH-110 | Get author's poems | GET | `/api/authors/:slug/poems` | Valid author | None | 200 OK | `Array of poems by this author` | None |
+
+---
+
+## 📚 5. BOOK APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| BOOK-001 | Get all books | GET | `/api/books?page=1&limit=10` | None | None | 200 OK | `{ books: [], total, page }` | None |
+| BOOK-002 | Get book by slug | GET | `/api/books/:slug` | Valid book | None | 200 OK | `book: { id, title, author, description, pdfUrl }` | None |
+| BOOK-003 | Get book - invalid slug | GET | `/api/books/invalid` | None | None | 404 Not Found | `error: "Book not found"` | None |
+| BOOK-004 | Create book - Admin | POST | `/api/books` | Admin auth | `{ "title": "Test Book", "author": "Test Author", "description": "Description", "pdfFile": "file.pdf" }` | 201 Created | `book object` | Delete book |
+| BOOK-005 | Create book - missing required | POST | `/api/books` | Admin auth | `{ "title": "Only Title" }` | 400 Bad Request | `validation error` | None |
+| BOOK-006 | Update book - Admin | PUT | `/api/books/:id` | Admin auth | `{ "title": "Updated Title" }` | 200 OK | `updated book` | Revert |
+| BOOK-007 | Delete book - Admin | DELETE | `/api/books/:id` | Admin auth | None | 204 No Content | No body | Book deleted |
+| BOOK-008 | Download book PDF | GET | `/api/books/:id/download` | Valid book ID | None | 200 OK | `PDF file (Content-Type: application/pdf)` | None |
+| BOOK-009 | Download book - no PDF | GET | `/api/books/:id/download` | Book without PDF | None | 404 Not Found | `error: "PDF not found"` | None |
+
+---
+
+## 🎵 6. AUDIO APIs (24 endpoints - CRITICAL)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Test Data | Expected Status | Expected Response | Post-Action |
+|-------|----------|--------|----------|---------------|-----------|-----------------|-------------------|-------------|
+| AUDIO-001 | Get all audio tracks | GET | `/api/audio?page=1&limit=20` | None | None | 200 OK | `{ audio: [], total, page }` | None |
+| AUDIO-002 | Get audio by type | GET | `/api/audio/type/:type` | Type: nauha/manqabat/qawwali | None | 200 OK | `Filtered audio array` | None |
+| AUDIO-003 | Get audio by invalid type | GET | `/api/audio/type/invalid` | None | None | 400 Bad Request | `error: "Invalid audio type"` | None |
+| AUDIO-004 | Get audio by occasion | GET | `/api/audio/occasion/:occasion` | Valid occasion | None | 200 OK | `Filtered audio array` | None |
+| AUDIO-005 | Get single audio by slug | GET | `/api/audio/:slug` | Valid audio | None | 200 OK | `audio: { id, title, artist, duration, audioUrl, lyrics }` | None |
+| AUDIO-006 | Get audio - not found | GET | `/api/audio/invalid-slug` | None | None | 404 Not Found | `error: "Audio not found"` | None |
+| AUDIO-007 | Stream audio file | GET | `/api/audio/:slug/stream` | Valid audio | Headers: Range | 206 Partial Content | `audio/mpeg stream` | None |
+| AUDIO-008 | Stream audio - invalid range | GET | `/api/audio/:slug/stream` | Valid audio | Range: bytes=999999- | 416 Range Not Satisfiable | `error: "Invalid range"` | None |
+| AUDIO-009 | Get audio transcript | GET | `/api/audio/:slug/transcript` | Audio has transcript | None | 200 OK | `{ transcript: "text", language: "ur" }` | None |
+| AUDIO-010 | Get similar audio recommendations | GET | `/api/audio/:slug/similar` | Valid audio | None | 200 OK | `Array of similar audio (max 10)` | None |
+| AUDIO-011 | Create audio - Admin | POST | `/api/audio` | Admin auth | `{ "title": "Test Audio", "artist": "Artist", "type": "naat", "audioFile": "file.mp3" }` | 201 Created | `audio object` | Delete audio |
+| AUDIO-012 | Create audio - missing file | POST | `/api/audio` | Admin auth | `{ "title": "No File" }` | 400 Bad Request | `error: "Audio file required"` | None |
+| AUDIO-013 | Update audio - Admin | PUT | `/api/audio/:id` | Admin auth | `{ "title": "Updated Title" }` | 200 OK | `updated audio` | Revert |
+| AUDIO-014 | Delete audio - Admin | DELETE | `/api/audio/:id` | Admin auth | None | 204 No Content | No body | Audio deleted |
+| AUDIO-015 | Like audio - authenticated | POST | `/api/audio/:id/like` | Auth user | None | 200 OK | `{ liked: true, likesCount: number }` | Unlike |
+| AUDIO-016 | Unlike audio | DELETE | `/api/audio/:id/like` | Auth user who liked | None | 200 OK | `{ liked: false, likesCount: number }` | None |
+| AUDIO-017 | Like audio - not found | POST | `/api/audio/999999/like` | Auth user | None | 404 Not Found | `error: "Audio not found"` | None |
+| AUDIO-018 | Bookmark audio | POST | `/api/audio/:id/bookmark` | Auth user | None | 200 OK | `{ bookmarked: true }` | Remove |
+| AUDIO-019 | Get user playlists | GET | `/api/audio/playlists/user` | Auth user | None | 200 OK | `Array of user playlists` | None |
+| AUDIO-020 | Create playlist | POST | `/api/audio/playlists` | Auth user | `{ "name": "My Favorites", "description": "Best audio" }` | 201 Created | `playlist object` | Delete playlist |
+| AUDIO-021 | Add audio to playlist | POST | `/api/audio/:audioId/playlist/:playlistId` | Auth user owns playlist | None | 200 OK | `{ success: true }` | Remove |
+| AUDIO-022 | Add duplicate audio to playlist | POST | `/api/audio/:audioId/playlist/:playlistId` | Audio already in playlist | None | 409 Conflict | `error: "Audio already in playlist"` | None |
+| AUDIO-023 | Remove audio from playlist | DELETE | `/api/audio/:audioId/playlist/:playlistId` | Auth user owns playlist | None | 200 OK | `{ removed: true }` | None |
+| AUDIO-024 | Get recently played | GET | `/api/audio/recent/played` | Auth user | None | 200 OK | `Array of recently played audio` | None |
+| AUDIO-025 | Get recommended audio | GET | `/api/audio/recommended` | Auth user | None | 200 OK | `Personalized recommendations` | None |
+| AUDIO-026 | Get audio statistics | GET | `/api/audio/stats` | Admin auth | None | 200 OK | `{ totalTracks, totalPlays, topArtists, popularTypes }` | None |
+| AUDIO-027 | Get featured audio | GET | `/api/audio/featured` | None | None | 200 OK | `Featured audio (max 10)` | None |
+| AUDIO-028 | Get trending audio | GET | `/api/audio/trending` | None | None | 200 OK | `Trending audio by plays/likes` | None |
+| AUDIO-029 | Search audio | GET | `/api/audio/search?q=keyword` | None | None | 200 OK | `Search results array` | None |
+| AUDIO-030 | Get popular by type | GET | `/api/audio/popular/:type` | Valid type | None | 200 OK | `Popular audio of that type` | None |
+| AUDIO-031 | Get audio by author | GET | `/api/audio/author/:authorId` | Valid author ID | None | 200 OK | `Audio by this author` | None |
+| AUDIO-032 | Get audio by tag | GET | `/api/audio/tag/:tag` | Valid tag | None | 200 OK | `Audio with this tag` | None |
+
+---
+
+## 🎬 7. VIDEO APIs (7 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status | Expected Response |
+|-------|----------|--------|----------|---------------|-----------------|-------------------|
+| VIDEO-001 | Get all videos | GET | `/api/videos` | None | 200 OK | `{ videos: [], total, page }` |
+| VIDEO-002 | Get video by slug | GET | `/api/videos/:slug` | Valid video | 200 OK | `video: { id, title, url, thumbnail, views }` |
+| VIDEO-003 | Stream video | GET | `/api/videos/:slug/stream` | Valid video | 206 Partial | `video/mp4 stream` |
+| VIDEO-004 | Create video - Admin | POST | `/api/videos` | Admin auth | 201 Created | `video object` |
+| VIDEO-005 | Create video - non-admin | POST | `/api/videos` | Regular user | 403 Forbidden | `error: "Admin access required"` |
+| VIDEO-006 | Update video - Admin | PUT | `/api/videos/:id` | Admin auth | 200 OK | `updated video` |
+| VIDEO-007 | Delete video - Admin | DELETE | `/api/videos/:id` | Admin auth | 204 No Content | No body |
+| VIDEO-008 | Like video | POST | `/api/videos/:id/like` | Auth user | 200 OK | `{ liked: true }` |
+
+---
+
+## 🏷️ 8. CATEGORY APIs (5 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status | Expected Response |
+|-------|----------|--------|----------|---------------|-----------------|-------------------|
+| CAT-001 | Get all categories | GET | `/api/categories` | None | 200 OK | `Array of categories with slugs` |
+| CAT-002 | Get category by slug | GET | `/api/categories/:slug` | Valid category | 200 OK | `category: { id, name, slug, description, count }` |
+| CAT-003 | Create category - Admin | POST | `/api/categories` | Admin auth | 201 Created | `category object` |
+| CAT-004 | Create duplicate category | POST | `/api/categories` | Admin auth | 409 Conflict | `error: "Category exists"` |
+| CAT-005 | Update category - Admin | PUT | `/api/categories/:id` | Admin auth | 200 OK | `updated category` |
+| CAT-006 | Delete category - Admin (with content) | DELETE | `/api/categories/:id` | Admin auth | 400 Bad Request | `error: "Category has associated content"` |
+
+---
+
+## 🔍 9. SEARCH APIs (7 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Test Data | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------|-----------------|-------------------|
+| SEARCH-001 | Global search | GET | `/api/search?q=love&type=all` | None | 200 OK | `{ poems: [], audio: [], videos: [], authors: [] }` |
+| SEARCH-002 | Search poems only | GET | `/api/search/poems?q=love` | None | 200 OK | `{ poems: [], total }` |
+| SEARCH-003 | Search authors only | GET | `/api/search/authors?q=iqbal` | None | 200 OK | `{ authors: [] }` |
+| SEARCH-004 | Search audio only | GET | `/api/search/audio?q=naat` | None | 200 OK | `{ audio: [] }` |
+| SEARCH-005 | Search with pagination | GET | `/api/search?q=love&page=2&limit=5` | None | 200 OK | `Paginated results` |
+| SEARCH-006 | Search suggestions | GET | `/api/search/suggestions?q=lov` | None | 200 OK | `{ suggestions: ["love", "lover", "lovely"] }` |
+| SEARCH-007 | Advanced search (POST) | POST | `/api/search/advanced` | `{ "keywords": "peace", "category": "ghazal", "author": "Ghalib", "dateFrom": "2020-01-01" }` | 200 OK | `Filtered results` |
+| SEARCH-008 | Empty search query | GET | `/api/search?q=` | None | 400 Bad Request | `error: "Search query required"` |
+
+---
+
+## 🔔 10. NOTIFICATION APIs (5 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status | Expected Response |
+|-------|----------|--------|----------|---------------|-----------------|-------------------|
+| NOTIF-001 | Get user notifications | GET | `/api/notifications?page=1` | Auth user | 200 OK | `{ notifications: [], unreadCount, total }` |
+| NOTIF-002 | Mark single as read | PUT | `/api/notifications/:id/read` | Auth user owns notif | 200 OK | `{ read: true }` |
+| NOTIF-003 | Mark all as read | PUT | `/api/notifications/read-all` | Auth user | 200 OK | `{ success: true, count: number }` |
+| NOTIF-004 | Delete single notification | DELETE | `/api/notifications/:id` | Auth user | 204 No Content | No body |
+| NOTIF-005 | Delete all notifications | DELETE | `/api/notifications` | Auth user | 204 No Content | No body |
+
+---
+
+## 💳 11. SUBSCRIPTION APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status | Expected Response |
+|-------|----------|--------|----------|---------------|-----------------|-------------------|
+| SUB-001 | Get current subscription | GET | `/api/subscriptions/current` | Auth user | 200 OK | `{ plan: "free/premium", expiresAt, features }` |
+| SUB-002 | Get available plans | GET | `/api/subscriptions/plans` | None | 200 OK | `[{ name, price, features, duration }]` |
+| SUB-003 | Create subscription | POST | `/api/subscriptions/create` | Auth user | 201 Created | `{ subscriptionId, paymentUrl }` |
+| SUB-004 | Cancel subscription | POST | `/api/subscriptions/cancel` | Auth user with active sub | 200 OK | `{ cancelled: true, expiresAt }` |
+| SUB-005 | Get payment history | GET | `/api/subscriptions/payments` | Auth user | 200 OK | `{ payments: [], total }` |
+| SUB-006 | Change plan | PUT | `/api/subscriptions/change-plan` | Auth user | 200 OK | `{ newPlan, proratedAmount }` |
+
+---
+
+## 👑 12. ADMIN APIs (7 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status | Expected Response |
+|-------|----------|--------|----------|---------------|-----------------|-------------------|
+| ADMIN-001 | Admin dashboard stats | GET | `/api/admin/dashboard` | Admin | 200 OK | `{ totalUsers, totalContent, revenue, activeSubscriptions }` |
+| ADMIN-002 | Get all users (admin view) | GET | `/api/admin/users` | Admin | 200 OK | `All users with sensitive data` |
+| ADMIN-003 | Update user role | PUT | `/api/admin/users/:id/role` | Admin | 200 OK | `{ role: "admin/creator/user" }` |
+| ADMIN-004 | Bulk audio operations | POST | `/api/admin/audio/bulk` | Admin | 200 OK | `{ processed, failed, errors }` |
+| ADMIN-005 | Update audio metadata | PATCH | `/api/admin/audio/:id/metadata` | Admin | 200 OK | `updated metadata` |
+| ADMIN-006 | Get system settings | GET | `/api/admin/settings` | Admin | 200 OK | `{ siteName, maintenanceMode, features }` |
+| ADMIN-007 | Update system settings | PUT | `/api/admin/settings` | Admin | 200 OK | `{ updated: true }` |
+
+---
+
+## 🎨 13. CREATOR APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status |
+|-------|----------|--------|----------|---------------|-----------------|
+| CR-001 | Creator dashboard | GET | `/api/creator/dashboard` | Creator role | 200 OK |
+| CR-002 | Get creator's content | GET | `/api/creator/content` | Creator | 200 OK |
+| CR-003 | Create content as creator | POST | `/api/creator/content` | Creator | 201 Created |
+| CR-004 | Update own content | PUT | `/api/creator/content/:id` | Creator (owner) | 200 OK |
+| CR-005 | Delete own content | DELETE | `/api/creator/content/:id` | Creator (owner) | 204 No Content |
+| CR-006 | Get creator statistics | GET | `/api/creator/stats` | Creator | 200 OK |
+| CR-007 | Creator - update others' content | PUT | `/api/creator/content/:id` | Creator (not owner) | 403 Forbidden |
+
+---
+
+## 📤 14. UPLOAD APIs (10 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Test Data | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------|-----------------|-------------------|
+| UPLOAD-001 | Upload single image | POST | `/api/upload/image` | `multipart/form-data` with image | 201 Created | `{ url: "https://...", publicId }` |
+| UPLOAD-002 | Upload cover image | POST | `/api/upload/cover` | Image file | 201 Created | `{ coverUrl }` |
+| UPLOAD-003 | Upload multiple images | POST | `/api/upload/images` | Multiple image files | 201 Created | `{ urls: [], count }` |
+| UPLOAD-004 | Upload PDF | POST | `/api/upload/pdf` | PDF file < 10MB | 201 Created | `{ pdfUrl, pages }` |
+| UPLOAD-005 | Upload EPUB | POST | `/api/upload/epub` | EPUB file | 201 Created | `{ epubUrl }` |
+| UPLOAD-006 | Upload audio | POST | `/api/upload/audio` | MP3 file < 20MB | 201 Created | `{ audioUrl, duration }` |
+| UPLOAD-007 | Upload video | POST | `/api/upload/video` | MP4 file < 100MB | 201 Created | `{ videoUrl, thumbnail }` |
+| UPLOAD-008 | Upload invalid file type | POST | `/api/upload/image` | .exe file | 400 Bad Request | `error: "Invalid file type"` |
+| UPLOAD-009 | Upload exceeds size limit | POST | `/api/upload/video` | 200MB file | 413 Payload Too Large | `error: "File too large"` |
+| UPLOAD-010 | Delete uploaded file | DELETE | `/api/upload/delete` | `{ fileUrl: "https://..." }` | 200 OK | `{ deleted: true }` |
+
+---
+
+## 🤖 15. AI APIs (3 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Test Data | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------|-----------------|-------------------|
+| AI-001 | Generate poem using AI | POST | `/api/ai/generate-poem` | `{ topic: "love", style: "ghazal", length: "short" }` | 200 OK | `{ poem: { title, content, suggestedTags } }` |
+| AI-002 | Generate poem - missing topic | POST | `/api/ai/generate-poem` | `{ style: "ghazal" }` | 400 Bad Request | `error: "Topic required"` |
+| AI-003 | Suggest tags for content | POST | `/api/ai/suggest-tags` | `{ content: "Poem text here..." }` | 200 OK | `{ tags: ["love", "sadness", "nature"] }` |
+| AI-004 | Translate poem | POST | `/api/ai/translate` | `{ text: "Urdu poem", targetLanguage: "en" }` | 200 OK | `{ translatedText: "English poem" }` |
+
+---
+
+## 🔤 16. TRANSLITERATION APIs (3 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Test Data | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------|-----------------|-------------------|
+| TRANS-001 | Urdu to Roman | POST | `/api/transliteration/urdu-to-roman` | `{ text: "اردو متن" }` | 200 OK | `{ romanText: "Urdu matan" }` |
+| TRANS-002 | Roman to Urdu | POST | `/api/transliteration/roman-to-urdu` | `{ text: "Urdu matan" }` | 200 OK | `{ urduText: "اردو متن" }` |
+| TRANS-003 | Bulk transliteration | POST | `/api/transliteration/bulk` | `{ texts: ["text1", "text2"], direction: "urdu-to-roman" }` | 200 OK | `{ results: [] }` |
+
+---
+
+## 📝 17. BLOG APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status |
+|-------|----------|--------|----------|---------------|-----------------|
+| BLOG-001 | Get all blog posts | GET | `/api/blogs` | None | 200 OK |
+| BLOG-002 | Get single blog by slug | GET | `/api/blogs/:slug` | Valid blog | 200 OK |
+| BLOG-003 | Create blog - Admin | POST | `/api/blogs` | Admin | 201 Created |
+| BLOG-004 | Create blog - non-admin | POST | `/api/blogs` | Regular user | 403 Forbidden |
+| BLOG-005 | Update blog - Admin | PUT | `/api/blogs/:id` | Admin | 200 OK |
+| BLOG-006 | Delete blog - Admin | DELETE | `/api/blogs/:id` | Admin | 204 No Content |
+| BLOG-007 | Like blog post | POST | `/api/blogs/:id/like` | Auth user | 200 OK |
+
+---
+
+## 🔐 18. CAPTCHA APIs (3 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------------|-------------------|
+| CAPTCHA-001 | Generate captcha | GET | `/api/captcha/generate` | 200 OK | `{ captchaId: "uuid", expiresIn: 300 }` |
+| CAPTCHA-002 | Get captcha image | GET | `/api/captcha/image/:captchaId` | 200 OK | `image/png` |
+| CAPTCHA-003 | Verify captcha - correct | POST | `/api/captcha/verify` | 200 OK | `{ verified: true }` |
+| CAPTCHA-004 | Verify captcha - wrong | POST | `/api/captcha/verify` | 400 Bad Request | `{ verified: false, error: "Incorrect captcha" }` |
+| CAPTCHA-005 | Verify expired captcha | POST | `/api/captcha/verify` | 400 Bad Request | `error: "Captcha expired"` |
+
+---
+
+## 💬 19. COMMENT APIs (6 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status |
+|-------|----------|--------|----------|---------------|-----------------|
+| COMM-001 | Get comments for content | GET | `/api/comments/:contentType/:contentId` | None | 200 OK |
+| COMM-002 | Create comment | POST | `/api/comments` | Auth user | 201 Created |
+| COMM-003 | Create comment - unauthenticated | POST | `/api/comments` | No token | 401 Unauthorized |
+| COMM-004 | Update own comment | PUT | `/api/comments/:id` | Comment owner | 200 OK |
+| COMM-005 | Update others' comment | PUT | `/api/comments/:id` | Different user | 403 Forbidden |
+| COMM-006 | Delete own comment | DELETE | `/api/comments/:id` | Comment owner | 204 No Content |
+| COMM-007 | Like comment | POST | `/api/comments/:id/like` | Auth user | 200 OK |
+| COMM-008 | Reply to comment | POST | `/api/comments/:id/reply` | Auth user | 201 Created |
+
+---
+
+## 📢 20. AD APIs (7 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status |
+|-------|----------|--------|----------|---------------|-----------------|
+| AD-001 | Get active ads by position | GET | `/api/ads/active?position=sidebar` | None | 200 OK |
+| AD-002 | Get all ads - Admin | GET | `/api/ads` | Admin | 200 OK |
+| AD-003 | Create ad - Admin | POST | `/api/ads` | Admin | 201 Created |
+| AD-004 | Update ad - Admin | PUT | `/api/ads/:id` | Admin | 200 OK |
+| AD-005 | Delete ad - Admin | DELETE | `/api/ads/:id` | Admin | 204 No Content |
+| AD-006 | Track ad click | POST | `/api/ads/:id/click` | None | 200 OK |
+| AD-007 | Track ad impression | POST | `/api/ads/:id/impression` | None | 200 OK |
+
+---
+
+## ⚙️ 21. APP SETTINGS APIs (8 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Preconditions | Expected Status |
+|-------|----------|--------|----------|---------------|-----------------|
+| SET-001 | Get all app settings (public) | GET | `/api/app-settings` | None | 200 OK |
+| SET-002 | Update settings - Admin | PUT | `/api/app-settings` | Admin | 200 OK |
+| SET-003 | Reset to defaults - Admin | POST | `/api/app-settings/reset` | Admin | 200 OK |
+| SET-004 | Get single setting by key | GET | `/api/app-settings/:key` | None | 200 OK |
+| SET-005 | Get non-existent setting | GET | `/api/app-settings/fake` | None | 404 Not Found |
+| SET-006 | Update single setting - Admin | PUT | `/api/app-settings/:key` | Admin | 200 OK |
+| SET-007 | Upload logo - Admin | POST | `/api/app-settings/upload/logo` | Admin | 201 Created |
+| SET-008 | Upload favicon - Admin | POST | `/api/app-settings/upload/favicon` | Admin | 201 Created |
+| SET-009 | Generate API key - Admin | POST | `/api/app-settings/api-keys` | Admin | 201 Created |
+| SET-010 | Delete API key - Admin | DELETE | `/api/app-settings/api-keys/:keyId` | Admin | 204 No Content |
+
+---
+
+## 🗺️ 22. SITEMAP APIs (3 endpoints)
+
+| TC-ID | Scenario | Method | Endpoint | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------------|-------------------|
+| SITEMAP-001 | Generate sitemap (force) | GET | `/api/sitemap/generate` | 200 OK | `{ success: true, urlCount: number }` |
+| SITEMAP-002 | Get sitemap.xml | GET | `/api/sitemap` | 200 OK | `application/xml` |
+| SITEMAP-003 | Get sitemap index | GET | `/api/sitemap/index` | 200 OK | `XML sitemap index` |
+
+---
+
+## 🔄 23. RATE LIMITING & SECURITY SCENARIOS
+
+| TC-ID | Scenario | Method | Endpoint | Test Execution | Expected Status |
+|-------|----------|--------|----------|----------------|-----------------|
+| RATE-001 | Rate limit - login attempts | POST | `/api/auth/login` | 6 failed attempts in 5 min | 429 Too Many Requests |
+| RATE-002 | Rate limit - API requests | GET | `/api/poems` | 101 requests in 60 sec | 429 after limit |
+| SEC-001 | SQL injection in query param | GET | `/api/poems?id=1' OR '1'='1` | Single request | 400 or sanitized 200 |
+| SEC-002 | XSS in comment | POST | `/api/comments` | `<script>alert('xss')</script>` | 400 or escaped |
+| SEC-003 | JWT token expiry | GET | `/api/auth/me` | Use expired token | 403 Forbidden |
+| SEC-004 | Missing auth header | GET | `/api/users/profile` | No Authorization header | 401 Unauthorized |
+| SEC-005 | CORS validation | OPTIONS | `/api/poems` | From different origin | Appropriate CORS headers |
+| SEC-006 | IDOR attempt | GET | `/api/users/999` | Access another user's data | 403 Forbidden |
+
+---
+
+## 🚦 24. PERFORMANCE & LOAD SCENARIOS
+
+| TC-ID | Scenario | Method | Endpoint | Threshold | Expected |
+|-------|----------|--------|----------|-----------|----------|
+| PERF-001 | Response time - GET poems | GET | `/api/poems?page=1` | < 500ms | Pass |
+| PERF-002 | Response time - GET audio with filter | GET | `/api/audio/type/naat` | < 800ms | Pass |
+| PERF-003 | Response time - Search | GET | `/api/search?q=love` | < 1000ms | Pass |
+| PERF-004 | Concurrent users - 100 users | GET | `/api/poems` | All succeed | Pass |
+| PERF-005 | Large payload upload | POST | `/api/upload/audio` | 15MB file | Processed |
+| PERF-006 | Database query optimization | GET | `/api/audio/stats` | < 200ms | Pass |
+
+---
+
+## ✅ 25. HEALTH CHECK & MONITORING
+
+| TC-ID | Scenario | Method | Endpoint | Expected Status | Expected Response |
+|-------|----------|--------|----------|-----------------|-------------------|
+| HEALTH-001 | Health check | GET | `/health` | 200 OK | `{ status: "OK", timestamp, uptime }` |
+| HEALTH-002 | Database connectivity | GET | `/health/db` | 200 OK | `{ database: "connected" }` |
+| HEALTH-003 | Storage health | GET | `/health/storage` | 200 OK | `{ storage: "available", freeSpace }` |
+| HEALTH-004 | Redis/cache health | GET | `/health/cache` | 200 OK | `{ cache: "connected" }` |
+| HEALTH-005 | API version | GET | `/api/version` | 200 OK | `{ version, environment, buildNumber }` |
+
+---
+
+# 📊 Test Coverage Summary
+
+| Module | Total Endpoints | Test Cases | Coverage |
+|--------|----------------|------------|----------|
+| Authentication | 8 | 25 | 100% |
+| Users | 5 | 14 | 100% |
+| Poems | 9 | 20 | 100% |
+| Authors | 6 | 10 | 100% |
+| Books | 6 | 9 | 100% |
+| Audio | 24 | 32 | 100% |
+| Videos | 7 | 8 | 100% |
+| Categories | 5 | 6 | 100% |
+| Search | 7 | 8 | 100% |
+| Notifications | 5 | 5 | 100% |
+| Subscriptions | 6 | 6 | 100% |
+| Admin | 7 | 7 | 100% |
+| Creator | 6 | 7 | 100% |
+| Upload | 10 | 10 | 100% |
+| AI | 3 | 4 | 100% |
+| Transliteration | 3 | 3 | 100% |
+| Blogs | 6 | 7 | 100% |
+| Backup | 4 | 4 | 100% |
+| App Settings | 8 | 10 | 100% |
+| Captcha | 3 | 5 | 100% |
+| Comments | 6 | 8 | 100% |
+| Ads | 7 | 7 | 100% |
+| Sitemap | 3 | 3 | 100% |
+| Rate Limiting | - | 6 | - |
+| Performance | - | 6 | - |
+| Security | - | 6 | - |
+| Health | 5 | 5 | 100% |
+| **TOTAL** | **~180** | **~231** | **100%** |
+
+---

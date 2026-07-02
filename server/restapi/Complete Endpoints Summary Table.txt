@@ -1,0 +1,71 @@
+
+
+
+Category	Method	Endpoint	Auth Required
+App Settings	GET	/api/app-settings	✅ Admin
+App Settings	PUT	/api/app-settings	✅ Admin
+App Settings	POST	/api/app-settings/reset	✅ Admin
+App Settings	GET	/api/app-settings/:key	✅ Admin
+App Settings	PUT	/api/app-settings/:key	✅ Admin
+Maintenance	GET	/api/settings/maintenance/public	❌ None
+File Uploads	POST	/api/app-settings/upload/:type	✅ Admin
+File Uploads	POST	/api/admin/settings/banner	✅ Admin
+API Keys	POST	/api/app-settings/api-keys	✅ Admin
+API Keys	DELETE	/api/app-settings/api-keys/:keyId	✅ Admin
+Public Settings	GET	/api/settings/public	❌ None
+Public Settings	GET	/api/settings/theme	❌ None
+Public Settings	GET	/api/settings/seo	❌ None
+Public Settings	GET	/api/settings/social	❌ None
+Public Settings	GET	/api/settings/footer	❌ None
+Public Settings	GET	/api/settings/announcement	❌ None
+Helpers	POST	/api/admin/settings/test-email	✅ Admin
+Helpers	POST	/api/admin/settings/test-payment	✅ Admin
+Helpers	POST	/api/admin/settings/clear-cache	✅ Admin
+Helpers	GET	/api/admin/settings/health	✅ Admin
+Helpers	POST	/api/admin/settings/backup	✅ Admin
+Helpers	POST	/api/admin/settings/restore	✅ Admin
+📝 Total Endpoints Count
+Admin Settings: 5 endpoints
+
+Maintenance: 1 endpoint
+
+File Uploads: 2 endpoints
+
+API Keys: 2 endpoints
+
+Public Settings: 6 endpoints
+
+Helpers: 6 endpoints
+
+Total: 22 endpoints
+
+🔑 Common Headers
+For Admin/Authenticated Endpoints:
+http
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+For File Upload Endpoints:
+http
+Authorization: Bearer <your_jwt_token>
+Content-Type: multipart/form-data
+For Public Endpoints:
+http
+Content-Type: application/json
+⚠️ Error Response Format
+json
+{
+  "success": false,
+  "message": "Error description here",
+  "error": "Detailed error message (development only)"
+}
+📌 Notes
+All endpoints are prefixed with /api (e.g., /api/app-settings)
+
+Admin endpoints require both authentication and admin role
+
+File uploads support common image formats (jpg, png, gif, webp, svg)
+
+Maximum file size for uploads is typically 5MB (may vary by configuration)
+
+API keys generated follow the format: zauq_live_[random_string] or zauq_test_[random_string]
+

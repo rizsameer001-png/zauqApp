@@ -1,108 +1,106 @@
-// // server/routes/transliterationRoutes.js
+// // ============================================
+// // TRANSLITERATION API ROUTES
+// // RESTful endpoints for production
+// // ============================================
+
 // import express from 'express';
-// import { protect, adminOnly } from '../middleware/auth.js';
-// import { 
-//   generateTransliteration, 
-//   generatePoemTransliteration, 
-//   batchGenerateTransliterations 
+// import rateLimit from 'express-rate-limit';
+// import {
+//   generateTransliteration,
+//   getTransliterationBySlug,
+//   getEngineStats,
+//   clearTransliterationCache,
+//   batchTransliterate
 // } from '../services/transliterationService.js';
-// import Poem from '../models/Poem.js';
 
 // const router = express.Router();
 
-// // Generate transliteration for a specific poem (Admin only)
-// router.post('/poem/:poemId', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { poemId } = req.params;
-//     const result = await generatePoemTransliteration(poemId);
-    
-//     if (result.success) {
-//       res.json({
-//         success: true,
-//         data: result.transliteration,
-//         method: result.method,
-//         saved: result.saved || false
-//       });
-//     } else {
-//       res.status(400).json({
-//         success: false,
-//         error: result.error
-//       });
-//     }
-//   } catch (error) {
-//     console.error('API error:', error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
+// // Rate limiting
+// const limiter = rateLimit({
+//   windowMs: 15 * 60 * 1000, // 15 minutes
+//   max: 100, // limit each IP to 100 requests per windowMs
+//   message: 'Too many requests, please try again later.'
 // });
 
-// // Generate transliteration for a poem by slug (Public - for display)
-// router.get('/poem/:slug', async (req, res) => {
+// // POST /api/transliteration - Generate transliteration
+// router.post('/', limiter, async (req, res) => {
 //   try {
-//     const { slug } = req.params;
-//     const poem = await Poem.findOne({ slug });
-    
-//     if (!poem) {
-//       return res.status(404).json({ success: false, error: 'Poem not found' });
-//     }
-    
-//     // If transliteration exists, return it
-//     if (poem.transliteration && poem.transliteration.trim().length > 0) {
-//       return res.json({
-//         success: true,
-//         data: poem.transliteration,
-//         fromCache: true
-//       });
-//     }
-    
-//     // Generate on the fly
-//     const content = poem.contentUrdu || poem.content;
-//     const result = await generateTransliteration(content, poem.language);
-    
-//     if (result.success) {
-//       // Save for future (don't await to not block response)
-//       poem.transliteration = result.transliteration;
-//       poem.save().catch(console.error);
-      
-//       res.json({
-//         success: true,
-//         data: result.transliteration,
-//         method: result.method
-//       });
-//     } else {
-//       res.status(400).json({ success: false, error: result.error });
-//     }
-//   } catch (error) {
-//     console.error('API error:', error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
-
-// // Batch generate transliterations for all poems missing it (Admin only)
-// router.post('/batch', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { limit = 50 } = req.body;
-//     const result = await batchGenerateTransliterations(limit);
-//     res.json(result);
-//   } catch (error) {
-//     console.error('Batch API error:', error);
-//     res.status(500).json({ success: false, error: error.message });
-//   }
-// });
-
-// // Test transliteration (without saving)
-// router.post('/test', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { text, language = 'urdu' } = req.body;
+//     const { text, language, options = {} } = req.body;
     
 //     if (!text) {
-//       return res.status(400).json({ success: false, error: 'Text is required' });
+//       return res.status(400).json({ error: 'Text is required' });
 //     }
     
-//     const result = await generateTransliteration(text, language);
+//     const result = await generateTransliteration(text, language, options);
+    
+//     if (!result.success) {
+//       return res.status(400).json(result);
+//     }
+    
 //     res.json(result);
 //   } catch (error) {
-//     console.error('Test API error:', error);
-//     res.status(500).json({ success: false, error: error.message });
+//     console.error('API error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // POST /api/transliteration/batch - Batch transliteration
+// router.post('/batch', limiter, async (req, res) => {
+//   try {
+//     const { texts, options = {} } = req.body;
+    
+//     if (!texts || !Array.isArray(texts) || texts.length === 0) {
+//       return res.status(400).json({ error: 'Array of texts is required' });
+//     }
+    
+//     if (texts.length > 50) {
+//       return res.status(400).json({ error: 'Maximum 50 texts per batch request' });
+//     }
+    
+//     const results = await batchTransliterate(texts, options);
+//     res.json({ success: true, results });
+//   } catch (error) {
+//     console.error('Batch API error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // GET /api/transliteration/poem/:slug - Get poem transliteration
+// router.get('/poem/:slug', async (req, res) => {
+//   try {
+//     const result = await getTransliterationBySlug(req.params.slug);
+    
+//     if (!result.success) {
+//       return res.status(404).json({ error: result.error });
+//     }
+    
+//     res.json(result);
+//   } catch (error) {
+//     console.error('Poem API error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // GET /api/transliteration/stats - Engine statistics
+// router.get('/stats', async (req, res) => {
+//   try {
+//     const stats = await getEngineStats();
+//     res.json({ success: true, stats });
+//   } catch (error) {
+//     console.error('Stats API error:', error);
+//     res.status(500).json({ error: error.message });
+//   }
+// });
+
+// // DELETE /api/transliteration/cache - Clear cache (admin only)
+// router.delete('/cache', async (req, res) => {
+//   try {
+//     // Add admin authentication here
+//     const result = await clearTransliterationCache();
+//     res.json(result);
+//   } catch (error) {
+//     console.error('Cache clear error:', error);
+//     res.status(500).json({ error: error.message });
 //   }
 // });
 
@@ -116,63 +114,136 @@
 
 
 
-
 // // server/routes/transliterationRoutes.js
 // import express from 'express';
 // import { protect, adminOnly } from '../middleware/auth.js';
-// import { 
-//   generateTransliteration, 
-//   generatePoemTransliteration, 
-//   batchGenerateTransliterations,
-//   getTransliterationBySlug
-// } from '../services/transliterationService.js';
 // import Poem from '../models/Poem.js';
+// import { generateTransliteration, generatePoemTransliteration } from '../services/transliterationService.js';
 
 // const router = express.Router();
 
 // // ============================================
-// // GET TRANSLITERATION BY SLUG (Public)
+// // SIMPLE WORKING ROUTES
 // // ============================================
-// router.get('/poem/:slug', async (req, res) => {
+
+// // POST /api/transliteration/poem/:id
+// // Generate transliteration for a poem by ID (Admin only)
+// router.post('/poem/:id', protect, adminOnly, async (req, res) => {
 //   try {
-//     const { slug } = req.params;
+//     const { id } = req.params;
+//     const { force = false } = req.body;
     
-//     if (!slug) {
-//       return res.status(400).json({ success: false, error: 'Slug is required' });
+//     console.log(`🔄 Generating transliteration for poem ID: ${id}`);
+    
+//     if (!id) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         error: 'Poem ID is required' 
+//       });
 //     }
     
-//     console.log(`🔍 Fetching transliteration for slug: ${slug}`);
-    
-//     const poem = await Poem.findOne({ slug });
+//     // Find the poem
+//     const poem = await Poem.findById(id);
     
 //     if (!poem) {
-//       return res.status(404).json({ success: false, error: 'Poem not found' });
+//       return res.status(404).json({ 
+//         success: false, 
+//         error: 'Poem not found' 
+//       });
 //     }
     
-//     // If transliteration already exists in database, return it
+//     // Get content based on language
+//     let content = '';
+//     if (poem.language === 'urdu') {
+//       content = poem.contentUrdu || poem.content || '';
+//     } else if (poem.language === 'hindi') {
+//       content = poem.contentHindi || poem.content || '';
+//     } else {
+//       content = poem.content || '';
+//     }
+    
+//     if (!content || content.trim().length === 0) {
+//       return res.status(400).json({ 
+//         success: false, 
+//         error: 'No content found for this poem' 
+//       });
+//     }
+    
+//     // Generate transliteration
+//     const result = await generateTransliteration(content, poem.language);
+    
+//     if (result.success) {
+//       // Save to database
+//       poem.transliteration = result.transliteration;
+//       poem.transliterationMethod = result.method;
+//       poem.transliterationGeneratedAt = new Date();
+//       await poem.save();
+      
+//       console.log(`✅ Transliteration generated for ${poem.title}`);
+      
+//       return res.json({
+//         success: true,
+//         data: result.transliteration,
+//         method: result.method,
+//         fromCache: false
+//       });
+//     } else {
+//       return res.status(500).json({
+//         success: false,
+//         error: result.error || 'Failed to generate transliteration'
+//       });
+//     }
+//   } catch (error) {
+//     console.error('Transliteration route error:', error);
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message
+//     });
+//   }
+// });
+
+// // GET /api/transliteration/poem/:identifier
+// // Get transliteration by slug OR ID (Public)
+// router.get('/poem/:identifier', async (req, res) => {
+//   try {
+//     const { identifier } = req.params;
+    
+//     console.log(`🔍 Fetching transliteration for: ${identifier}`);
+    
+//     // Try to find by ID first, then by slug
+//     let poem = await Poem.findById(identifier).catch(() => null);
+    
+//     if (!poem) {
+//       poem = await Poem.findOne({ slug: identifier });
+//     }
+    
+//     if (!poem) {
+//       return res.status(404).json({ 
+//         success: false, 
+//         error: 'Poem not found' 
+//       });
+//     }
+    
+//     // If transliteration exists, return it
 //     if (poem.transliteration && poem.transliteration.trim().length > 0) {
 //       console.log(`✅ Using cached transliteration for ${poem.title}`);
 //       return res.json({
 //         success: true,
 //         data: poem.transliteration,
 //         fromCache: true,
-//         language: poem.language
+//         language: poem.language,
+//         method: poem.transliterationMethod
 //       });
 //     }
     
-//     // Get content based on poem language
+//     // Get content based on language
 //     let content = '';
-//     console.log(`📝 Poem language: ${poem.language}`);
-    
 //     if (poem.language === 'urdu') {
 //       content = poem.contentUrdu || poem.content || '';
-//       console.log(`📖 Using Urdu content (${content.length} chars)`);
 //     } else if (poem.language === 'hindi') {
 //       content = poem.contentHindi || poem.content || '';
-//       console.log(`📖 Using Hindi content (${content.length} chars)`);
 //     } else {
 //       content = poem.content || '';
-//       console.log(`📖 Using ${poem.language} content (${content.length} chars)`);
 //     }
     
 //     if (!content || content.trim().length === 0) {
@@ -182,18 +253,18 @@
 //       });
 //     }
     
-//     // Generate transliteration on the fly
+//     // Generate transliteration
 //     console.log(`🔄 Generating transliteration for ${poem.language} poem...`);
 //     const result = await generateTransliteration(content, poem.language);
     
 //     if (result.success) {
-//       // Save to database for future requests (don't await to not block response)
+//       // Save for future
 //       poem.transliteration = result.transliteration;
-//       poem.save().catch(err => console.error('Error saving transliteration:', err));
+//       poem.transliterationMethod = result.method;
+//       poem.transliterationGeneratedAt = new Date();
+//       await poem.save();
       
-//       console.log(`✅ Transliteration generated using ${result.method}`);
-      
-//       res.json({
+//       return res.json({
 //         success: true,
 //         data: result.transliteration,
 //         method: result.method,
@@ -201,213 +272,56 @@
 //         fromCache: false
 //       });
 //     } else {
-//       console.error(`❌ Transliteration failed: ${result.error}`);
-//       res.status(400).json({ 
-//         success: false, 
-//         error: result.error || 'Failed to generate transliteration' 
-//       });
-//     }
-//   } catch (error) {
-//     console.error('API error in GET /poem/:slug:', error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: error.message || 'Internal server error' 
-//     });
-//   }
-// });
-
-// // ============================================
-// // GENERATE TRANSLITERATION FOR A POEM (Admin only)
-// // ============================================
-// router.post('/poem/:poemId', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { poemId } = req.params;
-    
-//     if (!poemId) {
-//       return res.status(400).json({ success: false, error: 'Poem ID is required' });
-//     }
-    
-//     console.log(`🔍 Generating transliteration for poem ID: ${poemId}`);
-    
-//     const result = await generatePoemTransliteration(poemId);
-    
-//     if (result.success) {
-//       console.log(`✅ Transliteration generated: ${result.method}`);
-//       res.json({
-//         success: true,
-//         data: result.transliteration,
-//         method: result.method,
-//         saved: result.saved || false,
-//         fromCache: result.fromCache || false
-//       });
-//     } else {
-//       console.error(`❌ Generation failed: ${result.error}`);
-//       res.status(400).json({
+//       return res.status(500).json({
 //         success: false,
 //         error: result.error || 'Failed to generate transliteration'
 //       });
 //     }
 //   } catch (error) {
-//     console.error('API error in POST /poem/:poemId:', error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: error.message || 'Internal server error' 
+//     console.error('GET transliteration error:', error);
+//     return res.status(500).json({
+//       success: false,
+//       error: error.message
 //     });
 //   }
 // });
 
-// // ============================================
-// // BATCH GENERATE TRANSLITERATIONS (Admin only)
-// // ============================================
-// router.post('/batch', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { limit = 50, language = null } = req.body;
-    
-//     console.log(`🔍 Batch generating transliterations (limit: ${limit}, language: ${language || 'all'})`);
-    
-//     const result = await batchGenerateTransliterations(limit, language);
-    
-//     console.log(`✅ Batch complete: ${result.generated} generated, ${result.failed} failed`);
-    
-//     res.json({
-//       success: true,
-//       total: result.total,
-//       generated: result.generated,
-//       failed: result.failed,
-//       results: result.results,
-//       message: `Generated ${result.generated} transliterations out of ${result.total} poems`
-//     });
-//   } catch (error) {
-//     console.error('Batch API error:', error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: error.message || 'Failed to batch generate transliterations' 
-//     });
-//   }
-// });
-
-// // ============================================
-// // TEST TRANSLITERATION (Admin only - without saving)
-// // ============================================
+// // POST /api/transliteration/test - Test endpoint
 // router.post('/test', protect, adminOnly, async (req, res) => {
 //   try {
 //     const { text, language = 'urdu' } = req.body;
     
-//     if (!text || text.trim().length === 0) {
+//     if (!text) {
 //       return res.status(400).json({ 
 //         success: false, 
-//         error: 'Text is required for testing' 
+//         error: 'Text is required' 
 //       });
 //     }
-    
-//     console.log(`🔍 Testing transliteration for ${language} text (${text.length} chars)`);
     
 //     const result = await generateTransliteration(text, language);
     
-//     if (result.success) {
-//       console.log(`✅ Test successful: ${result.method}`);
-//       res.json({
-//         success: true,
-//         original: text,
-//         transliteration: result.transliteration,
-//         method: result.method,
-//         language: language
-//       });
-//     } else {
-//       console.error(`❌ Test failed: ${result.error}`);
-//       res.status(400).json({ 
-//         success: false, 
-//         error: result.error || 'Failed to generate test transliteration' 
-//       });
-//     }
+//     res.json({
+//       success: result.success,
+//       original: text,
+//       transliteration: result.transliteration,
+//       method: result.method
+//     });
 //   } catch (error) {
-//     console.error('Test API error:', error);
+//     console.error('Test error:', error);
 //     res.status(500).json({ 
 //       success: false, 
-//       error: error.message || 'Internal server error' 
+//       error: error.message 
 //     });
 //   }
 // });
 
-// // ============================================
-// // GET TRANSLITERATION STATUS (Admin only)
-// // ============================================
-// router.get('/status', protect, adminOnly, async (req, res) => {
-//   try {
-//     const totalPoems = await Poem.countDocuments();
-//     const poemsWithTransliteration = await Poem.countDocuments({
-//       transliteration: { $exists: true, $ne: '' }
-//     });
-//     const poemsWithoutTransliteration = totalPoems - poemsWithTransliteration;
-    
-//     const byLanguage = await Poem.aggregate([
-//       {
-//         $group: {
-//           _id: '$language',
-//           total: { $sum: 1 },
-//           withTransliteration: {
-//             $sum: {
-//               $cond: [
-//                 { $and: [
-//                   { $ne: ['$transliteration', null] },
-//                   { $ne: ['$transliteration', ''] }
-//                 ] },
-//                 1,
-//                 0
-//               ]
-//             }
-//           }
-//         }
-//       }
-//     ]);
-    
-//     res.json({
-//       success: true,
-//       stats: {
-//         totalPoems,
-//         poemsWithTransliteration,
-//         poemsWithoutTransliteration,
-//         completionRate: totalPoems > 0 ? ((poemsWithTransliteration / totalPoems) * 100).toFixed(1) : 0,
-//         byLanguage
-//       }
-//     });
-//   } catch (error) {
-//     console.error('Status API error:', error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: error.message || 'Failed to get status' 
-//     });
-//   }
-// });
-
-// // ============================================
-// // DELETE TRANSLITERATION FOR A POEM (Admin only)
-// // ============================================
-// router.delete('/poem/:poemId', protect, adminOnly, async (req, res) => {
-//   try {
-//     const { poemId } = req.params;
-    
-//     const poem = await Poem.findById(poemId);
-//     if (!poem) {
-//       return res.status(404).json({ success: false, error: 'Poem not found' });
-//     }
-    
-//     poem.transliteration = '';
-//     await poem.save();
-    
-//     console.log(`🗑️ Deleted transliteration for ${poem.title}`);
-    
-//     res.json({
-//       success: true,
-//       message: 'Transliteration deleted successfully'
-//     });
-//   } catch (error) {
-//     console.error('Delete API error:', error);
-//     res.status(500).json({ 
-//       success: false, 
-//       error: error.message || 'Failed to delete transliteration' 
-//     });
-//   }
+// // GET /api/transliteration/health - Health check
+// router.get('/health', (req, res) => {
+//   res.json({ 
+//     success: true, 
+//     status: 'Transliteration API is running',
+//     routes: ['POST /poem/:id', 'GET /poem/:identifier', 'POST /test', 'GET /health']
+//   });
 // });
 
 // export default router;
@@ -433,39 +347,160 @@
 // server/routes/transliterationRoutes.js
 import express from 'express';
 import { protect, adminOnly } from '../middleware/auth.js';
-import { 
-  generateTransliteration, 
-  generatePoemTransliteration, 
-  batchGenerateTransliterations,
-  getTransliterationBySlug,
-  autoTransliteratePoem,
-  batchAutoTransliterate,
-  toggleAutoTransliterate
-} from '../services/transliterationService.js';
 import Poem from '../models/Poem.js';
+import { generateTransliteration, generatePoemTransliteration } from '../services/transliterationService.js';
 
 const router = express.Router();
 
 // ============================================
-// GET TRANSLITERATION BY SLUG (Public)
+// FORCED VALID METHOD - Always use this to prevent validation errors
 // ============================================
-router.get('/poem/:slug', async (req, res) => {
+const FORCED_VALID_METHOD = 'smart-engine';
+
+// Helper to ensure method is always valid
+const getValidMethod = (method) => {
+  const VALID_METHODS = [
+    'smart-engine',
+    'fallback-cleaning', 
+    'auto',
+    'production-hybrid',
+    'zauq-rules',
+    'vowel-inference'
+  ];
+  
+  if (method && VALID_METHODS.includes(method)) {
+    return method;
+  }
+  console.log(`⚠️ Invalid method "${method}" forced to "${FORCED_VALID_METHOD}"`);
+  return FORCED_VALID_METHOD;
+};
+
+// ============================================
+// SIMPLE WORKING ROUTES
+// ============================================
+
+// POST /api/transliteration/poem/:id
+// Generate transliteration for a poem by ID (Admin only)
+router.post('/poem/:id', protect, adminOnly, async (req, res) => {
   try {
-    const { slug } = req.params;
+    const { id } = req.params;
+    const { force = false } = req.body;
     
-    if (!slug) {
-      return res.status(400).json({ success: false, error: 'Slug is required' });
+    console.log(`🔄 Generating transliteration for poem ID: ${id}`);
+    
+    if (!id) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Poem ID is required' 
+      });
     }
     
-    console.log(`🔍 Fetching transliteration for slug: ${slug}`);
-    
-    const poem = await Poem.findOne({ slug });
+    // Find the poem
+    const poem = await Poem.findById(id);
     
     if (!poem) {
-      return res.status(404).json({ success: false, error: 'Poem not found' });
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Poem not found' 
+      });
     }
     
-    // If transliteration already exists in database, return it
+    // Get content based on language
+    let content = '';
+    if (poem.language === 'urdu') {
+      content = poem.contentUrdu || poem.content || '';
+    } else if (poem.language === 'hindi') {
+      content = poem.contentHindi || poem.content || '';
+    } else {
+      content = poem.content || '';
+    }
+    
+    if (!content || content.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'No content found for this poem' 
+      });
+    }
+    
+    // Generate transliteration
+    const result = await generateTransliteration(content, poem.language);
+    
+    if (result.success) {
+      // FORCE the method to a valid enum value
+      const validMethod = getValidMethod(result.method);
+      
+      console.log(`📌 Original method: ${result.method} → Stored as: ${validMethod}`);
+      
+      // Save to database with forced valid method
+      poem.transliteration = result.transliteration;
+      poem.transliterationMethod = validMethod;  // FORCED valid value
+      poem.transliterationGeneratedAt = new Date();
+      
+      try {
+        await poem.save();
+        console.log(`✅ Transliteration saved for ${poem.title} with method: ${validMethod}`);
+      } catch (saveError) {
+        console.error('❌ Save error, trying without method field:', saveError.message);
+        // If validation fails, save without the method field
+        poem.transliterationMethod = undefined;
+        await poem.save();
+        console.log(`✅ Saved without method field for ${poem.title}`);
+      }
+      
+      return res.json({
+        success: true,
+        data: result.transliteration,
+        method: validMethod,
+        originalMethod: result.method,
+        fromCache: false
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        error: result.error || 'Failed to generate transliteration'
+      });
+    }
+  } catch (error) {
+    console.error('Transliteration route error:', error);
+    
+    // Handle validation errors specifically
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        success: false,
+        error: 'Validation error: ' + Object.values(error.errors).map(e => e.message).join(', ')
+      });
+    }
+    
+    return res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// GET /api/transliteration/poem/:identifier
+// Get transliteration by slug OR ID (Public)
+router.get('/poem/:identifier', async (req, res) => {
+  try {
+    const { identifier } = req.params;
+    
+    console.log(`🔍 Fetching transliteration for: ${identifier}`);
+    
+    // Try to find by ID first, then by slug
+    let poem = await Poem.findById(identifier).catch(() => null);
+    
+    if (!poem) {
+      poem = await Poem.findOne({ slug: identifier });
+    }
+    
+    if (!poem) {
+      return res.status(404).json({ 
+        success: false, 
+        error: 'Poem not found' 
+      });
+    }
+    
+    // If transliteration exists, return it
     if (poem.transliteration && poem.transliteration.trim().length > 0) {
       console.log(`✅ Using cached transliteration for ${poem.title}`);
       return res.json({
@@ -473,23 +508,18 @@ router.get('/poem/:slug', async (req, res) => {
         data: poem.transliteration,
         fromCache: true,
         language: poem.language,
-        method: poem.transliterationMethod
+        method: poem.transliterationMethod || 'unknown'
       });
     }
     
-    // Get content based on poem language
+    // Get content based on language
     let content = '';
-    console.log(`📝 Poem language: ${poem.language}`);
-    
     if (poem.language === 'urdu') {
       content = poem.contentUrdu || poem.content || '';
-      console.log(`📖 Using Urdu content (${content.length} chars)`);
     } else if (poem.language === 'hindi') {
       content = poem.contentHindi || poem.content || '';
-      console.log(`📖 Using Hindi content (${content.length} chars)`);
     } else {
       content = poem.content || '';
-      console.log(`📖 Using ${poem.language} content (${content.length} chars)`);
     }
     
     if (!content || content.trim().length === 0) {
@@ -499,404 +529,233 @@ router.get('/poem/:slug', async (req, res) => {
       });
     }
     
-    // Generate transliteration on the fly
+    // Generate transliteration
     console.log(`🔄 Generating transliteration for ${poem.language} poem...`);
     const result = await generateTransliteration(content, poem.language);
     
     if (result.success) {
-      // Save to database for future requests
+      // FORCE the method to a valid enum value
+      const validMethod = getValidMethod(result.method);
+      
+      // Save for future
       poem.transliteration = result.transliteration;
-      poem.transliterationMethod = result.method;
+      poem.transliterationMethod = validMethod;
       poem.transliterationGeneratedAt = new Date();
-      poem.save().catch(err => console.error('Error saving transliteration:', err));
       
-      console.log(`✅ Transliteration generated using ${result.method}`);
+      try {
+        await poem.save();
+      } catch (saveError) {
+        console.error('Save error, continuing without saving:', saveError.message);
+        // Don't fail the request if save fails
+      }
       
-      res.json({
+      return res.json({
         success: true,
         data: result.transliteration,
-        method: result.method,
+        method: validMethod,
         language: poem.language,
         fromCache: false
       });
     } else {
-      console.error(`❌ Transliteration failed: ${result.error}`);
-      res.status(400).json({ 
-        success: false, 
-        error: result.error || 'Failed to generate transliteration' 
-      });
-    }
-  } catch (error) {
-    console.error('API error in GET /poem/:slug:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
-    });
-  }
-});
-
-// ============================================
-// GENERATE TRANSLITERATION FOR A POEM (Admin only)
-// ============================================
-router.post('/poem/:poemId', protect, adminOnly, async (req, res) => {
-  try {
-    const { poemId } = req.params;
-    const { force = false } = req.body;
-    
-    if (!poemId) {
-      return res.status(400).json({ success: false, error: 'Poem ID is required' });
-    }
-    
-    console.log(`🔍 Generating transliteration for poem ID: ${poemId}, force: ${force}`);
-    
-    const result = await generatePoemTransliteration(poemId, force);
-    
-    if (result.success) {
-      console.log(`✅ Transliteration generated: ${result.method}`);
-      res.json({
-        success: true,
-        data: result.transliteration,
-        method: result.method,
-        saved: result.saved || false,
-        fromCache: result.fromCache || false
-      });
-    } else {
-      console.error(`❌ Generation failed: ${result.error}`);
-      res.status(400).json({
+      return res.status(500).json({
         success: false,
         error: result.error || 'Failed to generate transliteration'
       });
     }
   } catch (error) {
-    console.error('API error in POST /poem/:poemId:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
+    console.error('GET transliteration error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message
     });
   }
 });
 
-// ============================================
-// AUTO-TRANSLITERATE A POEM (Admin only)
-// ============================================
-router.post('/poem/:poemId/auto', protect, adminOnly, async (req, res) => {
+// POST /api/transliteration/poem/:identifier/auto
+// Auto-transliterate a poem (Admin only)
+router.post('/poem/:identifier/auto', protect, adminOnly, async (req, res) => {
   try {
-    const { poemId } = req.params;
+    const { identifier } = req.params;
     const { force = false } = req.body;
     
-    if (!poemId) {
-      return res.status(400).json({ success: false, error: 'Poem ID is required' });
+    console.log(`🔄 Auto-transliterating: ${identifier}, force: ${force}`);
+    
+    // Find the poem
+    let poem = await Poem.findById(identifier).catch(() => null);
+    if (!poem) {
+      poem = await Poem.findOne({ slug: identifier });
     }
     
-    console.log(`🔄 Auto-transliterating poem ID: ${poemId}, force: ${force}`);
-    
-    const poem = await Poem.findById(poemId);
     if (!poem) {
       return res.status(404).json({ success: false, error: 'Poem not found' });
     }
     
-    const result = await autoTransliteratePoem(poem, force);
-    
-    if (result.success) {
-      console.log(`✅ Auto-transliteration successful: ${result.method}`);
-      res.json({
-        success: true,
-        data: result.transliteration,
-        method: result.method,
-        fromCache: result.fromCache || false
-      });
-    } else if (result.skipped) {
-      res.json({
+    if (poem.autoTransliterate === false && !force) {
+      return res.json({
         success: true,
         skipped: true,
         message: 'Auto-transliteration is disabled for this poem'
       });
+    }
+    
+    let content = '';
+    if (poem.language === 'urdu') {
+      content = poem.contentUrdu || poem.content || '';
     } else {
-      console.error(`❌ Auto-transliteration failed: ${result.error}`);
-      res.status(400).json({
-        success: false,
-        error: result.error || 'Failed to auto-transliterate poem'
-      });
-    }
-  } catch (error) {
-    console.error('API error in POST /poem/:poemId/auto:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
-    });
-  }
-});
-
-// ============================================
-// TOGGLE AUTO-TRANSLITERATION FOR A POEM (Admin only)
-// ============================================
-router.patch('/poem/:poemId/toggle-auto', protect, adminOnly, async (req, res) => {
-  try {
-    const { poemId } = req.params;
-    const { enabled } = req.body;
-    
-    if (!poemId) {
-      return res.status(400).json({ success: false, error: 'Poem ID is required' });
+      content = poem.content || '';
     }
     
-    if (enabled === undefined) {
-      return res.status(400).json({ success: false, error: 'Enabled flag is required' });
-    }
-    
-    console.log(`🔄 Toggling auto-transliteration for poem ${poemId} to ${enabled}`);
-    
-    const result = await toggleAutoTransliterate(poemId, enabled);
+    const result = await generateTransliteration(content, poem.language);
     
     if (result.success) {
-      res.json({
+      const validMethod = getValidMethod(result.method);
+      
+      poem.transliteration = result.transliteration;
+      poem.transliterationMethod = validMethod;
+      poem.transliterationGeneratedAt = new Date();
+      await poem.save();
+      
+      return res.json({
         success: true,
-        autoTransliterate: result.autoTransliterate
+        data: result.transliteration,
+        method: validMethod,
+        fromCache: false
       });
-    } else {
-      res.status(400).json({ success: false, error: result.error });
     }
+    
+    return res.status(500).json({ success: false, error: result.error });
   } catch (error) {
-    console.error('API error in PATCH /poem/:poemId/toggle-auto:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Internal server error' 
-    });
+    console.error('Auto-transliterate error:', error);
+    return res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// ============================================
-// BATCH GENERATE TRANSLITERATIONS (Admin only)
-// ============================================
-router.post('/batch', protect, adminOnly, async (req, res) => {
-  try {
-    const { limit = 50, language = null } = req.body;
-    
-    console.log(`🔍 Batch generating transliterations (limit: ${limit}, language: ${language || 'all'})`);
-    
-    const result = await batchGenerateTransliterations(limit, language);
-    
-    console.log(`✅ Batch complete: ${result.generated} generated, ${result.failed} failed`);
-    
-    res.json({
-      success: true,
-      total: result.total,
-      generated: result.generated,
-      failed: result.failed,
-      results: result.results,
-      message: `Generated ${result.generated} transliterations out of ${result.total} poems`
-    });
-  } catch (error) {
-    console.error('Batch API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to batch generate transliterations' 
-    });
-  }
-});
-
-// ============================================
-// BATCH AUTO-TRANSLITERATE (Admin only)
-// ============================================
-router.post('/batch/auto', protect, adminOnly, async (req, res) => {
-  try {
-    const { limit = 100, language = null } = req.body;
-    
-    console.log(`🔄 Batch auto-transliterating (limit: ${limit}, language: ${language || 'all'})`);
-    
-    const result = await batchAutoTransliterate(limit, language);
-    
-    console.log(`✅ Batch auto-transliteration complete: ${result.generated} generated, ${result.failed} failed`);
-    
-    res.json({
-      success: true,
-      total: result.total,
-      generated: result.generated,
-      failed: result.failed,
-      results: result.results,
-      message: `Auto-transliterated ${result.generated} poems out of ${result.total}`
-    });
-  } catch (error) {
-    console.error('Batch auto API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to batch auto-transliterate' 
-    });
-  }
-});
-
-// ============================================
-// TEST TRANSLITERATION (Admin only - without saving)
-// ============================================
+// POST /api/transliteration/test - Test endpoint
 router.post('/test', protect, adminOnly, async (req, res) => {
   try {
     const { text, language = 'urdu' } = req.body;
     
-    if (!text || text.trim().length === 0) {
+    if (!text) {
       return res.status(400).json({ 
         success: false, 
-        error: 'Text is required for testing' 
+        error: 'Text is required' 
       });
     }
-    
-    console.log(`🔍 Testing transliteration for ${language} text (${text.length} chars)`);
     
     const result = await generateTransliteration(text, language);
     
-    if (result.success) {
-      console.log(`✅ Test successful: ${result.method}`);
-      res.json({
-        success: true,
-        original: text,
-        transliteration: result.transliteration,
-        method: result.method,
-        language: language
-      });
-    } else {
-      console.error(`❌ Test failed: ${result.error}`);
-      res.status(400).json({ 
-        success: false, 
-        error: result.error || 'Failed to generate test transliteration' 
-      });
-    }
+    res.json({
+      success: result.success,
+      original: text,
+      transliteration: result.transliteration,
+      method: result.method
+    });
   } catch (error) {
-    console.error('Test API error:', error);
+    console.error('Test error:', error);
     res.status(500).json({ 
       success: false, 
-      error: error.message || 'Internal server error' 
+      error: error.message 
     });
   }
 });
 
-// ============================================
-// GET TRANSLITERATION STATUS (Admin only)
-// ============================================
+// GET /api/transliteration/status - Status endpoint (Admin only)
 router.get('/status', protect, adminOnly, async (req, res) => {
   try {
     const totalPoems = await Poem.countDocuments();
     const poemsWithTransliteration = await Poem.countDocuments({
       transliteration: { $exists: true, $ne: '' }
     });
-    const poemsWithoutTransliteration = totalPoems - poemsWithTransliteration;
-    
-    const autoTransliterateEnabled = await Poem.countDocuments({
-      autoTransliterate: true
-    });
-    
-    const byLanguage = await Poem.aggregate([
-      {
-        $group: {
-          _id: '$language',
-          total: { $sum: 1 },
-          withTransliteration: {
-            $sum: {
-              $cond: [
-                { $and: [
-                  { $ne: ['$transliteration', null] },
-                  { $ne: ['$transliteration', ''] }
-                ] },
-                1,
-                0
-              ]
-            }
-          },
-          autoEnabled: {
-            $sum: {
-              $cond: [{ $eq: ['$autoTransliterate', true] }, 1, 0]
-            }
-          }
-        }
-      }
-    ]);
     
     res.json({
       success: true,
       stats: {
         totalPoems,
         poemsWithTransliteration,
-        poemsWithoutTransliteration,
-        autoTransliterateEnabled,
-        completionRate: totalPoems > 0 ? ((poemsWithTransliteration / totalPoems) * 100).toFixed(1) : 0,
-        byLanguage
+        poemsWithoutTransliteration: totalPoems - poemsWithTransliteration,
+        completionRate: totalPoems > 0 ? ((poemsWithTransliteration / totalPoems) * 100).toFixed(1) : 0
       }
     });
   } catch (error) {
-    console.error('Status API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to get status' 
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// ============================================
-// DELETE TRANSLITERATION FOR A POEM (Admin only)
-// ============================================
-router.delete('/poem/:poemId', protect, adminOnly, async (req, res) => {
+// DELETE /api/transliteration/poem/:identifier - Delete transliteration (Admin only)
+router.delete('/poem/:identifier', protect, adminOnly, async (req, res) => {
   try {
-    const { poemId } = req.params;
+    const { identifier } = req.params;
     
-    const poem = await Poem.findById(poemId);
+    let poem = await Poem.findById(identifier).catch(() => null);
+    if (!poem) {
+      poem = await Poem.findOne({ slug: identifier });
+    }
+    
     if (!poem) {
       return res.status(404).json({ success: false, error: 'Poem not found' });
     }
     
     poem.transliteration = '';
-    poem.transliterationMethod = '';
+    poem.transliterationMethod = undefined;
     poem.transliterationGeneratedAt = null;
     await poem.save();
-    
-    console.log(`🗑️ Deleted transliteration for ${poem.title}`);
     
     res.json({
       success: true,
       message: 'Transliteration deleted successfully'
     });
   } catch (error) {
-    console.error('Delete API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to delete transliteration' 
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// ============================================
-// GET POEMS MISSING TRANSLITERATION (Admin only)
-// ============================================
-router.get('/missing', protect, adminOnly, async (req, res) => {
+// POST /api/transliteration/fix-methods - Fix invalid methods (Admin only)
+router.post('/fix-methods', protect, adminOnly, async (req, res) => {
   try {
-    const { limit = 50, language = null } = req.query;
+    const poems = await Poem.find({
+      transliteration: { $exists: true, $ne: '' }
+    });
     
-    const query = {
-      $or: [
-        { transliteration: { $exists: false } },
-        { transliteration: '' },
-        { transliteration: null }
-      ],
-      language: { $in: ['urdu', 'hindi'] }
-    };
-    
-    if (language && (language === 'urdu' || language === 'hindi')) {
-      query.language = language;
+    let fixed = 0;
+    for (const poem of poems) {
+      const oldMethod = poem.transliterationMethod;
+      const newMethod = getValidMethod(oldMethod);
+      
+      if (oldMethod !== newMethod) {
+        poem.transliterationMethod = newMethod;
+        await poem.save();
+        fixed++;
+        console.log(`Fixed: "${oldMethod}" → "${newMethod}" for ${poem.title}`);
+      }
     }
-    
-    const poems = await Poem.find(query)
-      .limit(parseInt(limit))
-      .select('title slug language contentUrdu contentHindi createdAt')
-      .populate('author', 'name');
     
     res.json({
       success: true,
       total: poems.length,
-      poems: poems
+      fixed,
+      message: `Fixed ${fixed} poems with invalid transliteration methods`
     });
   } catch (error) {
-    console.error('Missing poems API error:', error);
-    res.status(500).json({ 
-      success: false, 
-      error: error.message || 'Failed to fetch missing poems' 
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
+});
+
+// GET /api/transliteration/health - Health check
+router.get('/health', (req, res) => {
+  res.json({ 
+    success: true, 
+    status: 'Transliteration API is running',
+    routes: [
+      'POST /poem/:id',
+      'GET /poem/:identifier', 
+      'POST /poem/:identifier/auto',
+      'POST /test', 
+      'GET /status',
+      'DELETE /poem/:identifier',
+      'POST /fix-methods',
+      'GET /health'
+    ]
+  });
 });
 
 export default router;

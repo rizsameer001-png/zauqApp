@@ -1,0 +1,64 @@
+{
+  "poems": [
+    {
+      "title": "Raaz-e-Hayat",
+      "slug": "raaz-e-hayat",
+      "content": "The meaning of life is only to keep searching, because the moment you stop searching, life itself ceases.",
+      "contentUrdu": "زندگی جستجو کا نام ہے، رک جانا موت ہے",
+      "contentHindi": "ज़िंदगी जुस्तजू का नाम है, रुक जाना मौत है",
+      "authorSlug": "allama-iqbal",
+      "genre": "ghazal",
+      "language": "urdu",
+      "isPublished": true,
+      "tags": ["philosophy", "life"]
+    },
+    {
+      "title": "Duniya Ek Tamasha",
+      "slug": "duniya-ek-tamasha",
+      "content": "This world is just a show, and we are but actors playing parts that were written before we arrived.",
+      "contentUrdu": "یہ دنیا اک تماشا ہے، تماشا دیکھنے والے بھی ہم ہیں",
+      "contentHindi": "यह दुनिया इक तमाशा है, तमाशा देखने वाले भी हम हैं",
+      "authorSlug": "mir-taqi-mir",
+      "genre": "ghazal",
+      "language": "urdu",
+      "isPublished": true,
+      "tags": ["existential", "classic"]
+    },
+    {
+      "title": "Mujhse Pehli Si Mohabbat",
+      "slug": "mujhse-pehli-si-mohabbat",
+      "content": "Do not ask me for that old love, my darling; I thought life was beautiful because of you, but the world has other pains.",
+      "contentUrdu": "مجھ سے پہلی سی محبت مرے محبوب نہ مانگ",
+      "contentHindi": "मुझ से पहली सी मोहब्बत मेरे महबूब न माँग",
+      "authorSlug": "faiz-ahmad-faiz",
+      "genre": "nazm",
+      "language": "urdu",
+      "isPublished": true,
+      "tags": ["romance", "social-realism"]
+    },
+    {
+      "title": "Mohabbat Karne Wale",
+      "slug": "mohabbat-karne-wale",
+      "content": "Those who love are often the ones who suffer in silence, keeping their heart's secret buried within.",
+      "contentUrdu": "محبت کرنے والے کم نہ ہوں گے، تری محفل میں لیکن ہم نہ ہوں گے",
+      "contentHindi": "मोहब्बत करने वाले कम न होंगे, तिरी महफ़िल में लेकिन हम न होंगे",
+      "authorSlug": "hafeez-jalandhari",
+      "genre": "ghazal",
+      "language": "urdu",
+      "isPublished": true,
+      "tags": ["love", "legacy"]
+    },
+    {
+      "title": "Zindagi Ka Safar",
+      "slug": "zindagi-ka-safar",
+      "content": "The journey of life is a long road, where shadows lengthen and the night starts to embrace the tired traveler.",
+      "contentUrdu": "زندگی اک سفر ہے جس کی کوئی منزل نہیں ہوتی",
+      "contentHindi": "ज़िंदगी इक सफ़र है जिसकी कोई मंज़िल नहीं होती",
+      "authorSlug": "ahmad-faraz",
+      "genre": "ghazal",
+      "language": "urdu",
+      "isPublished": true,
+      "tags": ["journey", "life"]
+    }
+  ]
+}

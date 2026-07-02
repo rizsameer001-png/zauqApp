@@ -1,0 +1,4054 @@
+# Adabiyat API - Complete REST API Documentation
+
+Based on your `server.js` file, here's a comprehensive list of all REST API endpoints with test examples, expected responses, and status codes.
+
+---
+
+## 📋 Table of Contents
+1. [Authentication Routes](#authentication-routes)
+2. [User Routes](#user-routes)
+3. [Poem Routes](#poem-routes)
+4. [Author Routes](#author-routes)
+5. [Book Routes](#book-routes)
+6. [Audio Routes](#audio-routes)
+7. [Video Routes](#video-routes)
+8. [Category Routes](#category-routes)
+9. [Search Routes](#search-routes)
+10. [Notification Routes](#notification-routes)
+11. [Subscription Routes](#subscription-routes)
+12. [Analytics Routes](#analytics-routes)
+13. [Admin Routes](#admin-routes)
+14. [Creator Routes](#creator-routes)
+15. [Homepage Routes](#homepage-routes)
+16. [SEO Routes](#seo-routes)
+17. [Upload Routes](#upload-routes)
+18. [Settings Routes](#settings-routes)
+19. [AI Routes](#ai-routes)
+20. [Transliteration Routes](#transliteration-routes)
+21. [Playlist Routes](#playlist-routes)
+22. [Blog Routes](#blog-routes)
+23. [Backup Routes](#backup-routes)
+24. [App Settings Routes](#app-settings-routes)
+25. [Captcha Routes](#captcha-routes)
+26. [Comment Routes](#comment-routes)
+27. [Ad Routes](#ad-routes)
+28. [Sitemap Routes](#sitemap-routes)
+29. [Health & Test Routes](#health--test-routes)
+
+---
+
+## 🔐 Authentication Routes
+**Base URL:** `/api/auth`
+
+### 1. Register User
+- **Endpoint:** `POST /api/auth/register`
+- **Status:** `201 Created` / `400 Bad Request`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "role": "user"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "User registered successfully",
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "token": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+### 2. Login User
+- **Endpoint:** `POST /api/auth/login`
+- **Status:** `200 OK` / `401 Unauthorized`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "token": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+### 3. Logout User
+- **Endpoint:** `POST /api/auth/logout`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/logout \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Logged out successfully"
+}
+```
+
+### 4. Get Current User
+- **Endpoint:** `GET /api/auth/me`
+- **Status:** `200 OK` / `401 Unauthorized`
+
+```bash
+curl -X GET http://localhost:5000/api/auth/me \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "createdAt": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+### 5. Forgot Password
+- **Endpoint:** `POST /api/auth/forgot-password`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/forgot-password \
+  -H "Content-Type: application/json" \
+  -d '{"email": "john@example.com"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Password reset email sent"
+}
+```
+
+### 6. Reset Password
+- **Endpoint:** `POST /api/auth/reset-password/:token`
+- **Status:** `200 OK` / `400 Bad Request`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/reset-password/eyJhbGciOiJIUzI1NiIs... \
+  -H "Content-Type: application/json" \
+  -d '{"password": "newpassword123"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Password reset successfully"
+}
+```
+
+### 7. Change Password
+- **Endpoint:** `PUT /api/auth/change-password`
+- **Status:** `200 OK` / `400 Bad Request`
+
+```bash
+curl -X PUT http://localhost:5000/api/auth/change-password \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "currentPassword": "password123",
+    "newPassword": "newpassword123"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Password changed successfully"
+}
+```
+
+### 8. Refresh Token
+- **Endpoint:** `POST /api/auth/refresh-token`
+- **Status:** `200 OK` / `401 Unauthorized`
+
+```bash
+curl -X POST http://localhost:5000/api/auth/refresh-token \
+  -H "Authorization: Bearer YOUR_REFRESH_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs..."
+  }
+}
+```
+
+---
+
+## 👤 User Routes
+**Base URL:** `/api/users`
+
+### 1. Get All Users (Admin)
+- **Endpoint:** `GET /api/users`
+- **Status:** `200 OK` / `403 Forbidden`
+
+```bash
+curl -X GET "http://localhost:5000/api/users?page=1&limit=10" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 25,
+  "totalPages": 3,
+  "currentPage": 1,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    }
+  ]
+}
+```
+
+### 2. Get Single User
+- **Endpoint:** `GET /api/users/:id`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X GET http://localhost:5000/api/users/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "John Doe",
+    "email": "john@example.com",
+    "role": "user",
+    "profileImage": "uploads/profile.jpg",
+    "bio": "Poetry lover"
+  }
+}
+```
+
+### 3. Update User
+- **Endpoint:** `PUT /api/users/:id`
+- **Status:** `200 OK` / `400 Bad Request`
+
+```bash
+curl -X PUT http://localhost:5000/api/users/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Updated",
+    "bio": "Updated bio"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "User updated successfully",
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "John Updated",
+    "bio": "Updated bio"
+  }
+}
+```
+
+### 4. Delete User (Admin)
+- **Endpoint:** `DELETE /api/users/:id`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X DELETE http://localhost:5000/api/users/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "User deleted successfully"
+}
+```
+
+### 5. Get User Stats
+- **Endpoint:** `GET /api/users/:id/stats`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/users/65a1b2c3d4e5f67890abcdef/stats \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "poemsCount": 12,
+    "bookmarksCount": 34,
+    "likesCount": 56,
+    "commentsCount": 23
+  }
+}
+```
+
+---
+
+## 📝 Poem Routes
+**Base URL:** `/api/poems`
+
+### 1. Get All Poems
+- **Endpoint:** `GET /api/poems`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/poems?page=1&limit=20&category=ghazal&sort=newest"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 150,
+  "totalPages": 8,
+  "currentPage": 1,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Shaam-e-Firaq",
+      "slug": "shaam-e-firaq",
+      "poet": "Mirza Ghalib",
+      "poetId": "65a1b2c3d4e5f67890abcdee",
+      "content": "शाम-ए-फ़िराक़ अब न पूछ...",
+      "category": "ghazal",
+      "likes": 234,
+      "views": 1234
+    }
+  ]
+}
+```
+
+### 2. Get Single Poem
+- **Endpoint:** `GET /api/poems/:slug`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X GET http://localhost:5000/api/poems/shaam-e-firaq
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "title": "Shaam-e-Firaq",
+    "slug": "shaam-e-firaq",
+    "poet": "Mirza Ghalib",
+    "content": "शाम-ए-फ़िराक़ अब न पूछ...",
+    "translation": "Don't ask about the evening of separation...",
+    "category": "ghazal",
+    "tags": ["love", "sadness", "urdu"],
+    "likes": 234,
+    "views": 1235
+  }
+}
+```
+
+### 3. Create Poem (Admin/Creator)
+- **Endpoint:** `POST /api/poems`
+- **Status:** `201 Created` / `400 Bad Request`
+
+```bash
+curl -X POST http://localhost:5000/api/poems \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Poem",
+    "content": "Poem content here...",
+    "poet": "John Doe",
+    "category": "ghazal",
+    "tags": ["love", "poetry"]
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Poem created successfully",
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdeg",
+    "title": "New Poem",
+    "slug": "new-poem",
+    "content": "Poem content here..."
+  }
+}
+```
+
+### 4. Update Poem
+- **Endpoint:** `PUT /api/poems/:id`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X PUT http://localhost:5000/api/poems/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Updated Poem Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem updated successfully",
+  "data": { "title": "Updated Poem Title" }
+}
+```
+
+### 5. Delete Poem
+- **Endpoint:** `DELETE /api/poems/:id`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X DELETE http://localhost:5000/api/poems/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem deleted successfully"
+}
+```
+
+### 6. Like Poem
+- **Endpoint:** `POST /api/poems/:id/like`
+- **Status:** `200 OK` / `401 Unauthorized`
+
+```bash
+curl -X POST http://localhost:5000/api/poems/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem liked",
+  "data": { "likes": 235 }
+}
+```
+
+### 7. Bookmark Poem
+- **Endpoint:** `POST /api/poems/:id/bookmark`
+- **Status:** `200 OK` / `401 Unauthorized`
+
+```bash
+curl -X POST http://localhost:5000/api/poems/65a1b2c3d4e5f67890abcdef/bookmark \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Poem bookmarked"
+}
+```
+
+### 8. Get Featured Poems
+- **Endpoint:** `GET /api/poems/featured`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/poems/featured
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Featured Poem 1", "poet": "Famous Poet" }
+  ]
+}
+```
+
+### 9. Get Trending Poems
+- **Endpoint:** `GET /api/poems/trending`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/poems/trending?days=7"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Trending Poem", "views": 5000 }
+  ]
+}
+```
+
+---
+
+## 👨‍🎨 Author Routes
+**Base URL:** `/api/authors`
+
+### 1. Get All Authors
+- **Endpoint:** `GET /api/authors`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/authors?page=1&limit=20"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 45,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "name": "Mirza Ghalib",
+      "slug": "mirza-ghalib",
+      "bio": "Famous Urdu poet",
+      "poemsCount": 234,
+      "booksCount": 12
+    }
+  ]
+}
+```
+
+### 2. Get Single Author
+- **Endpoint:** `GET /api/authors/:slug`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X GET http://localhost:5000/api/authors/mirza-ghalib
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "Mirza Ghalib",
+    "slug": "mirza-ghalib",
+    "bio": "Famous Urdu poet of 19th century",
+    "birthYear": 1797,
+    "deathYear": 1869,
+    "image": "uploads/authors/ghalib.jpg",
+    "poems": [...],
+    "books": [...]
+  }
+}
+```
+
+### 3. Create Author (Admin)
+- **Endpoint:** `POST /api/authors`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/authors \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Allama Iqbal",
+    "bio": "National poet of Pakistan",
+    "birthYear": 1877,
+    "deathYear": 1938
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Author created successfully",
+  "data": { "_id": "...", "name": "Allama Iqbal" }
+}
+```
+
+### 4. Update Author
+- **Endpoint:** `PUT /api/authors/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/authors/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"bio": "Updated biography"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Author updated successfully"
+}
+```
+
+### 5. Delete Author
+- **Endpoint:** `DELETE /api/authors/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/authors/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Author deleted successfully"
+}
+```
+
+### 6. Get Author Poems
+- **Endpoint:** `GET /api/authors/:slug/poems`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/authors/mirza-ghalib/poems?page=1&limit=20
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 234,
+  "data": [{ "title": "Poem 1" }, { "title": "Poem 2" }]
+}
+```
+
+---
+
+## 📚 Book Routes
+**Base URL:** `/api/books`
+
+### 1. Get All Books
+- **Endpoint:** `GET /api/books`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/books?page=1&limit=20&category=poetry"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 78,
+  "totalPages": 4,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Deewan-e-Ghalib",
+      "slug": "deewan-e-ghalib",
+      "author": "Mirza Ghalib",
+      "coverImage": "uploads/books/cover.jpg",
+      "publishedYear": 1821
+    }
+  ]
+}
+```
+
+### 2. Get Single Book
+- **Endpoint:** `GET /api/books/:slug`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/books/deewan-e-ghalib
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "title": "Deewan-e-Ghalib",
+    "description": "Collection of Ghalib's poetry",
+    "author": "Mirza Ghalib",
+    "pages": 456,
+    "pdfUrl": "uploads/books/deewan.pdf"
+  }
+}
+```
+
+### 3. Create Book (Admin)
+- **Endpoint:** `POST /api/books`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/books \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Bang-e-Dra",
+    "author": "Allama Iqbal",
+    "description": "Collection of Urdu poems",
+    "publishedYear": 1924
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Book created successfully",
+  "data": { "_id": "...", "title": "Bang-e-Dra" }
+}
+```
+
+### 4. Update Book
+- **Endpoint:** `PUT /api/books/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/books/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"description": "Updated description"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Book updated successfully"
+}
+```
+
+### 5. Delete Book
+- **Endpoint:** `DELETE /api/books/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/books/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Book deleted successfully"
+}
+```
+
+### 6. Download Book PDF
+- **Endpoint:** `GET /api/books/:id/download`
+- **Status:** `200 OK` / `404 Not Found`
+
+```bash
+curl -X GET http://localhost:5000/api/books/65a1b2c3d4e5f67890abcdef/download \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response:** PDF file download
+
+---
+
+## 🎵 Audio Routes
+**Base URL:** `/api/audio`
+
+### 1. Get All Audio
+- **Endpoint:** `GET /api/audio`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/audio?page=1&limit=20&type=nauha"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 156,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Nauha Title",
+      "slug": "nauha-title",
+      "artist": "Famous Reciter",
+      "type": "nauha",
+      "occasion": "muharram",
+      "duration": 345,
+      "audioUrl": "/uploads/audio/nauha.mp3",
+      "plays": 1234
+    }
+  ]
+}
+```
+
+### 2. Get Audio by Type
+- **Endpoint:** `GET /api/audio/type/:type`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/type/nauha?page=1&limit=20
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 45,
+  "data": [{ "title": "Nauha 1" }, { "title": "Nauha 2" }]
+}
+```
+
+**Available types:** `nauha`, `manqabat`, `qawwali`, `naat`, `hamd`, `marsiya`, `soz`, `salam`
+
+### 3. Get Audio by Occasion
+- **Endpoint:** `GET /api/audio/occasion/:occasion`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/occasion/muharram
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 67,
+  "data": [...]
+}
+```
+
+**Available occasions:** `muharram`, `ramadan`, `eid`, `milad`, `general`
+
+### 4. Get Single Audio
+- **Endpoint:** `GET /api/audio/:slug`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/nauha-title
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "title": "Nauha Title",
+    "artist": "Famous Reciter",
+    "lyrics": "Lyrics text...",
+    "translation": "Translation...",
+    "type": "nauha",
+    "occasion": "muharram",
+    "audioUrl": "/uploads/audio/nauha.mp3",
+    "coverImage": "/uploads/covers/nauha.jpg",
+    "plays": 1235
+  }
+}
+```
+
+### 5. Stream Audio
+- **Endpoint:** `GET /api/audio/:slug/stream`
+- **Status:** `206 Partial Content`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/nauha-title/stream \
+  -H "Range: bytes=0-100000"
+```
+
+**Response:** Audio stream with `Content-Range` header
+
+### 6. Get Audio Transcript
+- **Endpoint:** `GET /api/audio/:slug/transcript`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/nauha-title/transcript
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "transcript": "Full transcript text...",
+    "timestamps": [{ "time": 0, "text": "..." }]
+  }
+}
+```
+
+### 7. Get Similar Audio
+- **Endpoint:** `GET /api/audio/:slug/similar`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/nauha-title/similar?limit=5
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Similar Nauha 1", "artist": "Artist Name" }
+  ]
+}
+```
+
+### 8. Create Audio (Admin)
+- **Endpoint:** `POST /api/audio`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/audio \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Nauha",
+    "artist": "Famous Reciter",
+    "type": "nauha",
+    "occasion": "muharram",
+    "audioUrl": "/uploads/audio/new.mp3",
+    "duration": 420
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Audio created successfully",
+  "data": { "_id": "...", "title": "New Nauha" }
+}
+```
+
+### 9. Update Audio (Admin)
+- **Endpoint:** `PUT /api/audio/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/audio/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"title": "Updated Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio updated successfully"
+}
+```
+
+### 10. Delete Audio (Admin)
+- **Endpoint:** `DELETE /api/audio/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/audio/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio deleted successfully"
+}
+```
+
+### 11. Like Audio
+- **Endpoint:** `POST /api/audio/:id/like`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/audio/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio liked",
+  "data": { "likes": 125 }
+}
+```
+
+### 12. Unlike Audio
+- **Endpoint:** `DELETE /api/audio/:id/like`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/audio/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Like removed"
+}
+```
+
+### 13. Bookmark Audio
+- **Endpoint:** `POST /api/audio/:id/bookmark`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/audio/65a1b2c3d4e5f67890abcdef/bookmark \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio bookmarked"
+}
+```
+
+### 14. Get User Playlists
+- **Endpoint:** `GET /api/audio/playlists/user`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/playlists/user \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "_id": "...", "name": "Favorites", "count": 15 }
+  ]
+}
+```
+
+### 15. Get Audio Stats
+- **Endpoint:** `GET /api/audio/stats`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/stats
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalAudio": 456,
+    "totalPlays": 123456,
+    "byType": {
+      "nauha": 120,
+      "manqabat": 89,
+      "qawwali": 67
+    }
+  }
+}
+```
+
+### 16. Get Featured Audio
+- **Endpoint:** `GET /api/audio/featured`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/featured?limit=10
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Featured Audio 1", "artist": "Artist Name" }
+  ]
+}
+```
+
+### 17. Get Trending Audio
+- **Endpoint:** `GET /api/audio/trending`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/audio/trending?days=7&limit=10"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Trending Audio", "plays": 5000 }
+  ]
+}
+```
+
+### 18. Get Audio by Playlist
+- **Endpoint:** `GET /api/audio/playlist/:playlistId`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/playlist/65a1b2c3d4e5f67890abcdef
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "title": "Audio 1", "artist": "Artist" }
+  ]
+}
+```
+
+### 19. Search Audio
+- **Endpoint:** `GET /api/audio/search`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/audio/search?q=nauha&type=nauha"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 23,
+  "data": [...]
+}
+```
+
+### 20. Get Popular by Type
+- **Endpoint:** `GET /api/audio/popular/:type`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/audio/popular/nauha?limit=10"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 21. Get Audio by Author
+- **Endpoint:** `GET /api/audio/author/:authorId`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/author/65a1b2c3d4e5f67890abcdef
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 22. Get Audio by Tag
+- **Endpoint:** `GET /api/audio/tag/:tag`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/tag/muharram
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 23. Get Recent Played
+- **Endpoint:** `GET /api/audio/recent/played`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio/recent/played \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 24. Get Recommended Audio
+- **Endpoint:** `GET /api/audio/recommended`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/audio/recommended?limit=10" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+---
+
+## 🎬 Video Routes
+**Base URL:** `/api/videos`
+
+### 1. Get All Videos
+- **Endpoint:** `GET /api/videos`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/videos?page=1&limit=20"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 89,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Video Title",
+      "slug": "video-title",
+      "description": "Video description",
+      "videoUrl": "/uploads/videos/video.mp4",
+      "thumbnail": "/uploads/thumbnails/thumb.jpg",
+      "views": 1234
+    }
+  ]
+}
+```
+
+### 2. Get Single Video
+- **Endpoint:** `GET /api/videos/:slug`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/videos/video-title
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "title": "Video Title",
+    "description": "Full description",
+    "videoUrl": "/uploads/videos/video.mp4",
+    "thumbnail": "/uploads/thumbnails/thumb.jpg",
+    "duration": 600,
+    "views": 1235
+  }
+}
+```
+
+### 3. Stream Video
+- **Endpoint:** `GET /api/videos/:slug/stream`
+- **Status:** `206 Partial Content`
+
+```bash
+curl -X GET http://localhost:5000/api/videos/video-title/stream \
+  -H "Range: bytes=0-1000000"
+```
+
+**Response:** Video stream with `Content-Range` header
+
+### 4. Create Video (Admin)
+- **Endpoint:** `POST /api/videos`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/videos \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Video",
+    "description": "Video description",
+    "videoUrl": "/uploads/videos/new.mp4",
+    "duration": 300
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Video created successfully"
+}
+```
+
+### 5. Update Video (Admin)
+- **Endpoint:** `PUT /api/videos/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/videos/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"title": "Updated Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Video updated successfully"
+}
+```
+
+### 6. Delete Video (Admin)
+- **Endpoint:** `DELETE /api/videos/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/videos/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Video deleted successfully"
+}
+```
+
+### 7. Like Video
+- **Endpoint:** `POST /api/videos/:id/like`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/videos/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Video liked"
+}
+```
+
+---
+
+## 🏷️ Category Routes
+**Base URL:** `/api/categories`
+
+### 1. Get All Categories
+- **Endpoint:** `GET /api/categories`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/categories
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "name": "Ghazal",
+      "slug": "ghazal",
+      "description": "Urdu poetic form",
+      "count": 234
+    },
+    {
+      "_id": "65a1b2c3d4e5f67890abcdeg",
+      "name": "Nazm",
+      "slug": "nazm",
+      "count": 156
+    }
+  ]
+}
+```
+
+### 2. Get Single Category
+- **Endpoint:** `GET /api/categories/:slug`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/categories/ghazal
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "Ghazal",
+    "slug": "ghazal",
+    "description": "Traditional Urdu poetic form",
+    "poems": [...]
+  }
+}
+```
+
+### 3. Create Category (Admin)
+- **Endpoint:** `POST /api/categories`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/categories \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Rubai",
+    "description": "Four-line Persian poetry form"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Category created successfully"
+}
+```
+
+### 4. Update Category (Admin)
+- **Endpoint:** `PUT /api/categories/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/categories/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"description": "Updated description"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Category updated successfully"
+}
+```
+
+### 5. Delete Category (Admin)
+- **Endpoint:** `DELETE /api/categories/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/categories/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Category deleted successfully"
+}
+```
+
+---
+
+## 🔍 Search Routes
+**Base URL:** `/api/search`
+
+### 1. Global Search
+- **Endpoint:** `GET /api/search`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search?q=ghalib&type=poems&page=1&limit=20"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "query": "ghalib",
+  "results": {
+    "poems": {
+      "total": 45,
+      "data": [{ "title": "Poem 1", "poet": "Ghalib" }]
+    },
+    "authors": {
+      "total": 2,
+      "data": [{ "name": "Mirza Ghalib" }]
+    },
+    "audio": {
+      "total": 12,
+      "data": [{ "title": "Audio 1" }]
+    }
+  }
+}
+```
+
+### 2. Search Poems Only
+- **Endpoint:** `GET /api/search/poems`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search/poems?q=love&category=ghazal"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 67,
+  "data": [...]
+}
+```
+
+### 3. Search Authors Only
+- **Endpoint:** `GET /api/search/authors`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search/authors?q=iqbal"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 3,
+  "data": [...]
+}
+```
+
+### 4. Search Audio Only
+- **Endpoint:** `GET /api/search/audio`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search/audio?q=nauha&type=nauha"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 45,
+  "data": [...]
+}
+```
+
+### 5. Search Books Only
+- **Endpoint:** `GET /api/search/books`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search/books?q=deewan"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 12,
+  "data": [...]
+}
+```
+
+### 6. Get Search Suggestions
+- **Endpoint:** `GET /api/search/suggestions`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/search/suggestions?q=gha"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "suggestions": [
+    "Ghalib", "Ghazal", "Ghalib poetry", "Ghalib audio"
+  ]
+}
+```
+
+### 7. Advanced Search
+- **Endpoint:** `POST /api/search/advanced`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/search/advanced \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "love",
+    "poet": "Ghalib",
+    "category": "ghazal",
+    "yearFrom": 1800,
+    "yearTo": 1900
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 23,
+  "data": [...]
+}
+```
+
+---
+
+## 🔔 Notification Routes
+**Base URL:** `/api/notifications`
+
+### 1. Get User Notifications
+- **Endpoint:** `GET /api/notifications`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/notifications?page=1&limit=20" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "unreadCount": 5,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "New Comment",
+      "message": "Someone commented on your poem",
+      "type": "comment",
+      "read": false,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### 2. Mark Notification as Read
+- **Endpoint:** `PUT /api/notifications/:id/read`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/notifications/65a1b2c3d4e5f67890abcdef/read \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Notification marked as read"
+}
+```
+
+### 3. Mark All Notifications as Read
+- **Endpoint:** `PUT /api/notifications/read-all`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/notifications/read-all \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "All notifications marked as read"
+}
+```
+
+### 4. Delete Notification
+- **Endpoint:** `DELETE /api/notifications/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/notifications/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Notification deleted"
+}
+```
+
+### 5. Delete All Notifications
+- **Endpoint:** `DELETE /api/notifications`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/notifications \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "All notifications deleted"
+}
+```
+
+---
+
+## 💳 Subscription Routes
+**Base URL:** `/api/subscriptions`
+
+### 1. Get Current Subscription
+- **Endpoint:** `GET /api/subscriptions/current`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/subscriptions/current \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "plan": "premium",
+    "status": "active",
+    "expiresAt": "2025-01-15T10:30:00.000Z",
+    "features": ["ad-free", "downloads", "offline"]
+  }
+}
+```
+
+### 2. Get Available Plans
+- **Endpoint:** `GET /api/subscriptions/plans`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/subscriptions/plans
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "name": "Free",
+      "price": 0,
+      "features": ["Basic access", "Limited downloads"]
+    },
+    {
+      "name": "Premium",
+      "price": 9.99,
+      "features": ["Ad-free", "Unlimited downloads", "Offline mode"]
+    }
+  ]
+}
+```
+
+### 3. Create Subscription
+- **Endpoint:** `POST /api/subscriptions/create`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/subscriptions/create \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "plan": "premium",
+    "paymentMethod": "card",
+    "paymentToken": "tok_visa"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Subscription created",
+  "data": { "subscriptionId": "sub_123", "status": "active" }
+}
+```
+
+### 4. Cancel Subscription
+- **Endpoint:** `POST /api/subscriptions/cancel`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/subscriptions/cancel \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Subscription cancelled"
+}
+```
+
+### 5. Get Payment History
+- **Endpoint:** `GET /api/subscriptions/payments`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/subscriptions/payments \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "amount": 9.99,
+      "date": "2024-01-15T10:30:00.000Z",
+      "status": "successful"
+    }
+  ]
+}
+```
+
+### 6. Change Plan
+- **Endpoint:** `PUT /api/subscriptions/change-plan`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/subscriptions/change-plan \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"newPlan": "premium_annual"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Plan changed successfully"
+}
+```
+
+---
+
+## 📊 Analytics Routes
+**Base URL:** `/api/analytics`
+
+### 1. Get Dashboard Stats (Admin)
+- **Endpoint:** `GET /api/analytics/dashboard`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/analytics/dashboard \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 1250,
+    "totalPoems": 3450,
+    "totalAudio": 567,
+    "totalVideos": 89,
+    "totalViews": 123456,
+    "newUsersToday": 23,
+    "activeUsers": 456
+  }
+}
+```
+
+### 2. Get Content Stats
+- **Endpoint:** `GET /api/analytics/content`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/analytics/content?days=30" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "mostViewedPoems": [...],
+    "mostPlayedAudio": [...],
+    "popularCategories": {...},
+    "trendingContent": [...]
+  }
+}
+```
+
+### 3. Get User Stats
+- **Endpoint:** `GET /api/analytics/users`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/analytics/users?period=month" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalUsers": 1250,
+    "newUsersLastMonth": 145,
+    "activeUsers": 456,
+    "userGrowth": [...],
+    "userRoles": { "admin": 3, "creator": 45, "user": 1202 }
+  }
+}
+```
+
+### 4. Get Audio Analytics (Admin)
+- **Endpoint:** `GET /api/admin/audio/analytics`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/admin/audio/analytics?days=30" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalPlays": 45678,
+    "averagePlaysPerDay": 1522,
+    "mostPlayedAudio": [...],
+    "popularTypes": {...},
+    "popularOccasions": {...}
+  }
+}
+```
+
+---
+
+## 👑 Admin Routes
+**Base URL:** `/api/admin`
+
+### 1. Dashboard Stats
+- **Endpoint:** `GET /api/admin/dashboard`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/admin/dashboard \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "users": { "total": 1250, "new": 23 },
+    "content": { "poems": 3450, "audio": 567 },
+    "engagement": { "likes": 12345, "comments": 6789 }
+  }
+}
+```
+
+### 2. Manage Users
+- **Endpoint:** `GET /api/admin/users`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/admin/users?page=1&limit=20" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 3. Update User Role
+- **Endpoint:** `PUT /api/admin/users/:id/role`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/admin/users/65a1b2c3d4e5f67890abcdef/role \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"role": "creator"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "User role updated"
+}
+```
+
+### 4. Bulk Audio Operations (Admin)
+- **Endpoint:** `POST /api/admin/audio/bulk`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/admin/audio/bulk \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action": "delete",
+    "ids": ["id1", "id2", "id3"]
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Bulk operation completed",
+  "deleted": 3
+}
+```
+
+### 5. Update Audio Metadata (Admin)
+- **Endpoint:** `PATCH /api/admin/audio/:id/metadata`
+- **Status:** `200 OK`
+
+```bash
+curl -X PATCH http://localhost:5000/api/admin/audio/65a1b2c3d4e5f67890abcdef/metadata \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"type": "manqabat", "occasion": "ramadan"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Metadata updated"
+}
+```
+
+### 6. Get System Settings
+- **Endpoint:** `GET /api/admin/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/admin/settings \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "maintenanceMode": false,
+    "registrationEnabled": true,
+    "maxUploadSize": 100,
+    "allowedFileTypes": ["mp3", "mp4", "jpg", "pdf"]
+  }
+}
+```
+
+### 7. Update System Settings
+- **Endpoint:** `PUT /api/admin/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/admin/settings \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"maintenanceMode": false, "registrationEnabled": true}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings updated"
+}
+```
+
+---
+
+## 🎨 Creator Routes
+**Base URL:** `/api/creator`
+
+### 1. Get Creator Dashboard
+- **Endpoint:** `GET /api/creator/dashboard`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/creator/dashboard \
+  -H "Authorization: Bearer CREATOR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "myPoems": 45,
+    "myAudio": 23,
+    "totalViews": 4567,
+    "totalLikes": 890,
+    "recentActivity": [...]
+  }
+}
+```
+
+### 2. Get Creator Content
+- **Endpoint:** `GET /api/creator/content`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/creator/content?type=poems" \
+  -H "Authorization: Bearer CREATOR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 3. Create Content (Creator)
+- **Endpoint:** `POST /api/creator/content`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/creator/content \
+  -H "Authorization: Bearer CREATOR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "type": "poem",
+    "title": "My New Poem",
+    "content": "Poem content...",
+    "category": "ghazal"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Content created successfully"
+}
+```
+
+### 4. Update Creator Content
+- **Endpoint:** `PUT /api/creator/content/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/creator/content/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer CREATOR_TOKEN" \
+  -d '{"title": "Updated Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Content updated"
+}
+```
+
+### 5. Delete Creator Content
+- **Endpoint:** `DELETE /api/creator/content/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/creator/content/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer CREATOR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Content deleted"
+}
+```
+
+### 6. Get Creator Stats
+- **Endpoint:** `GET /api/creator/stats`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/creator/stats \
+  -H "Authorization: Bearer CREATOR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "totalViews": 4567,
+    "totalLikes": 890,
+    "totalComments": 123,
+    "topPerforming": [...]
+  }
+}
+```
+
+---
+
+## 🏠 Homepage Routes
+**Base URL:** `/api/homepage`
+
+### 1. Get Homepage Data
+- **Endpoint:** `GET /api/homepage`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/homepage
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "hero": {
+      "title": "Welcome to Adabiyat",
+      "subtitle": "Discover Urdu Poetry",
+      "backgroundImage": "/uploads/hero.jpg"
+    },
+    "featuredPoems": [...],
+    "featuredAudio": [...],
+    "trendingNow": [...],
+    "newReleases": [...],
+    "categories": [...],
+    "featuredAuthors": [...]
+  }
+}
+```
+
+### 2. Update Hero Section (Admin)
+- **Endpoint:** `PUT /api/homepage/hero`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/homepage/hero \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "title": "New Title",
+    "subtitle": "New Subtitle",
+    "backgroundImage": "/uploads/new-hero.jpg"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Hero section updated"
+}
+```
+
+### 3. Update Featured Content (Admin)
+- **Endpoint:** `PUT /api/homepage/featured`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/homepage/featured \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "featuredPoems": ["poemId1", "poemId2"],
+    "featuredAudio": ["audioId1", "audioId2"]
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Featured content updated"
+}
+```
+
+---
+
+## 🔍 SEO Routes
+**Base URL:** `/api/seo`
+
+### 1. Get SEO Settings
+- **Endpoint:** `GET /api/seo/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/seo/settings
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "siteTitle": "Adabiyat - Urdu Poetry Platform",
+    "siteDescription": "Discover the beauty of Urdu poetry",
+    "keywords": ["urdu", "poetry", "ghazal", "nazm"],
+    "ogImage": "/uploads/og-image.jpg",
+    "twitterHandle": "@adabiyat"
+  }
+}
+```
+
+### 2. Update SEO Settings (Admin)
+- **Endpoint:** `PUT /api/seo/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/seo/settings \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{
+    "siteTitle": "Updated Title",
+    "siteDescription": "Updated description"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "SEO settings updated"
+}
+```
+
+### 3. Get Page Meta Tags
+- **Endpoint:** `GET /api/seo/meta/:page`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/seo/meta/poem/shaam-e-firaq
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "title": "Shaam-e-Firaq - Mirza Ghalib",
+    "description": "Read Shaam-e-Firaq by Mirza Ghalib",
+    "keywords": ["ghalib", "urdu poetry", "shaam-e-firaq"],
+    "ogTitle": "Shaam-e-Firaq - Mirza Ghalib",
+    "ogDescription": "A beautiful ghazal by Mirza Ghalib"
+  }
+}
+```
+
+### 4. Generate Sitemap
+- **Endpoint:** `GET /api/seo/sitemap`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/seo/sitemap
+```
+
+**Response:** XML sitemap
+
+---
+
+## 📤 Upload Routes
+**Base URL:** `/api/upload`
+
+### 1. Upload Image
+- **Endpoint:** `POST /api/upload/image`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/image \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "image=@/path/to/image.jpg"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/images/1705334400000-image.jpg",
+    "filename": "1705334400000-image.jpg",
+    "size": 123456
+  }
+}
+```
+
+### 2. Upload Cover Image
+- **Endpoint:** `POST /api/upload/cover`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/cover \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "cover=@/path/to/cover.jpg"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/covers/1705334400000-cover.jpg",
+    "filename": "1705334400000-cover.jpg"
+  }
+}
+```
+
+### 3. Upload Multiple Images
+- **Endpoint:** `POST /api/upload/images`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/images \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "images=@/path/to/image1.jpg" \
+  -F "images=@/path/to/image2.jpg"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "url": "/uploads/images/img1.jpg" },
+    { "url": "/uploads/images/img2.jpg" }
+  ]
+}
+```
+
+### 4. Upload PDF
+- **Endpoint:** `POST /api/upload/pdf`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/pdf \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "pdf=@/path/to/document.pdf"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/pdfs/1705334400000-document.pdf",
+    "filename": "1705334400000-document.pdf"
+  }
+}
+```
+
+### 5. Upload EPUB
+- **Endpoint:** `POST /api/upload/epub`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/epub \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "epub=@/path/to/book.epub"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/epubs/1705334400000-book.epub",
+    "filename": "1705334400000-book.epub"
+  }
+}
+```
+
+### 6. Upload eBook
+- **Endpoint:** `POST /api/upload/ebook`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/ebook \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "ebook=@/path/to/ebook.pdf"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/ebooks/1705334400000-ebook.pdf"
+  }
+}
+```
+
+### 7. Upload Audio
+- **Endpoint:** `POST /api/upload/audio`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/audio \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "audio=@/path/to/audio.mp3"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/audio/1705334400000-audio.mp3",
+    "filename": "1705334400000-audio.mp3",
+    "duration": 345,
+    "size": 5432100
+  }
+}
+```
+
+### 8. Upload Video
+- **Endpoint:** `POST /api/upload/video`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/video \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "video=@/path/to/video.mp4"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "url": "/uploads/videos/1705334400000-video.mp4",
+    "filename": "1705334400000-video.mp4",
+    "duration": 600,
+    "size": 54321000
+  }
+}
+```
+
+### 9. Upload Pages (Multiple)
+- **Endpoint:** `POST /api/upload/pages`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/upload/pages \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "pages=@/path/to/page1.jpg" \
+  -F "pages=@/path/to/page2.jpg"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "url": "/uploads/pages/page1.jpg", "pageNumber": 1 },
+    { "url": "/uploads/pages/page2.jpg", "pageNumber": 2 }
+  ]
+}
+```
+
+### 10. Delete File
+- **Endpoint:** `DELETE /api/upload/delete`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/upload/delete \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"filePath": "/uploads/images/file.jpg"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "File deleted successfully"
+}
+```
+
+---
+
+## ⚙️ Settings Routes
+
+### Admin Settings
+**Base URL:** `/api/admin/settings`
+
+### 1. Get Admin Settings
+- **Endpoint:** `GET /api/admin/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/admin/settings \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "siteName": "Adabiyat",
+    "siteDescription": "Urdu Poetry Platform",
+    "contactEmail": "admin@adabiyat.com",
+    "maintenanceMode": false,
+    "registrationEnabled": true,
+    "emailVerification": true,
+    "maxUploadSize": 100,
+    "allowedFileTypes": ["mp3", "mp4", "jpg", "png", "pdf"]
+  }
+}
+```
+
+### 2. Update Admin Settings
+- **Endpoint:** `PUT /api/admin/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/admin/settings \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "siteName": "Adabiyat 2.0",
+    "maintenanceMode": false
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings updated successfully"
+}
+```
+
+---
+
+### Public Settings
+**Base URL:** `/api/settings`
+
+### 1. Get Public Settings
+- **Endpoint:** `GET /api/settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/settings
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "siteName": "Adabiyat",
+    "siteDescription": "Urdu Poetry Platform",
+    "contactEmail": "info@adabiyat.com",
+    "socialLinks": {
+      "facebook": "https://facebook.com/adabiyat",
+      "twitter": "https://twitter.com/adabiyat",
+      "instagram": "https://instagram.com/adabiyat"
+    }
+  }
+}
+```
+
+---
+
+## 🤖 AI Routes
+**Base URL:** `/api/ai`
+
+### 1. Generate Poem
+- **Endpoint:** `POST /api/ai/generate-poem`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/ai/generate-poem \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "topic": "love",
+    "style": "ghazal",
+    "length": "short"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "title": "Dil Ki Baat",
+    "content": "Generated poem content...",
+    "style": "ghazal"
+  }
+}
+```
+
+### 2. Suggest Tags
+- **Endpoint:** `POST /api/ai/suggest-tags`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/ai/suggest-tags \
+  -H "Content-Type: application/json" \
+  -d '{"content": "Poem content here..."}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "tags": ["love", "sadness", "urdu", "poetry", "ghazal"]
+  }
+}
+```
+
+### 3. Translate Poem
+- **Endpoint:** `POST /api/ai/translate`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/ai/translate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "content": "Urdu poem content",
+    "targetLanguage": "en"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "translation": "English translation...",
+    "originalLanguage": "ur"
+  }
+}
+```
+
+---
+
+## 🔤 Transliteration Routes
+**Base URL:** `/api/transliteration`
+
+### 1. Urdu to Roman
+- **Endpoint:** `POST /api/transliteration/urdu-to-roman`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/transliteration/urdu-to-roman \
+  -H "Content-Type: application/json" \
+  -d '{"text": "محبت ایک احساس ہے"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "original": "محبت ایک احساس ہے",
+    "transliterated": "Muhabbat aik ehsas hai"
+  }
+}
+```
+
+### 2. Roman to Urdu
+- **Endpoint:** `POST /api/transliteration/roman-to-urdu`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/transliteration/roman-to-urdu \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Muhabbat aik ehsas hai"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "original": "Muhabbat aik ehsas hai",
+    "transliterated": "محبت ایک احساس ہے"
+  }
+}
+```
+
+### 3. Bulk Transliteration
+- **Endpoint:** `POST /api/transliteration/bulk`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/transliteration/bulk \
+  -H "Content-Type: application/json" \
+  -d '{
+    "texts": ["محبت", "دوستی", "خوشی"],
+    "direction": "urdu-to-roman"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    { "original": "محبت", "transliterated": "Muhabbat" },
+    { "original": "دوستی", "transliterated": "Dosti" },
+    { "original": "خوشی", "transliterated": "Khushi" }
+  ]
+}
+```
+
+---
+
+## 📋 Playlist Routes
+**Base URL:** `/api/playlists`
+
+### 1. Get User Playlists
+- **Endpoint:** `GET /api/playlists`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/playlists \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "name": "Favorites",
+      "description": "My favorite audio",
+      "audioCount": 15,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### 2. Create Playlist
+- **Endpoint:** `POST /api/playlists`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/playlists \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Nauha Collection",
+    "description": "My favorite nauhas",
+    "isPublic": true
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Playlist created",
+  "data": { "_id": "...", "name": "Nauha Collection" }
+}
+```
+
+### 3. Get Single Playlist
+- **Endpoint:** `GET /api/playlists/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/playlists/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "name": "Nauha Collection",
+    "description": "My favorite nauhas",
+    "audio": [...],
+    "audioCount": 15
+  }
+}
+```
+
+### 4. Update Playlist
+- **Endpoint:** `PUT /api/playlists/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/playlists/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"name": "Updated Playlist Name"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Playlist updated"
+}
+```
+
+### 5. Delete Playlist
+- **Endpoint:** `DELETE /api/playlists/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/playlists/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Playlist deleted"
+}
+```
+
+### 6. Add Audio to Playlist
+- **Endpoint:** `POST /api/playlists/:playlistId/audio/:audioId`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/playlists/playlist123/audio/audio456 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio added to playlist"
+}
+```
+
+### 7. Remove Audio from Playlist
+- **Endpoint:** `DELETE /api/playlists/:playlistId/audio/:audioId`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/playlists/playlist123/audio/audio456 \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio removed from playlist"
+}
+```
+
+---
+
+## 📝 Blog Routes
+**Base URL:** `/api/blogs`
+
+### 1. Get All Blogs
+- **Endpoint:** `GET /api/blogs`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/blogs?page=1&limit=10&category=poetry"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 45,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Understanding Ghazal",
+      "slug": "understanding-ghazal",
+      "excerpt": "A deep dive into the art of Ghazal...",
+      "author": "Admin",
+      "featuredImage": "/uploads/blogs/ghazal.jpg",
+      "views": 1234,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### 2. Get Single Blog
+- **Endpoint:** `GET /api/blogs/:slug`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/blogs/understanding-ghazal
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "65a1b2c3d4e5f67890abcdef",
+    "title": "Understanding Ghazal",
+    "content": "Full blog content...",
+    "author": "Admin",
+    "tags": ["poetry", "ghazal", "urdu"],
+    "comments": [],
+    "likes": 56
+  }
+}
+```
+
+### 3. Create Blog (Admin)
+- **Endpoint:** `POST /api/blogs`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/blogs \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Blog Post",
+    "content": "Full blog content...",
+    "category": "poetry",
+    "tags": ["urdu", "poetry"]
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Blog created successfully",
+  "data": { "_id": "...", "slug": "new-blog-post" }
+}
+```
+
+### 4. Update Blog (Admin)
+- **Endpoint:** `PUT /api/blogs/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/blogs/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"title": "Updated Blog Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Blog updated"
+}
+```
+
+### 5. Delete Blog (Admin)
+- **Endpoint:** `DELETE /api/blogs/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/blogs/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Blog deleted"
+}
+```
+
+### 6. Like Blog
+- **Endpoint:** `POST /api/blogs/:id/like`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/blogs/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Blog liked"
+}
+```
+
+---
+
+## 💾 Backup Routes
+**Base URL:** `/api/backup`
+
+### 1. Create Backup (Admin)
+- **Endpoint:** `POST /api/backup/create`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/backup/create \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Backup created",
+  "data": {
+    "filename": "backup-2024-01-15-103000.json",
+    "size": 1234567,
+    "timestamp": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+### 2. List Backups (Admin)
+- **Endpoint:** `GET /api/backup/list`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/backup/list \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "filename": "backup-2024-01-15-103000.json",
+      "size": 1234567,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### 3. Restore Backup (Admin)
+- **Endpoint:** `POST /api/backup/restore`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/backup/restore \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"filename": "backup-2024-01-15-103000.json"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Backup restored successfully"
+}
+```
+
+### 4. Download Backup (Admin)
+- **Endpoint:** `GET /api/backup/download/:filename`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/backup/download/backup-2024-01-15-103000.json \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response:** JSON file download
+
+---
+
+## ⚙️ App Settings Routes (NEW)
+**Base URL:** `/api/app-settings`
+
+### 1. Get All App Settings
+- **Endpoint:** `GET /api/app-settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/app-settings
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "general": {
+      "siteName": "Adabiyat",
+      "siteDescription": "Urdu Poetry Platform",
+      "timezone": "Asia/Karachi",
+      "language": "ur"
+    },
+    "appearance": {
+      "theme": "light",
+      "primaryColor": "#8B4513",
+      "logo": "/uploads/logo.png",
+      "favicon": "/uploads/favicon.ico"
+    },
+    "content": {
+      "itemsPerPage": 20,
+      "enableComments": true,
+      "enableRatings": true,
+      "autoApproveComments": false
+    },
+    "audio": {
+      "maxFileSize": 50,
+      "allowedFormats": ["mp3", "wav", "m4a"],
+      "enableDownload": true,
+      "enableStreaming": true
+    },
+    "video": {
+      "maxFileSize": 200,
+      "allowedFormats": ["mp4", "webm"],
+      "maxResolution": "1080p"
+    },
+    "security": {
+      "rateLimit": 300,
+      "enableCaptcha": true,
+      "sessionTimeout": 3600,
+      "maxLoginAttempts": 5
+    },
+    "social": {
+      "facebook": "https://facebook.com/adabiyat",
+      "twitter": "https://twitter.com/adabiyat",
+      "instagram": "https://instagram.com/adabiyat",
+      "youtube": "https://youtube.com/adabiyat"
+    },
+    "api": {
+      "rateLimit": 1000,
+      "enablePublicApi": true,
+      "apiKeys": []
+    },
+    "notifications": {
+      "emailEnabled": true,
+      "pushEnabled": true,
+      "adminEmail": "admin@adabiyat.com"
+    },
+    "seo": {
+      "metaTitle": "Adabiyat - Urdu Poetry",
+      "metaDescription": "Discover Urdu poetry",
+      "metaKeywords": ["urdu", "poetry", "ghazal"]
+    }
+  }
+}
+```
+
+### 2. Update All Settings (Admin)
+- **Endpoint:** `PUT /api/app-settings`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/app-settings \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "general": {
+      "siteName": "Adabiyat Pro",
+      "siteDescription": "Premium Urdu Poetry"
+    }
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings updated successfully",
+  "data": { "general": { "siteName": "Adabiyat Pro" } }
+}
+```
+
+### 3. Reset to Defaults (Admin)
+- **Endpoint:** `POST /api/app-settings/reset`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/app-settings/reset \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings reset to defaults"
+}
+```
+
+### 4. Get Single Setting
+- **Endpoint:** `GET /api/app-settings/:key`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/app-settings/general
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "siteName": "Adabiyat",
+    "siteDescription": "Urdu Poetry Platform",
+    "timezone": "Asia/Karachi",
+    "language": "ur"
+  }
+}
+```
+
+### 5. Update Single Setting (Admin)
+- **Endpoint:** `PUT /api/app-settings/:key`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/app-settings/general \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"siteName": "Adabiyat Plus"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Setting updated",
+  "data": { "siteName": "Adabiyat Plus" }
+}
+```
+
+### 6. Upload Logo/Favicon (Admin)
+- **Endpoint:** `POST /api/app-settings/upload/:type`
+- **Status:** `200 OK`
+
+```bash
+# Upload logo
+curl -X POST http://localhost:5000/api/app-settings/upload/logo \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -F "logo=@/path/to/logo.png"
+
+# Upload favicon
+curl -X POST http://localhost:5000/api/app-settings/upload/favicon \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -F "favicon=@/path/to/favicon.ico"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Logo uploaded successfully",
+  "data": { "logo": "/uploads/logo.png" }
+}
+```
+
+### 7. Generate API Key (Admin)
+- **Endpoint:** `POST /api/app-settings/api-keys`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/app-settings/api-keys \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"name": "Mobile App Key"}'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "key_123",
+    "name": "Mobile App Key",
+    "key": "adabiyat_live_xyz123...",
+    "createdAt": "2024-01-15T10:30:00.000Z"
+  }
+}
+```
+
+### 8. Delete API Key (Admin)
+- **Endpoint:** `DELETE /api/app-settings/api-keys/:keyId`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/app-settings/api-keys/key_123 \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "API key deleted"
+}
+```
+
+---
+
+## 🔐 Captcha Routes
+**Base URL:** `/api/captcha`
+
+### 1. Generate Captcha
+- **Endpoint:** `GET /api/captcha/generate`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/captcha/generate
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "captchaId": "captcha_123456",
+    "imageUrl": "/api/captcha/image/captcha_123456",
+    "expiresIn": 300
+  }
+}
+```
+
+### 2. Get Captcha Image
+- **Endpoint:** `GET /api/captcha/image/:captchaId`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/captcha/image/captcha_123456
+```
+
+**Response:** PNG image
+
+### 3. Verify Captcha
+- **Endpoint:** `POST /api/captcha/verify`
+- **Status:** `200 OK` / `400 Bad Request`
+
+```bash
+curl -X POST http://localhost:5000/api/captcha/verify \
+  -H "Content-Type: application/json" \
+  -d '{
+    "captchaId": "captcha_123456",
+    "answer": "ABCD"
+  }'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Captcha verified"
+}
+```
+
+**Response (400):**
+```json
+{
+  "success": false,
+  "message": "Invalid captcha"
+}
+```
+
+---
+
+## 💬 Comment Routes
+**Base URL:** `/api/comments`
+
+### 1. Get Comments for Content
+- **Endpoint:** `GET /api/comments/:contentType/:contentId`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/comments/poem/65a1b2c3d4e5f67890abcdef?page=1&limit=20"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "count": 45,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "user": { "name": "John Doe", "avatar": "/uploads/avatar.jpg" },
+      "content": "Beautiful poem!",
+      "likes": 12,
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+### 2. Create Comment
+- **Endpoint:** `POST /api/comments`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/comments \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "contentType": "poem",
+    "contentId": "65a1b2c3d4e5f67890abcdef",
+    "content": "This is a great poem!"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Comment added",
+  "data": { "_id": "...", "content": "This is a great poem!" }
+}
+```
+
+### 3. Update Comment
+- **Endpoint:** `PUT /api/comments/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/comments/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"content": "Updated comment"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Comment updated"
+}
+```
+
+### 4. Delete Comment
+- **Endpoint:** `DELETE /api/comments/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/comments/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Comment deleted"
+}
+```
+
+### 5. Like Comment
+- **Endpoint:** `POST /api/comments/:id/like`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/comments/65a1b2c3d4e5f67890abcdef/like \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Comment liked",
+  "data": { "likes": 13 }
+}
+```
+
+### 6. Reply to Comment
+- **Endpoint:** `POST /api/comments/:id/reply`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/comments/65a1b2c3d4e5f67890abcdef/reply \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"content": "This is a reply"}'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Reply added",
+  "data": { "reply": {...} }
+}
+```
+
+---
+
+## 📢 Ad Routes
+**Base URL:** `/api/ads`
+
+### 1. Get Active Ads
+- **Endpoint:** `GET /api/ads/active`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/ads/active?position=sidebar"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "65a1b2c3d4e5f67890abcdef",
+      "title": "Book Store Ad",
+      "imageUrl": "/uploads/ads/bookstore.jpg",
+      "linkUrl": "https://bookstore.com",
+      "position": "sidebar",
+      "impressions": 1234,
+      "clicks": 56
+    }
+  ]
+}
+```
+
+### 2. Get All Ads (Admin)
+- **Endpoint:** `GET /api/ads`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET "http://localhost:5000/api/ads?page=1&limit=20" \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": [...]
+}
+```
+
+### 3. Create Ad (Admin)
+- **Endpoint:** `POST /api/ads`
+- **Status:** `201 Created`
+
+```bash
+curl -X POST http://localhost:5000/api/ads \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "New Ad",
+    "imageUrl": "/uploads/ads/new-ad.jpg",
+    "linkUrl": "https://example.com",
+    "position": "header",
+    "startDate": "2024-01-15",
+    "endDate": "2024-12-31"
+  }'
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Ad created",
+  "data": { "_id": "...", "title": "New Ad" }
+}
+```
+
+### 4. Update Ad (Admin)
+- **Endpoint:** `PUT /api/ads/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X PUT http://localhost:5000/api/ads/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN" \
+  -d '{"title": "Updated Ad Title"}'
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Ad updated"
+}
+```
+
+### 5. Delete Ad (Admin)
+- **Endpoint:** `DELETE /api/ads/:id`
+- **Status:** `200 OK`
+
+```bash
+curl -X DELETE http://localhost:5000/api/ads/65a1b2c3d4e5f67890abcdef \
+  -H "Authorization: Bearer ADMIN_TOKEN"
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Ad deleted"
+}
+```
+
+### 6. Track Ad Click
+- **Endpoint:** `POST /api/ads/:id/click`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/ads/65a1b2c3d4e5f67890abcdef/click
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Click tracked"
+}
+```
+
+### 7. Track Ad Impression
+- **Endpoint:** `POST /api/ads/:id/impression`
+- **Status:** `200 OK`
+
+```bash
+curl -X POST http://localhost:5000/api/ads/65a1b2c3d4e5f67890abcdef/impression
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Impression tracked"
+}
+```
+
+---
+
+## 🗺️ Sitemap Routes
+**Base URL:** `/api/sitemap`
+
+### 1. Generate Sitemap
+- **Endpoint:** `GET /api/sitemap/generate`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/sitemap/generate
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Sitemap generated",
+  "data": {
+    "url": "/sitemap.xml",
+    "count": 1245
+  }
+}
+```
+
+### 2. Get Sitemap
+- **Endpoint:** `GET /api/sitemap`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/sitemap
+```
+
+**Response:** XML sitemap
+
+### 3. Get Sitemap Index
+- **Endpoint:** `GET /api/sitemap/index`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/sitemap/index
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "data": {
+    "sitemaps": [
+      "sitemap-pages.xml",
+      "sitemap-posts.xml",
+      "sitemap-categories.xml"
+    ]
+  }
+}
+```
+
+---
+
+## ❤️ Health & Test Routes
+
+### 1. Health Check
+- **Endpoint:** `GET /api/health`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/health
+```
+
+**Response (200):**
+```json
+{
+  "status": "OK",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": 123456,
+  "environment": "development"
+}
+```
+
+### 2. Detailed Health Check
+- **Endpoint:** `GET /api/health/detailed`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/health/detailed
+```
+
+**Response (200):**
+```json
+{
+  "status": "OK",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": 123456,
+  "memory": { "rss": 123456789, "heapTotal": 12345678 },
+  "environment": "development",
+  "nodeVersion": "v18.17.0",
+  "cors": {
+    "allowedOrigins": ["http://localhost:3000", "http://localhost:5000"],
+    "currentMode": "development (permissive)"
+  },
+  "database": {
+    "connected": true,
+    "state": 1
+  },
+  "routes": {
+    "audio": "/api/audio",
+    "audioTypes": "/api/audio/type/:type",
+    "audioOccasions": "/api/audio/occasion/:occasion",
+    "audioStats": "/api/audio/stats",
+    "audioPlaylists": "/api/audio/playlist/:playlistId"
+  }
+}
+```
+
+### 3. Audio Test Endpoint
+- **Endpoint:** `GET /api/audio-test`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/audio-test
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Audio routes are configured",
+  "availableEndpoints": [
+    "GET    /api/audio",
+    "GET    /api/audio/featured",
+    "GET    /api/audio/stats",
+    "GET    /api/audio/type/:type",
+    "GET    /api/audio/occasion/:occasion",
+    "GET    /api/audio/playlist/:playlistId"
+  ]
+}
+```
+
+### 4. Upload Test Endpoint
+- **Endpoint:** `GET /api/upload-test`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/api/upload-test
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Upload endpoint is configured",
+  "endpoints": [
+    "POST   /api/upload/image",
+    "POST   /api/upload/cover",
+    "POST   /api/upload/images",
+    "POST   /api/upload/pages",
+    "POST   /api/upload/pdf",
+    "POST   /api/upload/epub",
+    "POST   /api/upload/ebook",
+    "POST   /api/upload/audio",
+    "POST   /api/upload/video",
+    "DELETE /api/upload/delete"
+  ]
+}
+```
+
+### 5. Root Endpoint
+- **Endpoint:** `GET /`
+- **Status:** `200 OK`
+
+```bash
+curl -X GET http://localhost:5000/
+```
+
+**Response (200):**
+```json
+{
+  "name": "Adabiyat API",
+  "version": "1.0.0",
+  "status": "running",
+  "endpoints": {
+    "health": "/api/health",
+    "audio": "/api/audio",
+    "auth": "/api/auth",
+    "admin": "/api/admin",
+    "appSettings": "/api/app-settings"
+  }
+}
+```
+
+---
+
+## 📊 Summary of All Endpoints
+
+| Category | Base URL | Number of Endpoints |
+|----------|----------|---------------------|
+| Authentication | `/api/auth` | 8 |
+| Users | `/api/users` | 5 |
+| Poems | `/api/poems` | 9 |
+| Authors | `/api/authors` | 6 |
+| Books | `/api/books` | 6 |
+| Audio | `/api/audio` | 24 |
+| Videos | `/api/videos` | 7 |
+| Categories | `/api/categories` | 5 |
+| Search | `/api/search` | 7 |
+| Notifications | `/api/notifications` | 5 |
+| Subscriptions | `/api/subscriptions` | 6 |
+| Analytics | `/api/analytics` | 4 |
+| Admin | `/api/admin` | 7 |
+| Creator | `/api/creator` | 6 |
+| Homepage | `/api/homepage` | 3 |
+| SEO | `/api/seo` | 4 |
+| Upload | `/api/upload` | 10 |
+| Settings | `/api/admin/settings` & `/api/settings` | 3 |
+| AI | `/api/ai` | 3 |
+| Transliteration | `/api/transliteration` | 3 |
+| Playlists | `/api/playlists` | 7 |
+| Blogs | `/api/blogs` | 6 |
+| Backup | `/api/backup` | 4 |
+| App Settings | `/api/app-settings` | 8 |
+| Captcha | `/api/captcha` | 3 |
+| Comments | `/api/comments` | 6 |
+| Ads | `/api/ads` | 7 |
+| Sitemap | `/api/sitemap` | 3 |
+| Health/Test | Various | 5 |
+
+**Total Endpoints: ~180+**
+
+---
+
+## 🔑 Authentication Header
+
+For protected routes, include the JWT token in the Authorization header:
+
+```bash
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+## 📝 Common Query Parameters
+
+- `page` - Page number for pagination (default: 1)
+- `limit` - Items per page (default: 10-20)
+- `sort` - Sort field (e.g., `newest`, `oldest`, `popular`)
+- `category` - Filter by category
+- `type` - Filter by type (for audio/video)
+- `q` - Search query
+- `days` - Time period for trending content
+
+## 🚦 HTTP Status Codes
+
+| Code | Meaning |
+|------|---------|
+| 200 | OK - Request successful |
+| 201 | Created - Resource created |
+| 204 | No Content - Request successful, no response body |
+| 206 | Partial Content - Used for streaming |
+| 400 | Bad Request - Invalid input |
+| 401 | Unauthorized - Authentication required |
+| 403 | Forbidden - Insufficient permissions |
+| 404 | Not Found - Resource not found |
+| 409 | Conflict - Resource already exists |
+| 429 | Too Many Requests - Rate limit exceeded |
+| 500 | Internal Server Error |

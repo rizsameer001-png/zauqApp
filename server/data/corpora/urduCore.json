@@ -1,0 +1,686 @@
+{
+  "version": "3.0",
+  "lastUpdated": "2024-01-15",
+  "words": {
+    "ہم": {
+      "roman": "Hum",
+      "frequency": 1000,
+      "category": ["pronoun", "common"]
+    },
+    "تم": {
+      "roman": "tum",
+      "frequency": 950,
+      "category": ["pronoun", "common"]
+    },
+    "آپ": {
+      "roman": "aap",
+      "frequency": 900,
+      "category": ["pronoun", "common"]
+    },
+    "وہ": {
+      "roman": "Woh",
+      "frequency": 3500,
+      "category": ["pronoun", "common"]
+    },
+    "یہ": {
+      "roman": "Yeh",
+      "frequency": 5000,
+      "category": ["pronoun", "common"]
+    },
+    "میں": {
+      "roman": "mein",
+      "frequency": 10000,
+      "category": ["postposition", "common"]
+    },
+    "دیکھیں": {
+      "roman": "dekhein",
+      "frequency": 850,
+      "category": ["verb", "poetry"]
+    },
+    "دیکھیں گے": {
+      "roman": "dekheinge",
+      "frequency": 800,
+      "category": ["verb", "future", "poetry"]
+    },
+    "دیکھنا": {
+      "roman": "dekhna",
+      "frequency": 700,
+      "category": ["verb", "common"]
+    },
+    "دیکھتا": {
+      "roman": "dekhta",
+      "frequency": 600,
+      "category": ["verb", "common"]
+    },
+    "دیکھتی": {
+      "roman": "dekhti",
+      "frequency": 550,
+      "category": ["verb", "common"]
+    },
+    "دیکھتے": {
+      "roman": "dekhte",
+      "frequency": 600,
+      "category": ["verb", "common"]
+    },
+    "لازم": {
+      "roman": "laazim",
+      "frequency": 600,
+      "category": ["adjective", "poetry"]
+    },
+    "ہے": {
+      "roman": "hai",
+      "frequency": 5000,
+      "category": ["verb", "auxiliary", "common"]
+    },
+    "ہیں": {
+      "roman": "hain",
+      "frequency": 4500,
+      "category": ["verb", "auxiliary", "common"]
+    },
+    "ہوں": {
+      "roman": "hoon",
+      "frequency": 3500,
+      "category": ["verb", "auxiliary", "common"]
+    },
+    "تھا": {
+      "roman": "tha",
+      "frequency": 4000,
+      "category": ["verb", "past", "common"]
+    },
+    "تھی": {
+      "roman": "thi",
+      "frequency": 3500,
+      "category": ["verb", "past", "common"]
+    },
+    "تھے": {
+      "roman": "the",
+      "frequency": 3800,
+      "category": ["verb", "past", "common"]
+    },
+    "تھیں": {
+      "roman": "thin",
+      "frequency": 2500,
+      "category": ["verb", "past", "common"]
+    },
+    "کہ": {
+      "roman": "ke",
+      "frequency": 4500,
+      "category": ["conjunction", "common"]
+    },
+    "بھی": {
+      "roman": "bhi",
+      "frequency": 4000,
+      "category": ["particle", "common"]
+    },
+    "تو": {
+      "roman": "to",
+      "frequency": 3500,
+      "category": ["particle", "common"]
+    },
+    "ہی": {
+      "roman": "hi",
+      "frequency": 3800,
+      "category": ["particle", "common"]
+    },
+    "دن": {
+      "roman": "din",
+      "frequency": 2000,
+      "category": ["noun", "time", "common"]
+    },
+    "جس": {
+      "roman": "jis",
+      "frequency": 1800,
+      "category": ["pronoun", "relative", "common"]
+    },
+    "کا": {
+      "roman": "ka",
+      "frequency": 5000,
+      "category": ["postposition", "common"]
+    },
+    "کی": {
+      "roman": "ki",
+      "frequency": 9000,
+      "category": ["postposition", "common"]
+    },
+    "کے": {
+      "roman": "ke",
+      "frequency": 8000,
+      "category": ["postposition", "common"]
+    },
+    "کو": {
+      "roman": "ko",
+      "frequency": 7000,
+      "category": ["postposition", "common"]
+    },
+    "سے": {
+      "roman": "se",
+      "frequency": 7500,
+      "category": ["postposition", "common"]
+    },
+    "پر": {
+      "roman": "par",
+      "frequency": 6000,
+      "category": ["postposition", "common"]
+    },
+    "پہ": {
+      "roman": "pe",
+      "frequency": 4000,
+      "category": ["postposition", "common"]
+    },
+    "تک": {
+      "roman": "tak",
+      "frequency": 3500,
+      "category": ["postposition", "common"]
+    },
+    "لیے": {
+      "roman": "liye",
+      "frequency": 3000,
+      "category": ["postposition", "common"]
+    },
+    "وعدہ": {
+      "roman": "waada",
+      "frequency": 500,
+      "category": ["noun", "poetry"]
+    },
+    "جو": {
+      "roman": "jo",
+      "frequency": 3000,
+      "category": ["pronoun", "relative", "common"]
+    },
+    "لوح": {
+      "roman": "lauh",
+      "frequency": 200,
+      "category": ["noun", "poetry", "spiritual"]
+    },
+    "ازل": {
+      "roman": "azal",
+      "frequency": 300,
+      "category": ["noun", "poetry", "spiritual"]
+    },
+    "لکھا": {
+      "roman": "likha",
+      "frequency": 800,
+      "category": ["verb", "past", "common"]
+    },
+    "لکھی": {
+      "roman": "likhi",
+      "frequency": 600,
+      "category": ["verb", "past", "common"]
+    },
+    "لکھے": {
+      "roman": "likhe",
+      "frequency": 550,
+      "category": ["verb", "past", "common"]
+    },
+    "لکھنا": {
+      "roman": "likhna",
+      "frequency": 650,
+      "category": ["verb", "common"]
+    },
+    "جب": {
+      "roman": "Jab",
+      "frequency": 2500,
+      "category": ["conjunction", "time", "common"]
+    },
+    "ظلم": {
+      "roman": "zulm",
+      "frequency": 600,
+      "category": ["noun", "poetry"]
+    },
+    "ستم": {
+      "roman": "sitam",
+      "frequency": 500,
+      "category": ["noun", "poetry"]
+    },
+    "پہاڑ": {
+      "roman": "pahaar",
+      "frequency": 400,
+      "category": ["noun", "nature", "common"]
+    },
+    "گراں": {
+      "roman": "giraan",
+      "frequency": 250,
+      "category": ["adjective", "poetry"]
+    },
+    "ریت": {
+      "roman": "reet",
+      "frequency": 300,
+      "category": ["noun", "nature", "poetry"]
+    },
+    "طرح": {
+      "roman": "tarah",
+      "frequency": 800,
+      "category": ["noun", "manner", "common"]
+    },
+    "اڑ": {
+      "roman": "urr",
+      "frequency": 200,
+      "category": ["verb", "poetry"]
+    },
+    "اڑنا": {
+      "roman": "urna",
+      "frequency": 250,
+      "category": ["verb", "common"]
+    },
+    "جائیں": {
+      "roman": "jayein",
+      "frequency": 600,
+      "category": ["verb", "subjunctive", "common"]
+    },
+    "جائیں گے": {
+      "roman": "jayeinge",
+      "frequency": 550,
+      "category": ["verb", "future", "common"]
+    },
+    "جانا": {
+      "roman": "jana",
+      "frequency": 2000,
+      "category": ["verb", "common"]
+    },
+    "جاتا": {
+      "roman": "jata",
+      "frequency": 1200,
+      "category": ["verb", "common"]
+    },
+    "جاتی": {
+      "roman": "jati",
+      "frequency": 1000,
+      "category": ["verb", "common"]
+    },
+    "جاتے": {
+      "roman": "jate",
+      "frequency": 1100,
+      "category": ["verb", "common"]
+    },
+    "گیا": {
+      "roman": "gaya",
+      "frequency": 1500,
+      "category": ["verb", "past", "common"]
+    },
+    "گئی": {
+      "roman": "gayi",
+      "frequency": 1300,
+      "category": ["verb", "past", "common"]
+    },
+    "گئے": {
+      "roman": "gaye",
+      "frequency": 1400,
+      "category": ["verb", "past", "common"]
+    },
+    "محکوموں": {
+      "roman": "mahkumon",
+      "frequency": 100,
+      "category": ["noun", "poetry"]
+    },
+    "پاؤں": {
+      "roman": "paaon",
+      "frequency": 400,
+      "category": ["noun", "body", "common"]
+    },
+    "تلے": {
+      "roman": "taley",
+      "frequency": 300,
+      "category": ["postposition", "common"]
+    },
+    "دھرتی": {
+      "roman": "dharti",
+      "frequency": 600,
+      "category": ["noun", "nature", "common"]
+    },
+    "دھڑکے": {
+      "roman": "dharakey",
+      "frequency": 150,
+      "category": ["verb", "poetry"]
+    },
+    "دھڑکنا": {
+      "roman": "dharakna",
+      "frequency": 200,
+      "category": ["verb", "common"]
+    },
+    "گی": {
+      "roman": "gi",
+      "frequency": 2000,
+      "category": ["auxiliary", "future", "common"]
+    },
+    "گا": {
+      "roman": "ga",
+      "frequency": 1800,
+      "category": ["auxiliary", "future", "common"]
+    },
+    "گے": {
+      "roman": "ge",
+      "frequency": 2200,
+      "category": ["auxiliary", "future", "common"]
+    },
+    "اہل": {
+      "roman": "ahl",
+      "frequency": 400,
+      "category": ["noun", "group", "poetry"]
+    },
+    "حکم": {
+      "roman": "hukm",
+      "frequency": 500,
+      "category": ["noun", "common"]
+    },
+    "سر": {
+      "roman": "sar",
+      "frequency": 800,
+      "category": ["noun", "body", "common"]
+    },
+    "اوپر": {
+      "roman": "oopar",
+      "frequency": 600,
+      "category": ["postposition", "common"]
+    },
+    "بجلی": {
+      "roman": "bijli",
+      "frequency": 400,
+      "category": ["noun", "nature", "common"]
+    },
+    "کرے": {
+      "roman": "karey",
+      "frequency": 800,
+      "category": ["verb", "subjunctive", "common"]
+    },
+    "کرنا": {
+      "roman": "karna",
+      "frequency": 3000,
+      "category": ["verb", "common"]
+    },
+    "کرتا": {
+      "roman": "karta",
+      "frequency": 2000,
+      "category": ["verb", "common"]
+    },
+    "کرتی": {
+      "roman": "karti",
+      "frequency": 1800,
+      "category": ["verb", "common"]
+    },
+    "کرتے": {
+      "roman": "karte",
+      "frequency": 2200,
+      "category": ["verb", "common"]
+    },
+    "کیا": {
+      "roman": "kiya",
+      "frequency": 2500,
+      "category": ["verb", "past", "common"]
+    },
+    "کی": {
+      "roman": "ki",
+      "frequency": 3500,
+      "category": ["verb", "past", "common"]
+    },
+    "کئے": {
+      "roman": "kiye",
+      "frequency": 1500,
+      "category": ["verb", "past", "common"]
+    },
+    "کڑکے": {
+      "roman": "karakey",
+      "frequency": 100,
+      "category": ["verb", "poetry"]
+    },
+    "کڑکنا": {
+      "roman": "karakna",
+      "frequency": 150,
+      "category": ["verb", "common"]
+    },
+    "دل": {
+      "roman": "dil",
+      "frequency": 3000,
+      "category": ["noun", "poetry", "common"]
+    },
+    "عشق": {
+      "roman": "ishq",
+      "frequency": 800,
+      "category": ["noun", "poetry"]
+    },
+    "محبت": {
+      "roman": "mohabbat",
+      "frequency": 900,
+      "category": ["noun", "poetry"]
+    },
+    "غم": {
+      "roman": "gham",
+      "frequency": 700,
+      "category": ["noun", "poetry"]
+    },
+    "درد": {
+      "roman": "dard",
+      "frequency": 750,
+      "category": ["noun", "poetry"]
+    },
+    "خوشی": {
+      "roman": "khushi",
+      "frequency": 600,
+      "category": ["noun", "poetry"]
+    },
+    "وفا": {
+      "roman": "wafa",
+      "frequency": 550,
+      "category": ["noun", "poetry"]
+    },
+    "جفا": {
+      "roman": "jafa",
+      "frequency": 400,
+      "category": ["noun", "poetry"]
+    },
+    "زندگی": {
+      "roman": "zindagi",
+      "frequency": 900,
+      "category": ["noun", "poetry", "common"]
+    },
+    "موت": {
+      "roman": "maut",
+      "frequency": 700,
+      "category": ["noun", "poetry", "common"]
+    },
+    "دنیا": {
+      "roman": "duniya",
+      "frequency": 800,
+      "category": ["noun", "poetry", "common"]
+    },
+    "آسمان": {
+      "roman": "aasman",
+      "frequency": 650,
+      "category": ["noun", "nature", "poetry"]
+    },
+    "چاند": {
+      "roman": "chaand",
+      "frequency": 600,
+      "category": ["noun", "nature", "poetry"]
+    },
+    "سورج": {
+      "roman": "suraj",
+      "frequency": 550,
+      "category": ["noun", "nature", "common"]
+    },
+    "ستارہ": {
+      "roman": "sitarah",
+      "frequency": 450,
+      "category": ["noun", "nature", "poetry"]
+    },
+    "رات": {
+      "roman": "raat",
+      "frequency": 1200,
+      "category": ["noun", "time", "common"]
+    },
+    "صبح": {
+      "roman": "subah",
+      "frequency": 800,
+      "category": ["noun", "time", "common"]
+    },
+    "شام": {
+      "roman": "shaam",
+      "frequency": 750,
+      "category": ["noun", "time", "common"]
+    },
+    "آنکھ": {
+      "roman": "aankh",
+      "frequency": 1000,
+      "category": ["noun", "body", "common"]
+    },
+    "نظر": {
+      "roman": "nazar",
+      "frequency": 700,
+      "category": ["noun", "body", "poetry"]
+    },
+    "چہرہ": {
+      "roman": "chehra",
+      "frequency": 600,
+      "category": ["noun", "body", "common"]
+    },
+    "ہونٹ": {
+      "roman": "hont",
+      "frequency": 450,
+      "category": ["noun", "body", "poetry"]
+    },
+    "آہ": {
+      "roman": "aah",
+      "frequency": 500,
+      "category": ["noun", "emotion", "poetry"]
+    },
+    "نالہ": {
+      "roman": "nalah",
+      "frequency": 350,
+      "category": ["noun", "emotion", "poetry"]
+    },
+    "فریاد": {
+      "roman": "faryaad",
+      "frequency": 400,
+      "category": ["noun", "emotion", "poetry"]
+    },
+    "اشک": {
+      "roman": "ashk",
+      "frequency": 450,
+      "category": ["noun", "emotion", "poetry"]
+    },
+    "اور": {
+      "roman": "aur",
+      "frequency": 8000,
+      "category": ["conjunction", "common"]
+    },
+    "یا": {
+      "roman": "ya",
+      "frequency": 4000,
+      "category": ["conjunction", "common"]
+    },
+    "نہیں": {
+      "roman": "nahin",
+      "frequency": 9000,
+      "category": ["negation", "common"]
+    },
+    "نہ": {
+      "roman": "na",
+      "frequency": 6000,
+      "category": ["negation", "common"]
+    },
+    "مگر": {
+      "roman": "magar",
+      "frequency": 2000,
+      "category": ["conjunction", "common"]
+    },
+    "لیکن": {
+      "roman": "lekin",
+      "frequency": 2500,
+      "category": ["conjunction", "common"]
+    },
+    "کیوں": {
+      "roman": "kyun",
+      "frequency": 1500,
+      "category": ["question", "common"]
+    },
+    "کیا": {
+      "roman": "kya",
+      "frequency": 5000,
+      "category": ["question", "common"]
+    },
+    "کیسے": {
+      "roman": "kaise",
+      "frequency": 1200,
+      "category": ["question", "common"]
+    },
+    "کب": {
+      "roman": "kab",
+      "frequency": 1800,
+      "category": ["question", "common"]
+    },
+    "کہاں": {
+      "roman": "kahan",
+      "frequency": 1500,
+      "category": ["question", "common"]
+    },
+    "جہاں": {
+      "roman": "jahan",
+      "frequency": 1200,
+      "category": ["adverb", "common"]
+    },
+    "وہاں": {
+      "roman": "wahan",
+      "frequency": 1300,
+      "category": ["adverb", "common"]
+    },
+    "یہاں": {
+      "roman": "yahan",
+      "frequency": 1400,
+      "category": ["adverb", "common"]
+    },
+    "اب": {
+      "roman": "ab",
+      "frequency": 3000,
+      "category": ["adverb", "time", "common"]
+    },
+    "تب": {
+      "roman": "tab",
+      "frequency": 2000,
+      "category": ["adverb", "time", "common"]
+    },
+    "پھر": {
+      "roman": "phir",
+      "frequency": 3500,
+      "category": ["adverb", "common"]
+    },
+    "آج": {
+      "roman": "aaj",
+      "frequency": 2000,
+      "category": ["adverb", "time", "common"]
+    },
+    "کل": {
+      "roman": "kal",
+      "frequency": 1800,
+      "category": ["adverb", "time", "common"]
+    },
+    "کبھی": {
+      "roman": "kabhi",
+      "frequency": 2200,
+      "category": ["adverb", "common"]
+    },
+    "ہمیشہ": {
+      "roman": "hamesha",
+      "frequency": 1500,
+      "category": ["adverb", "common"]
+    },
+    "بہت": {
+      "roman": "bohat",
+      "frequency": 4000,
+      "category": ["adverb", "common"]
+    },
+    "زیادہ": {
+      "roman": "zyada",
+      "frequency": 2500,
+      "category": ["adverb", "common"]
+    },
+    "تھوڑا": {
+      "roman": "thora",
+      "frequency": 1500,
+      "category": ["adverb", "common"]
+    },
+    "بالکل": {
+      "roman": "bilkul",
+      "frequency": 2000,
+      "category": ["adverb", "common"]
+    }
+  }
+}

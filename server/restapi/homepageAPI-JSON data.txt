@@ -1,0 +1,1035 @@
+https://zauqappbackend.onrender.com/api/homepage/
+Here's the complete API documentation with 
+**request JSON data examples** and **response status codes** for all endpoints:
+
+## 🔓 Public Routes (No Authentication Required)
+
+### GET `/api/homepage/`
+Get complete homepage data
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "sections": [...],
+    "featured": {...},
+    "banners": [...],
+    "quote": {...}
+  }
+}
+```
+
+---
+
+### GET `/api/homepage/daily-quote`
+Get daily quote
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `404 Not Found` - No quote found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "quote_123",
+    "text": "The only way to do great work is to love what you do.",
+    "author": "Steve Jobs",
+    "date": "2026-06-16"
+  }
+}
+```
+
+---
+
+### GET `/api/homepage/featured?type={type}`
+Get featured content by type
+
+**Query Parameters:**
+- `type` - Optional (values: `poems`, `authors`, `books`, `audio`, `videos`)
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `400 Bad Request` - Invalid type parameter
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "type": "poems",
+    "items": [
+      {
+        "id": "poem_001",
+        "title": "Dreams",
+        "author": "Langston Hughes",
+        "coverImage": "https://example.com/cover.jpg"
+      }
+    ]
+  }
+}
+```
+
+---
+
+### GET `/api/homepage/banners`
+Get public banners (only active ones)
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "banner_001",
+      "title": "Summer Sale",
+      "imageUrl": "https://example.com/banner.jpg",
+      "link": "/sale",
+      "order": 1,
+      "isActive": true
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/homepage/config`
+Get public config (only active sections)
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "activeSections": ["hero", "featured", "banners", "dailyQuote"],
+    "theme": "light",
+    "layout": "grid"
+  }
+}
+```
+
+---
+
+## 🔐 Admin Routes (Authentication Required)
+
+### Config Management
+
+#### GET `/api/homepage/config`
+Get config (authenticated)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Insufficient permissions
+- `500 Internal Server Error` - Server error
+
+---
+
+#### GET `/api/homepage/admin/config`
+Get admin config
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "sections": [
+      {
+        "name": "hero",
+        "title": "Hero Section",
+        "isActive": true,
+        "order": 1,
+        "settings": {}
+      }
+    ],
+    "globalSettings": {
+      "siteTitle": "Zauq App",
+      "maintenanceMode": false
+    }
+  }
+}
+```
+
+---
+
+#### PUT `/api/homepage/config`
+Update config
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "globalSettings": {
+    "siteTitle": "Zauq App Updated",
+    "maintenanceMode": false,
+    "theme": "dark"
+  },
+  "seo": {
+    "description": "Premium poetry platform",
+    "keywords": ["poetry", "urdu", "shayari"]
+  }
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Config updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Config updated successfully",
+  "data": {
+    "globalSettings": {...}
+  }
+}
+```
+
+---
+
+### Section Management
+
+#### PUT `/api/homepage/admin/sections/:section`
+Update specific section
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**URL Parameters:**
+- `section` - Section name (e.g., `hero`, `featured`, `banners`)
+
+**Request Body:**
+```json
+{
+  "title": "Featured Poems",
+  "isActive": true,
+  "order": 1,
+  "settings": {
+    "layout": "grid",
+    "itemsPerPage": 12,
+    "backgroundColor": "#f5f5f5"
+  },
+  "content": {
+    "heading": "Poetry of the Day",
+    "subheading": "Explore amazing poems"
+  }
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Section updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Section not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Section updated successfully",
+  "data": {
+    "section": "featured",
+    "title": "Featured Poems",
+    "isActive": true
+  }
+}
+```
+
+---
+
+#### PATCH `/api/homepage/admin/sections/:section/toggle`
+Toggle section status (enable/disable)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**URL Parameters:**
+- `section` - Section name
+
+**Request Body:**
+```json
+{
+  "isActive": false
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Section toggled successfully
+- `400 Bad Request` - Invalid request
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Section not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Section toggled successfully",
+  "data": {
+    "section": "featured",
+    "isActive": false
+  }
+}
+```
+
+---
+
+#### PUT `/api/homepage/admin/sections/reorder`
+Reorder sections
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "sections": [
+    { "name": "hero", "order": 1 },
+    { "name": "featured", "order": 2 },
+    { "name": "banners", "order": 3 },
+    { "name": "dailyQuote", "order": 4 }
+  ]
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Sections reordered successfully
+- `400 Bad Request` - Invalid order data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Sections reordered successfully",
+  "data": {
+    "sections": [...]
+  }
+}
+```
+
+---
+
+### Banner Management (Full CRUD)
+
+#### GET `/api/homepage/admin/banners`
+Get all banners
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "banner_001",
+      "title": "Summer Sale",
+      "description": "Get 50% off",
+      "imageUrl": "https://example.com/banner1.jpg",
+      "mobileImageUrl": "https://example.com/mobile-banner1.jpg",
+      "link": "/sale",
+      "target": "_blank",
+      "order": 1,
+      "isActive": true,
+      "startDate": "2026-06-01",
+      "endDate": "2026-06-30",
+      "createdAt": "2026-05-01T10:00:00Z",
+      "updatedAt": "2026-05-15T14:30:00Z"
+    }
+  ]
+}
+```
+
+---
+
+#### GET `/api/homepage/admin/banners/:id`
+Get banner by ID
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**URL Parameters:**
+- `id` - Banner ID
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Banner not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "id": "banner_001",
+    "title": "Summer Sale",
+    "description": "Get 50% off",
+    "imageUrl": "https://example.com/banner1.jpg",
+    "isActive": true
+  }
+}
+```
+
+---
+
+#### POST `/api/homepage/admin/banners`
+Add new banner
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "title": "Winter Collection",
+  "description": "New arrivals up to 40% off",
+  "imageUrl": "https://example.com/winter-banner.jpg",
+  "mobileImageUrl": "https://example.com/mobile-winter-banner.jpg",
+  "link": "/winter-sale",
+  "target": "_blank",
+  "order": 5,
+  "isActive": true,
+  "startDate": "2026-12-01",
+  "endDate": "2026-12-31"
+}
+```
+
+**Response Status Codes:**
+- `201 Created` - Banner created successfully
+- `400 Bad Request` - Invalid data or missing required fields
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banner created successfully",
+  "data": {
+    "id": "banner_002",
+    "title": "Winter Collection",
+    "createdAt": "2026-06-16T10:00:00Z"
+  }
+}
+```
+
+---
+
+#### PUT `/api/homepage/admin/banners/:id`
+Update specific banner
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**URL Parameters:**
+- `id` - Banner ID
+
+**Request Body:**
+```json
+{
+  "title": "Updated Winter Sale",
+  "description": "Extended sale - 50% off",
+  "isActive": true,
+  "endDate": "2027-01-15"
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Banner updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Banner not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banner updated successfully",
+  "data": {
+    "id": "banner_002",
+    "title": "Updated Winter Sale",
+    "updatedAt": "2026-06-16T10:30:00Z"
+  }
+}
+```
+
+---
+
+#### DELETE `/api/homepage/admin/banners/:id`
+Remove banner
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**URL Parameters:**
+- `id` - Banner ID
+
+**Response Status Codes:**
+- `200 OK` - Banner deleted successfully
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Banner not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banner deleted successfully"
+}
+```
+
+---
+
+#### PUT `/api/homepage/admin/banners`
+Update multiple banners
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "banners": [
+    {
+      "id": "banner_001",
+      "isActive": false,
+      "order": 2
+    },
+    {
+      "id": "banner_002",
+      "title": "New Title",
+      "isActive": true
+    }
+  ]
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Banners updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banners updated successfully",
+  "data": {
+    "updatedCount": 2
+  }
+}
+```
+
+---
+
+#### POST `/api/homepage/admin/banners/reorder`
+Reorder banners
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "orders": [
+    { "id": "banner_003", "order": 1 },
+    { "id": "banner_001", "order": 2 },
+    { "id": "banner_002", "order": 3 }
+  ]
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Banners reordered successfully
+- `400 Bad Request` - Invalid order data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banners reordered successfully",
+  "data": {
+    "banners": [...]
+  }
+}
+```
+
+---
+
+#### PATCH `/api/homepage/admin/banners/:id/toggle`
+Toggle banner status
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**URL Parameters:**
+- `id` - Banner ID
+
+**Request Body:**
+```json
+{
+  "isActive": false
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Banner status toggled successfully
+- `400 Bad Request` - Invalid request
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Banner not found
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Banner status updated",
+  "data": {
+    "id": "banner_001",
+    "isActive": false
+  }
+}
+```
+
+---
+
+#### POST `/api/homepage/admin/banners/bulk`
+Bulk upload banners
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "banners": [
+    {
+      "title": "Spring Sale",
+      "imageUrl": "https://example.com/spring.jpg",
+      "link": "/spring",
+      "order": 1
+    },
+    {
+      "title": "Summer Sale",
+      "imageUrl": "https://example.com/summer.jpg",
+      "link": "/summer",
+      "order": 2
+    }
+  ]
+}
+```
+
+**Response Status Codes:**
+- `201 Created` - Banners uploaded successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "2 banners uploaded successfully",
+  "data": {
+    "created": 2,
+    "failed": 0,
+    "banners": [...]
+  }
+}
+```
+
+---
+
+### Featured Content Management
+
+#### GET `/api/homepage/admin/featured`
+Get featured content (CMS)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "poems": ["poem_001", "poem_002", "poem_003"],
+    "authors": ["author_001", "author_002"],
+    "books": ["book_001"],
+    "audio": ["audio_001", "audio_002"],
+    "videos": ["video_001"]
+  }
+}
+```
+
+---
+
+#### PUT `/api/homepage/admin/featured`
+Update featured content
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "poems": ["poem_001", "poem_002", "poem_003", "poem_004"],
+  "authors": ["author_001", "author_002", "author_003"],
+  "books": ["book_001", "book_002"],
+  "audio": ["audio_001"],
+  "videos": ["video_001", "video_002"]
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Featured content updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Featured content updated successfully",
+  "data": {
+    "updatedFields": ["poems", "authors", "books", "audio", "videos"]
+  }
+}
+```
+
+---
+
+### Quote Settings Management
+
+#### GET `/api/homepage/admin/quote-settings`
+Get quote settings
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "autoRefresh": true,
+    "refreshInterval": 24,
+    "refreshUnit": "hours",
+    "quoteSource": "database",
+    "customQuotes": [
+      {
+        "id": "quote_001",
+        "text": "Life is beautiful",
+        "author": "Unknown"
+      }
+    ],
+    "lastUpdated": "2026-06-15T00:00:00Z"
+  }
+}
+```
+
+---
+
+#### PUT `/api/homepage/admin/quote-settings`
+Update quote settings
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "autoRefresh": true,
+  "refreshInterval": 12,
+  "refreshUnit": "hours",
+  "quoteSource": "api",
+  "apiEndpoint": "https://api.quotes.com/random",
+  "customQuotes": [
+    {
+      "id": "quote_001",
+      "text": "The only limit is your mind",
+      "author": "Anonymous"
+    },
+    {
+      "text": "Dream big, work hard",
+      "author": "Motivation"
+    }
+  ]
+}
+```
+
+**Response Status Codes:**
+- `200 OK` - Quote settings updated successfully
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Quote settings updated successfully",
+  "data": {
+    "autoRefresh": true,
+    "refreshInterval": 12,
+    "lastUpdated": "2026-06-16T10:00:00Z"
+  }
+}
+```
+
+---
+
+### Stats & Analytics
+
+#### GET `/api/homepage/admin/stats`
+Get homepage statistics
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Response Status Codes:**
+- `200 OK` - Success
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `500 Internal Server Error` - Server error
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "data": {
+    "totalViews": 15234,
+    "uniqueVisitors": 5432,
+    "averageTimeOnPage": 125,
+    "sectionInteractions": {
+      "hero": 5234,
+      "featured": 3421,
+      "banners": 1234,
+      "dailyQuote": 2345
+    },
+    "topBanners": [
+      {
+        "id": "banner_001",
+        "clicks": 523,
+        "ctr": 0.12
+      }
+    ],
+    "period": "last_30_days",
+    "updatedAt": "2026-06-16T10:00:00Z"
+  }
+}
+```
+
+---
+
+## 📌 Legacy Routes (Deprecated)
+
+All legacy routes follow the same patterns as admin routes but without the `/admin` prefix or with different paths. They are maintained for backward compatibility but will be deprecated in future versions.
+
+### Common Response Status Codes for Legacy Routes:
+- `200 OK` - Success
+- `400 Bad Request` - Invalid data
+- `401 Unauthorized` - No token provided
+- `403 Forbidden` - Admin access required
+- `404 Not Found` - Resource not found
+- `500 Internal Server Error` - Server error
+
+---
+
+## 🧪 Debug & Test Routes
+
+### GET `/api/homepage/test`
+Test if router is working
+
+**Response Status Codes:**
+- `200 OK` - Router is working
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "message": "Homepage router is working!"
+}
+```
+
+---
+
+### GET `/api/homepage/debug/routes`
+Get all registered routes
+
+**Response Status Codes:**
+- `200 OK` - Success
+
+**Response Example:**
+```json
+{
+  "success": true,
+  "totalRoutes": 40,
+  "routes": [
+    "GET /api/homepage/",
+    "GET /api/homepage/daily-quote",
+    "GET /api/homepage/admin/config",
+    "..."
+  ],
+  "message": "All homepage routes loaded successfully"
+}
+```
+
+---
+
+## 🔑 Common HTTP Status Codes Summary
+
+| Status Code | Meaning | When it occurs |
+|-------------|---------|----------------|
+| 200 OK | Success | GET, PUT, PATCH requests successful |
+| 201 Created | Resource created | POST requests creating new resources |
+| 400 Bad Request | Invalid request | Missing required fields, invalid data format |
+| 401 Unauthorized | Authentication required | No token or invalid token provided |
+| 403 Forbidden | Insufficient permissions | Valid token but not admin role |
+| 404 Not Found | Resource not found | Requested ID or section doesn't exist |
+| 500 Internal Server Error | Server error | Database error, server configuration issue |
+
+## 📝 Headers Required for Admin Routes
+
+```http
+Authorization: Bearer <your_jwt_token>
+Content-Type: application/json
+```
+
+## ⚠️ Error Response Format
+
+```json
+{
+  "success": false,
+  "message": "Error description here",
+  "error": "Detailed error message (development only)"
+}
+```
