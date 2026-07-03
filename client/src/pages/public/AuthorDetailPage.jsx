@@ -9879,7 +9879,39 @@ const AuthorDetailPage = () => {
   //   )
   // }
 
-  const renderBooks = () => {
+  const DefaultCover = () => (
+  <div className="relative w-full aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-br from-[#0f172a] to-[#020617] flex flex-col justify-between p-3 border border-white/5">
+    
+    {/* gradient frame */}
+    <div className="absolute inset-2 rounded-md border border-transparent bg-gradient-to-br from-[#db2777] via-[#ec4899] to-[#DAA520] opacity-40 pointer-events-none" />
+
+    {/* glow */}
+    <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(219,39,119,0.15),transparent_60%)] pointer-events-none" />
+
+    {/* top */}
+    <div className="text-center z-10">
+      <div className="text-pink-200 text-lg font-medium leading-relaxed">
+        کتاب
+      </div>
+      <div className="w-10 h-[2px] mx-auto mt-1 bg-gradient-to-r from-[#db2777] to-[#DAA520] rounded" />
+    </div>
+
+    {/* middle */}
+    <div className="flex flex-col items-center justify-center z-10">
+      <BookMarked className="h-10 w-10 text-pink-300 opacity-90 mb-1" />
+      <span className="text-[10px] tracking-widest text-yellow-400 opacity-70">
+        NO COVER
+      </span>
+    </div>
+
+    {/* bottom */}
+    <div className="text-center text-[10px] text-pink-400 opacity-60 z-10">
+      ZAUQ LIBRARY
+    </div>
+  </div>
+)
+
+const renderBooks = () => {
   if (booksLoading) return <LoadingSkeleton />
 
   if (!books?.length) {
@@ -9924,16 +9956,14 @@ const AuthorDetailPage = () => {
                 {/* badge */}
                 {book.isPremium && (
                   <div className="absolute top-1.5 right-1.5">
-                    <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 text-white text-[10px] rounded-full">
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 bg-[#DAA520] text-white text-[10px] rounded-full">
                       <Crown className="h-3 w-3" />
                     </span>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
-                No Cover
-              </div>
+              <DefaultCover />
             )}
 
             {/* Content */}
