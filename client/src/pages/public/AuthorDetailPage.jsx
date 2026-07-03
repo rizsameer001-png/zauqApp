@@ -9879,6 +9879,7 @@ const AuthorDetailPage = () => {
   //   )
   // }
 
+// uncomment  Above code if Admin deafult cover updated-there is no sync default cover
   const DefaultCover = () => (
   <div className="relative w-full aspect-[3/4] rounded-md overflow-hidden bg-gradient-to-br from-[#0f172a] to-[#020617] flex flex-col justify-between p-3 border border-white/5">
     
