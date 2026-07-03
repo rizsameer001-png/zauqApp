@@ -8992,79 +8992,210 @@ const EbookCMSPage = () => {
     }
   };
 
-  const handleBulkUpload = async () => {
-    if (!bulkFile) {
-      toast.error('Please select a JSON file');
-      return;
-    }
+  // const handleBulkUpload = async () => {
+  //   if (!bulkFile) {
+  //     toast.error('Please select a JSON file');
+  //     return;
+  //   }
 
-    setBulkUploading(true);
-    const reader = new FileReader();
+  //   setBulkUploading(true);
+  //   const reader = new FileReader();
     
-    reader.onload = async (event) => {
-      try {
-        const booksData = JSON.parse(event.target.result);
+  //   reader.onload = async (event) => {
+  //     try {
+  //       const booksData = JSON.parse(event.target.result);
         
-        let booksArray = [];
-        if (Array.isArray(booksData)) {
-          booksArray = booksData;
-        } else if (booksData.books && Array.isArray(booksData.books)) {
-          booksArray = booksData.books;
-        } else if (booksData.data && Array.isArray(booksData.data)) {
-          booksArray = booksData.data;
-        } else {
-          toast.error('Invalid JSON format. Expected array of books or object with "books" array.');
-          return;
-        }
+  //       let booksArray = [];
+  //       if (Array.isArray(booksData)) {
+  //         booksArray = booksData;
+  //       } else if (booksData.books && Array.isArray(booksData.books)) {
+  //         booksArray = booksData.books;
+  //       } else if (booksData.data && Array.isArray(booksData.data)) {
+  //         booksArray = booksData.data;
+  //       } else {
+  //         toast.error('Invalid JSON format. Expected array of books or object with "books" array.');
+  //         return;
+  //       }
         
-        if (booksArray.length === 0) {
-          toast.error('No books found in JSON file');
-          return;
-        }
+  //       if (booksArray.length === 0) {
+  //         toast.error('No books found in JSON file');
+  //         return;
+  //       }
 
-        let successCount = 0;
-        let errorCount = 0;
-        const errors = [];
+  //       let successCount = 0;
+  //       let errorCount = 0;
+  //       const errors = [];
 
-        for (const book of booksArray) {
-          try {
-            if (!book.slug && book.title) {
-              book.slug = generateSlugFromTitle(book.title);
-            }
-            await bookAPI.createBook(book);
-            successCount++;
-          } catch (err) {
-            console.error(`Failed to upload book: ${book.title}`, err);
-            errorCount++;
-            errors.push({ title: book.title, error: err.response?.data?.message || err.message });
+  //       for (const book of booksArray) {
+  //         try {
+  //           if (!book.slug && book.title) {
+  //             book.slug = generateSlugFromTitle(book.title);
+  //           }
+  //           await bookAPI.createBook(book);
+  //           successCount++;
+  //         } catch (err) {
+  //           console.error(`Failed to upload book: ${book.title}`, err);
+  //           errorCount++;
+  //           errors.push({ title: book.title, error: err.response?.data?.message || err.message });
+  //         }
+  //       }
+
+  //       if (errorCount > 0) {
+  //         console.warn('Bulk upload errors:', errors);
+  //         toast.success(`Bulk upload complete: ${successCount} uploaded, ${errorCount} failed. Check console for details.`);
+  //       } else {
+  //         toast.success(`Successfully uploaded ${successCount} books!`);
+  //       }
+        
+  //       fetchBooks();
+  //       setShowBulkModal(false);
+  //       setBulkFile(null);
+  //     } catch (error) {
+  //       console.error('Error parsing JSON:', error);
+  //       toast.error('Invalid JSON format. Please check your file structure.');
+  //     } finally {
+  //       setBulkUploading(false);
+  //     }
+  //   };
+
+  //   reader.onerror = () => {
+  //     toast.error('Failed to read file');
+  //     setBulkUploading(false);
+  //   };
+
+  //   reader.readAsText(bulkFile);
+  // };
+
+  // client/src/pages/admin/EbookCMSPage.jsx - Replace the handleBulkUpload function
+
+const handleBulkUpload = async () => {
+  if (!bulkFile) {
+    toast.error('Please select a JSON file');
+    return;
+  }
+
+  setBulkUploading(true);
+  const reader = new FileReader();
+  
+  reader.onload = async (event) => {
+    try {
+      // Parse JSON
+      const booksData = JSON.parse(event.target.result);
+      
+      // Extract books array from various possible structures
+      let booksArray = [];
+      if (Array.isArray(booksData)) {
+        booksArray = booksData;
+      } else if (booksData.books && Array.isArray(booksData.books)) {
+        booksArray = booksData.books;
+      } else if (booksData.data && Array.isArray(booksData.data)) {
+        booksArray = booksData.data;
+      } else {
+        toast.error('Invalid JSON format. Expected array of books or object with "books" array.');
+        setBulkUploading(false);
+        return;
+      }
+      
+      if (booksArray.length === 0) {
+        toast.error('No books found in JSON file');
+        setBulkUploading(false);
+        return;
+      }
+
+      console.log(`📦 Processing ${booksArray.length} books for bulk upload`);
+      console.log('📦 Sample book:', booksArray[0]);
+
+      // Prepare books - generate slugs and validate
+      const preparedBooks = booksArray
+        .map((book, index) => {
+          // Generate slug if not provided
+          if (!book.slug && book.title) {
+            book.slug = generateSlugFromTitle(book.title);
           }
-        }
+          // Ensure slug is unique by appending index if duplicate
+          if (book.slug) {
+            // Check for duplicate slugs in the array
+            const duplicateCount = booksArray.filter(b => b.slug === book.slug).length;
+            if (duplicateCount > 1) {
+              book.slug = `${book.slug}-${index + 1}`;
+            }
+          }
+          // Validate required fields
+          if (!book.title) {
+            console.warn(`⚠️ Book at index ${index} has no title, skipping...`);
+            return null;
+          }
+          if (!book.author) {
+            console.warn(`⚠️ Book "${book.title}" has no author, skipping...`);
+            return null;
+          }
+          return book;
+        })
+        .filter(book => book !== null);
 
+      if (preparedBooks.length === 0) {
+        toast.error('No valid books to upload. Each book must have a title and author.');
+        setBulkUploading(false);
+        return;
+      }
+
+      console.log(`📦 Sending ${preparedBooks.length} books to bulk endpoint`);
+
+      // ✅ CORRECT: Call bulk API once with all books
+      const response = await bookAPI.bulkUploadBooks(preparedBooks);
+      
+      console.log('✅ Bulk upload response:', response);
+      
+      // Handle response
+      if (response.success) {
+        const { successCount = 0, errorCount = 0, errors = [], createdBooks = [] } = response.data || {};
+        
         if (errorCount > 0) {
           console.warn('Bulk upload errors:', errors);
-          toast.success(`Bulk upload complete: ${successCount} uploaded, ${errorCount} failed. Check console for details.`);
+          // Show first few errors
+          const errorSummary = errors.slice(0, 3).map(e => `• ${e.title}: ${e.error}`).join('\n');
+          const moreErrors = errors.length > 3 ? `\n... and ${errors.length - 3} more errors` : '';
+          toast.error(
+            `Bulk upload: ${successCount} succeeded, ${errorCount} failed.\n${errorSummary}${moreErrors}`,
+            { duration: 8000 }
+          );
         } else {
-          toast.success(`Successfully uploaded ${successCount} books!`);
+          toast.success(`✅ Successfully uploaded ${successCount || preparedBooks.length} books!`);
         }
         
-        fetchBooks();
+        // Refresh the book list
+        await fetchBooks();
         setShowBulkModal(false);
         setBulkFile(null);
-      } catch (error) {
-        console.error('Error parsing JSON:', error);
-        toast.error('Invalid JSON format. Please check your file structure.');
-      } finally {
-        setBulkUploading(false);
+      } else {
+        throw new Error(response.message || 'Bulk upload failed');
       }
-    };
-
-    reader.onerror = () => {
-      toast.error('Failed to read file');
+      
+    } catch (error) {
+      console.error('❌ Bulk upload error:', error);
+      
+      // Handle specific error cases
+      if (error.response?.status === 413) {
+        toast.error('File too large. Please split your JSON into smaller batches.');
+      } else if (error.response?.status === 400) {
+        toast.error(`Validation error: ${error.response?.data?.message || 'Invalid data format'}`);
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        toast.error('Authentication required. Please log in again.');
+      } else {
+        toast.error(error.response?.data?.message || error.message || 'Failed to upload books');
+      }
+    } finally {
       setBulkUploading(false);
-    };
-
-    reader.readAsText(bulkFile);
+    }
   };
+
+  reader.onerror = () => {
+    toast.error('Failed to read file');
+    setBulkUploading(false);
+  };
+
+  reader.readAsText(bulkFile);
+};
 
   const resetModal = () => {
     setShowAddModal(false);
