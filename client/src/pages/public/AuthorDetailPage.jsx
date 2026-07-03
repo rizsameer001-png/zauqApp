@@ -9848,36 +9848,138 @@ const AuthorDetailPage = () => {
     )
   }
 
+  // const renderBooks = () => {
+  //   if (booksLoading) return <LoadingSkeleton />
+  //   if (books.length === 0) return <EmptyState icon={BookMarked} title="No Books Available" message="Books by this author will appear here once added." />
+  //   return (
+  //     <>
+  //       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+  //         {books.map((book) => (
+  //           <Link key={book._id} to={`/book/${book.slug}`} className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group">
+  //             {book.coverImage && (
+  //               <div className="relative w-full aspect-[2/3] overflow-hidden">
+  //                 <img src={book.coverImage} alt={book.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+  //                 {book.isPremium && <div className="absolute top-2 right-2"><span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500 text-white text-xs rounded-full"><Crown className="h-3 w-3" />Premium</span></div>}
+  //               </div>
+  //             )}
+  //             <div className="p-4">
+  //               <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
+  //               <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
+  //               <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
+  //                 <span className="capitalize">{book.type || 'Ebook'}</span>
+  //                 <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{book.stats?.views?.toLocaleString() || 0}</span>
+  //                 <span className="flex items-center gap-1"><Download className="h-3 w-3" />{book.stats?.downloads?.toLocaleString() || 0}</span>
+  //               </div>
+  //             </div>
+  //           </Link>
+  //         ))}
+  //       </div>
+  //       <Pagination page={booksPage} totalPages={booksPagination.totalPages} onPageChange={setBooksPage} isLoading={booksFetching} />
+  //     </>
+  //   )
+  // }
+
   const renderBooks = () => {
-    if (booksLoading) return <LoadingSkeleton />
-    if (books.length === 0) return <EmptyState icon={BookMarked} title="No Books Available" message="Books by this author will appear here once added." />
+  if (booksLoading) return <LoadingSkeleton />
+
+  if (!books?.length) {
     return (
-      <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {books.map((book) => (
-            <Link key={book._id} to={`/book/${book.slug}`} className="block bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl transition-all group">
-              {book.coverImage && (
-                <div className="relative h-48 overflow-hidden">
-                  <img src={book.coverImage} alt={book.title} loading="lazy" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                  {book.isPremium && <div className="absolute top-2 right-2"><span className="flex items-center gap-0.5 px-1.5 py-0.5 bg-amber-500 text-white text-xs rounded-full"><Crown className="h-3 w-3" />Premium</span></div>}
-                </div>
-              )}
-              <div className="p-4">
-                <h4 className="font-medium text-gray-900 line-clamp-1">{book.title}</h4>
-                <p className="text-sm text-gray-500 line-clamp-2 mt-1">{book.description}</p>
-                <div className="flex items-center gap-3 mt-2 text-xs text-gray-400">
-                  <span className="capitalize">{book.type || 'Ebook'}</span>
-                  <span className="flex items-center gap-1"><Eye className="h-3 w-3" />{book.stats?.views?.toLocaleString() || 0}</span>
-                  <span className="flex items-center gap-1"><Download className="h-3 w-3" />{book.stats?.downloads?.toLocaleString() || 0}</span>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-        <Pagination page={booksPage} totalPages={booksPagination.totalPages} onPageChange={setBooksPage} isLoading={booksFetching} />
-      </>
+      <EmptyState
+        icon={BookMarked}
+        title="No Books Available"
+        message="Books by this author will appear here once added."
+      />
     )
   }
+
+  return (
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4">
+        {books.map((book) => (
+          <Link
+            key={book._id}
+            to={`/book/${book.slug}`}
+            className="block bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-md transition group"
+          >
+            {/* Cover */}
+            {book.coverImage ? (
+              <div className="relative w-full aspect-[3/4] bg-gray-100 flex items-center justify-center overflow-hidden">
+                
+                {/* soft bg fill */}
+                <img
+                  src={book.coverImage}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover blur-lg scale-110 opacity-25"
+                />
+
+                {/* full visible image */}
+                <img
+                  src={book.coverImage}
+                  alt={book.title || "Book cover"}
+                  loading="lazy"
+                  className="relative max-w-full max-h-full object-contain group-hover:scale-105 transition"
+                />
+
+                {/* badge */}
+                {book.isPremium && (
+                  <div className="absolute top-1.5 right-1.5">
+                    <span className="flex items-center gap-1 px-1.5 py-0.5 bg-amber-500 text-white text-[10px] rounded-full">
+                      <Crown className="h-3 w-3" />
+                    </span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="w-full aspect-[3/4] bg-gray-100 flex items-center justify-center text-gray-400 text-xs">
+                No Cover
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="p-2.5">
+              <h4 className="text-sm font-medium text-gray-900 line-clamp-1">
+                {book.title || "Untitled"}
+              </h4>
+
+              <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
+                {book.description || "No description"}
+              </p>
+
+              <div className="flex items-center justify-between mt-1.5 text-[11px] text-gray-500">
+                <span className="capitalize truncate">
+                  {book.type || "ebook"}
+                </span>
+
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center gap-0.5">
+                    <Eye className="h-3 w-3" />
+                    {book.stats?.views ?? 0}
+                  </span>
+
+                  <span className="flex items-center gap-0.5">
+                    <Download className="h-3 w-3" />
+                    {book.stats?.downloads ?? 0}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Pagination */}
+      <div className="mt-4">
+        <Pagination
+          page={booksPage}
+          totalPages={booksPagination?.totalPages || 1}
+          onPageChange={setBooksPage}
+          isLoading={booksFetching}
+        />
+      </div>
+    </>
+  )
+}
 
   const renderAudio = () => {
     if (audioLoading) return <LoadingSkeleton />
