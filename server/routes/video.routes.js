@@ -158,9 +158,69 @@
 
 
 
+// // server/routes/video.routes.js
+// import express from 'express';
+// import { protect, creatorOnly } from '../middleware/auth.js';
+// import {
+//   uploadCreatorVideo,
+//   getCreatorVideos,
+//   getCreatorPresets,
+//   getCreatorStatistics,
+//   getCreatorVideo,
+//   updateCreatorVideo,
+//   deleteCreatorVideo,
+//   publishCreatorVideo,
+//   unpublishCreatorVideo,
+//   bulkDeleteCreatorVideos,
+//   getVideoAnalytics
+// } from '../controllers/creator.video.controller.js';
+
+// const router = express.Router();
+
+// // ============================================
+// // PUBLIC VIDEO ROUTES
+// // ============================================
+// // Add your public video routes here
+
+// // ============================================
+// // CREATOR VIDEO ROUTES
+// // ============================================
+// router.post('/creator/upload', protect, creatorOnly, uploadCreatorVideo);
+// router.get('/creator', protect, creatorOnly, getCreatorVideos);
+// router.get('/creator/presets', protect, creatorOnly, getCreatorPresets);
+// router.get('/creator/statistics', protect, creatorOnly, getCreatorStatistics);
+// router.get('/creator/:id', protect, creatorOnly, getCreatorVideo);
+// router.put('/creator/:id', protect, creatorOnly, updateCreatorVideo);
+// router.delete('/creator/:id', protect, creatorOnly, deleteCreatorVideo);
+// router.patch('/creator/:id/publish', protect, creatorOnly, publishCreatorVideo);
+// router.patch('/creator/:id/unpublish', protect, creatorOnly, unpublishCreatorVideo);
+// router.post('/creator/bulk-delete', protect, creatorOnly, bulkDeleteCreatorVideos);
+// router.get('/creator/:id/analytics', protect, creatorOnly, getVideoAnalytics);
+
+// export default router;
+
+
+
+
+
+
+
+
 // server/routes/video.routes.js
 import express from 'express';
-import { protect, creatorOnly } from '../middleware/auth.js';
+import { protect, creatorOnly, optionalAuth } from '../middleware/auth.js';
+import { cacheMiddleware } from '../middleware/cache.js';
+import {
+  getVideos,
+  getVideoBySlug,
+  createVideo,
+  updateVideo,
+  deleteVideo,
+  getFeaturedVideos,
+  getVideoStream,
+  getVideoSubtitles,
+  bulkCreateVideos
+} from '../controllers/video.controller.js';
 import {
   uploadCreatorVideo,
   getCreatorVideos,
@@ -178,9 +238,21 @@ import {
 const router = express.Router();
 
 // ============================================
-// PUBLIC VIDEO ROUTES
+// PUBLIC VIDEO ROUTES (ADD THESE BACK!)
 // ============================================
-// Add your public video routes here
+router.get('/', cacheMiddleware(300), getVideos);
+router.get('/featured', cacheMiddleware(600), getFeaturedVideos);
+router.get('/:slug', optionalAuth, getVideoBySlug);
+router.get('/:slug/stream', getVideoStream);
+router.get('/:slug/subtitles', getVideoSubtitles);
+
+// ============================================
+// ADMIN VIDEO ROUTES
+// ============================================
+router.post('/', protect, createVideo);
+router.put('/:id', protect, updateVideo);
+router.delete('/:id', protect, deleteVideo);
+router.post('/bulk', protect, bulkCreateVideos);
 
 // ============================================
 // CREATOR VIDEO ROUTES
